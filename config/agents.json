@@ -1,0 +1,164 @@
+{
+  "version": "1.0.0",
+  "description": "Heimdall Predefined Agent Registry — Model-agnostic engineering personas with specialized skill bundles",
+  "agents": {
+    "orchestrator": {
+      "name": "Orchestrator & Architecture Sentinel",
+      "capabilityTier": "deep_reasoning",
+      "description": "Enforces planning gates (/grill-me), teases out hidden assumptions, creates modular execution plans, and coordinates subagent handoffs.",
+      "vendorPreferences": {
+        "gemini": "gemini-4",
+        "claude": "claude-opus-5-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "brainstorming",
+        "writing-plans",
+        "subagent-driven-development",
+        "dispatching-parallel-agents",
+        "using-git-worktrees",
+        "writing-skills",
+        "executing-plans"
+      ]
+    },
+    "frontend-designer": {
+      "name": "Frontend & UI Design Engineer",
+      "capabilityTier": "high_polish_vision",
+      "description": "Enforces design systems, typography hierarchy, token adherence, aesthetic cohesion, and anti-slop visual rules for desktop/web surfaces.",
+      "vendorPreferences": {
+        "gemini": "gemini-3.8-flash",
+        "claude": "claude-sonnet-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "taste-skill",
+        "taste-skill-v1",
+        "gpt-tasteskill",
+        "brandkit",
+        "minimalist-skill",
+        "brutalist-skill",
+        "soft-skill",
+        "antislop-ui",
+        "antislop-human",
+        "stitch-skill",
+        "image-to-code-skill",
+        "imagegen-frontend-web",
+        "redesign-skill"
+      ]
+    },
+    "mobile-designer": {
+      "name": "Mobile & Responsive UI Engineer",
+      "capabilityTier": "responsive_flex_safety",
+      "description": "Guarantees mobile layout integrity, touch-target sizing (48px+), zero-clipping overflow flex containers, and responsive viewport safety.",
+      "vendorPreferences": {
+        "gemini": "gemini-3.8-flash",
+        "claude": "claude-sonnet-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "antislop-layoutmobile",
+        "antislop-human",
+        "antislop-ui",
+        "imagegen-frontend-mobile",
+        "taste-skill"
+      ]
+    },
+    "tester": {
+      "name": "Verification & TDD Engineer",
+      "capabilityTier": "fast_verification",
+      "description": "Enforces strict Test-Driven Development (TDD). Mandates failing automated tests before implementation, boundary testing, and negative error coverage.",
+      "vendorPreferences": {
+        "gemini": "gemini-3.8-flash",
+        "claude": "claude-sonnet-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "test-driven-development",
+        "verification-before-completion",
+        "systematic-debugging",
+        "executing-plans"
+      ]
+    },
+    "security-auditor": {
+      "name": "AppSec & Differential Security Auditor",
+      "capabilityTier": "deep_assurance_audit",
+      "description": "Performs dynamic differential HTTP probing across unprivileged/admin roles, audits OWASP Top 10 vulnerabilities, and detects insecure default configurations.",
+      "vendorPreferences": {
+        "gemini": "gemini-4",
+        "claude": "claude-opus-5-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "strix-security",
+        "security-audit-sweep",
+        "owasp-security",
+        "cloudflare-security-audit",
+        "snyk-agent-scan",
+        "trailofbits-audit-context",
+        "trailofbits-insecure-defaults",
+        "trailofbits-triage-brocards"
+      ]
+    },
+    "database-architect": {
+      "name": "Database & Data Storage Architect",
+      "capabilityTier": "schema_migration_safety",
+      "description": "Governs schema migrations, normalization, query optimization, connection pooling, and transaction safety across PostgreSQL, SQLite, MySQL, and NoSQL.",
+      "vendorPreferences": {
+        "gemini": "gemini-3.1-pro",
+        "claude": "claude-sonnet-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "postgres-best-practices",
+        "systematic-debugging",
+        "karpathy-guidelines"
+      ]
+    },
+    "code-sentinel": {
+      "name": "Code Restraint & Anti-Slop Sentinel",
+      "capabilityTier": "surgical_restraint",
+      "description": "Demands minimal surgical edits, strips redundant comments and defensive bloat, purges dead code, and enforces clean branch hygiene.",
+      "vendorPreferences": {
+        "gemini": "gemini-3.8-flash",
+        "claude": "claude-sonnet-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "karpathy-guidelines",
+        "antislop",
+        "antislop-code",
+        "antislop-copywriting",
+        "antislop-human",
+        "finishing-a-development-branch",
+        "document-organizer"
+      ]
+    },
+    "reviewer": {
+      "name": "Adversarial Code Reviewer",
+      "capabilityTier": "adversarial_diff_eval",
+      "description": "Performs adversarial pull request and diff critiques, identifies edge-case regressions, and coordinates cross-model validation reviews.",
+      "vendorPreferences": {
+        "gemini": "gemini-4",
+        "claude": "claude-opus-5-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "requesting-code-review",
+        "receiving-code-review",
+        "claude-collaborator",
+        "gemini-collaborator",
+        "using-superpowers",
+        "diagnosing-superpowers",
+        "output-skill"
+      ]
+    }
+  }
+}

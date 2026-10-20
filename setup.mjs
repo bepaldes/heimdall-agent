@@ -36,16 +36,39 @@ const colors = {
 
 const userHome = os.homedir();
 const skillsDir = path.join(__dirname, 'skills');
+const agentsDir = path.join(__dirname, 'agents');
+const playbooksDir = path.join(__dirname, 'playbooks');
 const toolsDir = path.join(__dirname, 'tools');
 const doctrineDir = path.join(__dirname, 'doctrine');
 const profilesPath = path.join(__dirname, 'config', 'profiles.json');
 const modelsPath = path.join(__dirname, 'config', 'models.json');
+const agentsConfigPath = path.join(__dirname, 'config', 'agents.json');
 
 const targetPaths = {
   claude: path.join(userHome, '.claude', 'skills'),
   gemini: path.join(userHome, '.gemini', 'skills'),
   codex: path.join(userHome, '.codex', 'skills'),
   agents: path.join(userHome, '.agents', 'skills')
+};
+
+const targetAgentPaths = {
+  claude: path.join(userHome, '.claude', 'agents'),
+  gemini: path.join(userHome, '.gemini', 'agents'),
+  codex: path.join(userHome, '.codex', 'agents'),
+  agents: path.join(userHome, '.agents', 'agents')
+};
+
+const targetDoctrinePaths = {
+  claude: path.join(userHome, '.claude', 'CLAUDE.md'),
+  gemini: path.join(userHome, '.gemini', 'GEMINI.md'),
+  codex: path.join(userHome, '.codex', 'AGENTS.md'),
+  agents: path.join(userHome, '.agents', 'AGENTS.md')
+};
+
+const targetPlaybookPaths = {
+  claude: path.join(userHome, '.claude', 'playbooks'),
+  gemini: path.join(userHome, '.gemini', 'playbooks'),
+  agents: path.join(userHome, '.agents', 'playbooks')
 };
 
 function printBanner() {
@@ -424,6 +447,50 @@ function copyDirectory(src, dest, dryRun = false) {
   return count;
 }
 
+function deployAgentContracts(targetDir, link = false, clean = false, dryRun = false, agentsList = null) {
+  if (!fs.existsSync(agentsDir)) return 0;
+  const allFiles = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
+  const agentFiles = agentsList ? allFiles.filter(f => agentsList.includes(f)) : allFiles;
+
+  if (link && agentFiles.length === allFiles.length) {
+    linkDirectory(agentsDir, targetDir, dryRun);
+    return agentFiles.length;
+  }
+
+  if (!dryRun && !fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+
+  if (clean) {
+    cleanTargetDirectory(targetDir, dryRun);
+  }
+
+  let count = 0;
+  for (const file of agentFiles) {
+    const src = path.join(agentsDir, file);
+    const dest = path.join(targetDir, file);
+    if (!dryRun) {
+      fs.copyFileSync(src, dest);
+    }
+    count++;
+  }
+  return count;
+}
+
+function cleanLegacyLocalAgents(dryRun = false) {
+  const parksAppAgents = path.join(path.dirname(__dirname), 'parks-app', '.claude', 'agents');
+  if (fs.existsSync(parksAppAgents)) {
+    try {
+      if (!dryRun) {
+        fs.rmSync(parksAppAgents, { recursive: true, force: true });
+        linkDirectory(agentsDir, parksAppAgents, false);
+      }
+      return parksAppAgents;
+    } catch {}
+  }
+  return null;
+}
+
 function deployGlobalShims(targetToolsDir, dryRun = false) {
   if (!targetToolsDir) return;
   if (!dryRun && !fs.existsSync(targetToolsDir)) {
@@ -501,6 +568,10 @@ async function runSync(options, detected) {
     .filter(d => d.isDirectory())
     .map(d => d.name);
 
+  const allAvailableAgents = fs.existsSync(agentsDir)
+    ? fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'))
+    : [];
+
   let syncedAny = false;
 
   for (const [agent, targetDir] of Object.entries(targetPaths)) {
@@ -516,8 +587,14 @@ async function runSync(options, detected) {
         ? fs.readdirSync(targetDir, { withFileTypes: true }).filter(d => d.name !== '.system')
         : [];
 
-      if (!exists || currentSkills.length < allAvailableSkills.length) {
-        console.log(`-> Newly active harness detected: ${colors.bold}${agent.toUpperCase()}${colors.reset} (${targetDir})`);
+      const targetAgentDir = targetAgentPaths[agent];
+      const agentExists = fs.existsSync(targetAgentDir);
+      const currentAgents = agentExists
+        ? fs.readdirSync(targetAgentDir).filter(f => f.endsWith('.md'))
+        : [];
+
+      if (!exists || currentSkills.length < allAvailableSkills.length || !agentExists || currentAgents.length < allAvailableAgents.length) {
+        console.log(`-> Newly active harness detected: ${colors.bold}${agent.toUpperCase()}${colors.reset}`);
         if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
 
         let count = 0;
@@ -527,10 +604,30 @@ async function runSync(options, detected) {
           linkDirectory(srcSkill, destSkill, false);
           count++;
         }
-        console.log(`   ${colors.green}✔ Linked ${count} skills via NTFS Junctions${colors.reset}\n`);
+
+        let agentCount = 0;
+        if (targetAgentDir) {
+          agentCount = deployAgentContracts(targetAgentDir, true, false, false);
+        }
+
+        // Synchronize doctrine & playbooks
+        const targetDocFile = targetDoctrinePaths[agent];
+        const srcDoc = path.join(doctrineDir, 'AGENTS.md');
+        if (targetDocFile && fs.existsSync(srcDoc)) {
+          const parentDir = path.dirname(targetDocFile);
+          if (fs.existsSync(parentDir)) fs.copyFileSync(srcDoc, targetDocFile);
+        }
+
+        const targetPlayDir = targetPlaybookPaths[agent];
+        if (targetPlayDir && fs.existsSync(playbooksDir)) {
+          const parentDir = path.dirname(targetPlayDir);
+          if (fs.existsSync(parentDir)) linkDirectory(playbooksDir, targetPlayDir, false);
+        }
+
+        console.log(`   ${colors.green}✔ Linked ${count} skills and ${agentCount} predefined agents via Live Junctions${colors.reset}\n`);
         syncedAny = true;
       } else {
-        console.log(`  ${colors.green}✔${colors.reset} ${agent.toUpperCase().padEnd(8)}: 100% in sync (${currentSkills.length} skills active)`);
+        console.log(`  ${colors.green}✔${colors.reset} ${agent.toUpperCase().padEnd(8)}: 100% in sync (${currentSkills.length} skills, ${currentAgents.length} agents active)`);
       }
     }
   }
@@ -585,11 +682,17 @@ function runAudit(options) {
     .filter(d => d.isDirectory())
     .map(d => d.name);
 
-  console.log(`Repository Canonical Skills: ${colors.green}${availableSkills.length}${colors.reset}\n`);
+  const availableAgents = fs.existsSync(agentsDir)
+    ? fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'))
+    : [];
+
+  console.log(`Repository Canonical Skills:    ${colors.green}${availableSkills.length}${colors.reset}`);
+  console.log(`Repository Predefined Agents:   ${colors.green}${availableAgents.length}${colors.reset}\n`);
 
   const unlinkedTools = [];
 
   for (const [agent, targetDir] of Object.entries(targetPaths)) {
+    const targetAgentDir = targetAgentPaths[agent];
     if (fs.existsSync(targetDir)) {
       const entries = fs.readdirSync(targetDir, { withFileTypes: true })
         .filter(d => (d.isDirectory() || d.isSymbolicLink()) && d.name !== '.system');
@@ -610,7 +713,11 @@ function runAudit(options) {
         ? ` (${colors.cyan}Live Junctions / Single Source of Truth${colors.reset})`
         : linkedCount > 0 ? ` (${linkedCount} linked, ${installed.length - linkedCount} copies)` : ' (Static copies)';
 
-      console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${statusColor}${installed.length} skills${colors.reset} in ${targetDir}${linkLabel}`);
+      const agentCount = fs.existsSync(targetAgentDir)
+        ? fs.readdirSync(targetAgentDir).filter(f => f.endsWith('.md')).length
+        : 0;
+
+      console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${statusColor}${installed.length} skills, ${agentCount} agents${colors.reset} in ${path.dirname(targetDir)}${linkLabel}`);
 
       if (installed.length === 0) {
         unlinkedTools.push(agent);
@@ -626,8 +733,8 @@ function runAudit(options) {
   }
 
   if (unlinkedTools.length > 0) {
-    console.log(`\n${colors.yellow}${colors.bold}[!] Notice:${colors.reset} Installed tools missing skill links: ${unlinkedTools.join(', ')}`);
-    console.log(`    Run ${colors.cyan}heimdall sync${colors.reset} to link skills automatically in 1 second.`);
+    console.log(`\n${colors.yellow}${colors.bold}[!] Notice:${colors.reset} Installed tools missing skill/agent links: ${unlinkedTools.join(', ')}`);
+    console.log(`    Run ${colors.cyan}heimdall sync${colors.reset} to link automatically in 1 second.`);
   }
 
   const activeToolsDir = options.toolsDir || detected.pathCandidates[0];
@@ -640,7 +747,7 @@ function runAudit(options) {
   }
 
   const activeDoctrine = options.doctrinePath || (detected.doctrineCandidates.find(p => fs.existsSync(p)) || detected.doctrineCandidates[0]);
-  console.log(`\n${colors.bold}Universal Doctrine:${colors.reset}`);
+  console.log(`\n${colors.bold}Universal Doctrine & Playbooks:${colors.reset}`);
   if (fs.existsSync(activeDoctrine)) {
     console.log(`  ${colors.green}Active at ${activeDoctrine}${colors.reset}`);
   } else {
@@ -862,6 +969,32 @@ async function main() {
     console.log(`   ${colors.green}✔ ${modeVerb} ${installedCount} skills to ${agent}${colors.reset}`);
   }
 
+  // 3.b Deploy Predefined Agents
+  console.log(`\n${colors.bold}${colors.cyan}--- Deploying Predefined Agents ---${colors.reset}`);
+  const allAvailableAgents = fs.existsSync(agentsDir)
+    ? fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'))
+    : [];
+  const agentsToInstall = (selectedProfile.agents === '*' || !selectedProfile.agents)
+    ? allAvailableAgents
+    : selectedProfile.agents.map(a => `${a}.md`).filter(f => allAvailableAgents.includes(f));
+
+  for (const [agent, targetDir] of activeDestinations) {
+    const targetAgentDir = targetAgentPaths[agent];
+    if (targetAgentDir) {
+      const count = deployAgentContracts(targetAgentDir, options.link, options.clean, options.dryRun, agentsToInstall);
+      const modeVerb = options.link ? 'Linked (NTFS Junctions)' : 'Synchronized';
+      console.log(`   ${colors.green}✔ ${modeVerb} ${count} predefined agents to ${agent} (${targetAgentDir})${colors.reset}`);
+    }
+  }
+
+  // Cleanup legacy local agents if clean requested
+  if (options.clean) {
+    const cleanedLocal = cleanLegacyLocalAgents(options.dryRun);
+    if (cleanedLocal) {
+      console.log(`   ${colors.yellow}✔ Cleaned legacy local agents in ${cleanedLocal} and linked canonical registry${colors.reset}`);
+    }
+  }
+
   // 4. Configure Claude Desktop if selected or in 'all'
   if (options.agents.includes('desktop') || options.agents.includes('all')) {
     const claudeDesktopDir = getClaudeDesktopDir();
@@ -906,16 +1039,42 @@ async function main() {
     console.log(`   ${colors.green}✔ Deployed ${tools.length} cross-model bridge tools + 'heimdall' global CLI shim${colors.reset}`);
   }
 
-  // 6. Deploy universal doctrine if requested
-  if (options.doctrine && options.doctrinePath) {
-    console.log(`\n-> Deploying Universal Doctrine to ${colors.bold}${options.doctrinePath}${colors.reset}...`);
+  // 6. Deploy universal doctrine & playbooks if requested
+  if (options.doctrine) {
+    console.log(`\n-> Deploying Universal Doctrine & Playbooks...`);
     const srcDoc = path.join(doctrineDir, 'AGENTS.md');
     if (fs.existsSync(srcDoc) && !options.dryRun) {
-      const docParent = path.dirname(options.doctrinePath);
-      if (!fs.existsSync(docParent)) fs.mkdirSync(docParent, { recursive: true });
-      fs.copyFileSync(srcDoc, options.doctrinePath);
+      if (options.doctrinePath) {
+        const docParent = path.dirname(options.doctrinePath);
+        if (!fs.existsSync(docParent)) fs.mkdirSync(docParent, { recursive: true });
+        fs.copyFileSync(srcDoc, options.doctrinePath);
+        console.log(`   ${colors.green}✔ Universal AGENTS.md doctrine active at ${options.doctrinePath}${colors.reset}`);
+      }
+
+      // Synchronize doctrine across all active harnesses
+      for (const [agent, targetDocFile] of Object.entries(targetDoctrinePaths)) {
+        const parentDir = path.dirname(targetDocFile);
+        if (fs.existsSync(parentDir)) {
+          fs.copyFileSync(srcDoc, targetDocFile);
+          console.log(`   ${colors.green}✔ Synchronized doctrine to ${targetDocFile}${colors.reset}`);
+        }
+      }
+
+      // Synchronize playbooks
+      if (fs.existsSync(playbooksDir)) {
+        for (const [agent, targetPlayDir] of Object.entries(targetPlaybookPaths)) {
+          const parentDir = path.dirname(targetPlayDir);
+          if (fs.existsSync(parentDir)) {
+            if (options.link) {
+              linkDirectory(playbooksDir, targetPlayDir, options.dryRun);
+            } else {
+              copyDirectory(playbooksDir, targetPlayDir, options.dryRun);
+            }
+            console.log(`   ${colors.green}✔ Synchronized playbooks to ${targetPlayDir}${colors.reset}`);
+          }
+        }
+      }
     }
-    console.log(`   ${colors.green}✔ Universal AGENTS.md doctrine active at ${options.doctrinePath}${colors.reset}`);
   }
 
   console.log(`\n${colors.bold}${colors.green}=== Heimdall Installation Complete! ===${colors.reset}\n`);

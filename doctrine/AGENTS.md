@@ -41,13 +41,17 @@ When in plan mode or handling a `/plan` request in any project:
      - Implement fast, verify slow with high effort.
      - Verification is not a checkbox: write automated tests first (TDD), assert non-zero bounding box visual renders, check error/regression paths, and run full boundary checks.
    - **Orchestrator Role & Specialized Subagent Dispatch is DEFAULT**:
-     - The agent handling the plan acts as the **Orchestrator**.
-     - Break plans into distinct phases and dispatch specialized parallel subagents:
-       - 🎨 **Designer**: Enforces design systems, tokens, zero clipping, anti-slop.
-       - 🧪 **Tester**: Writes failing tests, covers edge cases and regressions.
-       - 🛡️ **Security Auditor**: Verifies IAM, differential HTTP probes, input sanitization.
-       - 🧹 **Code Hygiene**: Scans dead code, unreferenced exports, boundary violations.
-       - ⚖️ **Adversarial Reviewer**: Performs deep diff critique before completion.
+     - The agent handling the plan acts as the **Orchestrator** (`orchestrator`).
+     - Break plans into distinct phases and dispatch specialized parallel subagents from Heimdall's Predefined Agent Registry (`~/.agents/agents/` / `~/.claude/agents/` / `~/.gemini/agents/`):
+       - 📋 **`orchestrator`**: Planning gatekeeper, requirement grilling, modular plan decomposition.
+       - 🎨 **`frontend-designer`**: Web design systems, tokens, typography, anti-slop UI, WCAG AAA.
+       - 📱 **`mobile-designer`**: Mobile viewport safety, touch targets (48px+), zero-clipping flex bounds.
+       - 🧪 **`tester`**: Writes failing tests first (TDD), verifies bounds, edge cases, negative coverage.
+       - 🛡️ **`security-auditor`**: Differential HTTP probing (anon/user/admin), OWASP, Trail of Bits.
+       - 🗄️ **`database-architect`**: Safe migrations, indexing, pooling, queries (Postgres/Supabase, SQLite, MySQL, NoSQL).
+       - 🧹 **`code-sentinel`**: Karpathy simplicity (minimum code), anti-slop code/copywriting, dead-code purging.
+       - ⚖️ **`reviewer`**: Adversarial diff critique, regression detection, cross-model verification.
+     - **Model-Agnostic Execution**: All agent contracts default to `model: inherit`. They run automatically on whichever model your active harness is using, preserving single-vendor autonomy (Gemini-only, Claude-only, or Codex-only). Cross-model reviews occur via dedicated bridges when configured.
    - **Tri-Directional Cross-Model Reviews are DEFAULT**:
      - Tasks executed by Claude $\rightarrow$ Gemini validates (`powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`) or Codex validates (`powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`).
      - Tasks executed by Gemini $\rightarrow$ Claude validates (`powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`) or Codex validates (`powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`).

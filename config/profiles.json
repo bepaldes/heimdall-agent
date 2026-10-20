@@ -2,12 +2,13 @@
   "profiles": {
     "full": {
       "name": "Full Powerhouse",
-      "description": "Complete 48-skill suite: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
-      "skills": "*"
+      "description": "Complete 49-skill suite & 8 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
+      "skills": "*",
+      "agents": "*"
     },
     "minimal": {
       "name": "Lean & Surgical",
-      "description": "Core 15-skill suite for essential planning, surgical coding, anti-slop, and verification.",
+      "description": "Core 15-skill suite & 4 core agents for essential planning, surgical coding, anti-slop, and verification.",
       "skills": [
         "brainstorming",
         "writing-plans",
@@ -24,6 +25,12 @@
         "systematic-debugging",
         "project-hygiene",
         "finishing-a-development-branch"
+      ],
+      "agents": [
+        "orchestrator",
+        "tester",
+        "code-sentinel",
+        "reviewer"
       ]
     },
     "security": {
@@ -42,11 +49,17 @@
         "systematic-debugging",
         "verification-before-completion",
         "antislop"
+      ],
+      "agents": [
+        "orchestrator",
+        "security-auditor",
+        "tester",
+        "reviewer"
       ]
     },
     "design": {
       "name": "Frontend & Taste Studio",
-      "description": "14-skill design engineering, token systems, GSAP motion, and aesthetic craftsmanship.",
+      "description": "14-skill design engineering, token systems, responsive mobile layouts, and aesthetic craftsmanship.",
       "skills": [
         "taste-skill",
         "taste-skill-v1",
@@ -62,6 +75,12 @@
         "image-to-code-skill",
         "imagegen-frontend-web",
         "imagegen-frontend-mobile"
+      ],
+      "agents": [
+        "orchestrator",
+        "frontend-designer",
+        "mobile-designer",
+        "code-sentinel"
       ]
     }
   }

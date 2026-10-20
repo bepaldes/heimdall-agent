@@ -3,11 +3,12 @@
 <p align="left">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
+  <a href="#predefined-agents-8-specialized-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
   <a href="#skill-inventory-49-curated-skills"><img src="https://img.shields.io/badge/skills-49%20frozen-blueviolet.svg?style=flat-square" alt="Skills: 49 Frozen" /></a>
   <a href="#supported-runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Desktop-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
-**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes 49 version-frozen skills across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
+**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **49 version-frozen skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
 
 ---
 
@@ -297,17 +298,47 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 
 ## 7. Profiles
 
-| Profile | Skills | Primary Focus | Best For |
-| :--- | :---: | :--- | :--- |
-| **`full`** | 49 | Complete engineering suite: planning, antislop, design, security, hygiene, database | Everyday development across all runtimes |
-| **`minimal`** | 15 | Lean core: planning, Karpathy simplicity, TDD, antislop, hygiene | Fast workflows, lightweight laptops, beginners |
-| **`security`** | 12 | Differential HTTP probing, OWASP top 10, Snyk scans, Trail of Bits checks | Penetration testing & pre-deployment audits |
-| **`design`** | 14 | Design tokens, responsive layouts, motion curves, antislop UI rules | Frontend development & design system work |
+| Profile | Skills | Predefined Agents | Primary Focus | Best For |
+| :--- | :---: | :---: | :--- | :--- |
+| **`full`** | 49 | 8 (All) | Complete engineering suite: planning, antislop, design, security, hygiene, database | Everyday development across all runtimes |
+| **`minimal`** | 15 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer` | Fast workflows, lightweight laptops, beginners |
+| **`security`** | 12 | 4 | Security posture: `orchestrator`, `security-auditor`, `tester`, `reviewer` | Penetration testing & pre-deployment audits |
+| **`design`** | 14 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel` | Frontend development & design system work |
+
+---
+
+<a id="predefined-agents-8-specialized-personas"></a>
+## 8. Predefined Agent Roster (8 Specialized Personas)
+
+Heimdall equips your engineering harnesses with **8 specialized, model-agnostic agent personas**. Each agent is pre-configured with explicit behavioral contracts and bound to a curated subset of Heimdall's 49 skills.
+
+### Model-Agnostic Execution (`model: inherit`)
+To prevent vendor lock-in and support single-vendor setups, all agent contracts declare `model: inherit` (or omit `model:`):
+* **Single-Vendor Autonomy**: If your machine only runs **Google Antigravity (`agy`)**, all agents execute on your active Gemini model. If you only run **OpenAI Codex CLI**, they run on your active Codex model. They will **never** fail by attempting to reach an unconfigured external vendor.
+* **Per-Harness Capability Mapping**: [`config/agents.json`](config/agents.json) defines runtime-specific preferences so multi-model setups automatically dispatch the optimal model per task.
+
+| Persona | Capability Tier | Key Role & Contract | Associated Skill Bundle |
+| :--- | :--- | :--- | :--- |
+| **`orchestrator`** | `deep_reasoning` | Planning gatekeeper (`/grill-me`), requirements interrogation, modular task decomposition, and subagent handoffs. | `brainstorming`, `writing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills` |
+| **`frontend-designer`** | `high_polish_vision` | Enforces Section 0.B "Design Read", design token mappings, typographic hierarchy, and anti-slop UI aesthetics for web surfaces. | `taste-skill`, `taste-skill-v1`, `gpt-tasteskill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill` |
+| **`mobile-designer`** | `responsive_flex_safety` | Dedicated to mobile viewports (320px–430px), minimum 48px touch targets, zero-clipping overflow flex containers, and responsive assets. | `antislop-layoutmobile`, `antislop-human`, `antislop-ui`, `imagegen-frontend-mobile`, `taste-skill` |
+| **`tester`** | `fast_verification` | Enforces Test-Driven Development (TDD). Mandates authoring failing automated tests *before* code logic, plus boundary and negative coverage. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `executing-plans` |
+| **`security-auditor`** | `deep_assurance_audit` | Dynamic differential HTTP probing (anonymous vs unprivileged vs admin), OWASP Top 10 defenses, and Trail of Bits insecure defaults detection. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
+| **`database-architect`** | `schema_migration_safety` | Governs non-destructive schema migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL, NoSQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
+| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments and defensive dead-code, and purges AI slop. | `karpathy-guidelines`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch`, `document-organizer` |
+| **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions, verifies test assertions, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
+
+### How Agents Are Deployed
+Running `node setup.mjs --clean --link --yes` (or `heimdall sync`) links all 8 agent contracts via Live Junctions into:
+* **Claude Code**: `~/.claude/agents/` (natively invokable by name)
+* **Google Antigravity**: `~/.gemini/agents/` & universal `.agents/`
+* **OpenAI Codex CLI**: `~/.codex/agents/`
+* **Shared Multi-Agent**: `~/.agents/agents/`
 
 ---
 
 <a id="supported-runtimes"></a>
-## 8. Supported Runtimes & Cross-Platform Matrix
+## 9. Supported Runtimes & Cross-Platform Matrix
 
 Heimdall operates across **Windows**, **macOS**, and **Linux**. It automatically selects native directory junctions (`junction`) on Windows or standard directory symlinks (`ln -s`) on POSIX systems.
 
@@ -347,7 +378,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 ---
 
 <a id="skill-inventory-49-curated-skills"></a>
-## 9. Skill Inventory (49 Curated Skills)
+## 10. Skill Inventory (49 Curated Skills)
 
 <details open>
 <summary><b>1. Planning & Verification Discipline (10 skills)</b></summary>
@@ -435,7 +466,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 
 ---
 
-## 10. Companion Remote Orchestrators
+## 11. Companion Remote Orchestrators
 
 For multi-device pair programming and mobile monitoring, Heimdall integrates with:
 
