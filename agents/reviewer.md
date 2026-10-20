@@ -9,6 +9,7 @@ skills:
   - receiving-code-review
   - claude-collaborator
   - gemini-collaborator
+  - codex-collaborator
   - using-superpowers
   - diagnosing-superpowers
   - output-skill

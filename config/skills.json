@@ -1,7 +1,166 @@
 {
-  "version": "1.0.0",
-  "description": "Heimdall Canonical Skill Registry & Upstream Provenance Catalog",
+  "version": "1.2.0",
+  "description": "Heimdall Canonical Skill Registry & 15-Suite Hierarchy",
+  "totalSuites": 15,
+  "totalModules": 50,
   "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+  "suites": {
+    "superpowers": {
+      "name": "Superpowers Software Engineering Suite",
+      "type": "Multi-Skill Suite",
+      "upstream": "https://github.com/obra/superpowers",
+      "modules": [
+        "brainstorming",
+        "writing-plans",
+        "executing-plans",
+        "subagent-driven-development",
+        "dispatching-parallel-agents",
+        "test-driven-development",
+        "systematic-debugging",
+        "verification-before-completion",
+        "finishing-a-development-branch",
+        "using-git-worktrees",
+        "requesting-code-review",
+        "receiving-code-review",
+        "using-superpowers",
+        "diagnosing-superpowers",
+        "writing-skills"
+      ]
+    },
+    "taste-studio": {
+      "name": "Taste Design & Aesthetic Studio",
+      "type": "Multi-Skill Suite",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "taste-skill",
+        "taste-skill-v1",
+        "gpt-tasteskill",
+        "brandkit",
+        "minimalist-skill",
+        "brutalist-skill",
+        "soft-skill",
+        "redesign-skill",
+        "image-to-code-skill",
+        "stitch-skill",
+        "imagegen-frontend-web",
+        "imagegen-frontend-mobile"
+      ]
+    },
+    "antislop": {
+      "name": "Anti-Slop Quality & Token Efficiency Suite",
+      "type": "Multi-Skill Suite",
+      "upstream": "https://github.com/obra/antislop",
+      "modules": [
+        "antislop",
+        "antislop-code",
+        "antislop-copywriting",
+        "antislop-ui",
+        "antislop-human",
+        "antislop-layoutmobile",
+        "caveman"
+      ]
+    },
+    "cross-model-bridges": {
+      "name": "Tri-Directional Cross-Model Bridges",
+      "type": "Multi-Skill Suite",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "claude-collaborator",
+        "gemini-collaborator",
+        "codex-collaborator"
+      ]
+    },
+    "trailofbits-appsec": {
+      "name": "Trail of Bits High-Assurance AppSec Suite",
+      "type": "Multi-Skill Suite",
+      "upstream": "https://github.com/trailofbits/skills",
+      "modules": [
+        "trailofbits-audit-context",
+        "trailofbits-insecure-defaults",
+        "trailofbits-triage-brocards"
+      ]
+    },
+    "ponytail": {
+      "name": "Ponytail Code Restraint",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/DietrichGebert/ponytail",
+      "modules": [
+        "ponytail"
+      ]
+    },
+    "karpathy-guidelines": {
+      "name": "Karpathy Simplicity Guidelines",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/karpathy/guidelines",
+      "modules": [
+        "karpathy-guidelines"
+      ]
+    },
+    "strix-security": {
+      "name": "Strix Differential Security Probing",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/strix-security/strix",
+      "modules": [
+        "strix-security"
+      ]
+    },
+    "owasp-security": {
+      "name": "OWASP Top 10 Web Defense",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "owasp-security"
+      ]
+    },
+    "cloudflare-security-audit": {
+      "name": "Cloudflare Edge & WAF Security",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "cloudflare-security-audit"
+      ]
+    },
+    "snyk-agent-scan": {
+      "name": "Snyk Dependency & Vulnerability Scan",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "snyk-agent-scan"
+      ]
+    },
+    "postgres-best-practices": {
+      "name": "Supabase Postgres Best Practices",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/supabase/postgres-best-practices",
+      "modules": [
+        "postgres-best-practices"
+      ]
+    },
+    "project-hygiene": {
+      "name": "Project & Workspace Hygiene Sentinel",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "project-hygiene"
+      ]
+    },
+    "output-skill": {
+      "name": "Structured Analysis & Output Formatting",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "output-skill"
+      ]
+    },
+    "caveman": {
+      "name": "Caveman Chat Token Brevity Protocol",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/JuliusBrussee/caveman",
+      "modules": [
+        "caveman"
+      ]
+    }
+  },
   "skills": {
     "antislop": {
       "name": "antislop",
@@ -392,6 +551,14 @@
       "category": "Multi-Agent & Review",
       "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
       "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "codex-collaborator": {
+      "name": "codex-collaborator",
+      "category": "Multi-Agent & Review",
+      "description": "Coordinate with OpenAI Codex CLI (codex.exe) to cross-validate changes, request second-opinion reviews on git diffs, or validate test runs.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
       "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
     }

@@ -4,11 +4,11 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#predefined-agents-8-specialized-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
-  <a href="#skill-inventory-49-curated-skills"><img src="https://img.shields.io/badge/skills-49%20frozen-blueviolet.svg?style=flat-square" alt="Skills: 49 Frozen" /></a>
+  <a href="#skill-inventory-15-curated-suites--toolkits--50-modules"><img src="https://img.shields.io/badge/skills-15%20suites%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 15 Suites (50 Modules)" /></a>
   <a href="#supported-runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Desktop-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
-**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **49 version-frozen skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
+**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **15 curated skill suites (50 modular capabilities)** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
 
 ---
 
@@ -24,7 +24,7 @@
 - [7. Profiles](#7-profiles)
 - [8. Predefined Agent Roster (8 Specialized Personas)](#predefined-agents-8-specialized-personas)
 - [9. Supported Runtimes & Cross-Platform Matrix](#supported-runtimes)
-- [10. Skill Inventory (49 Curated Skills)](#skill-inventory-49-curated-skills)
+- [10. Skill Inventory (15 Curated Suites & Toolkits / 50 Modules)](#skill-inventory-15-curated-suites--toolkits--50-modules)
 - [11. Companion Remote Orchestrators & Architectural Memory](#11-companion-remote-orchestrators)
 - [License](#license)
 
@@ -341,10 +341,10 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 
 | Profile | Skills | Predefined Agents | Primary Focus | Best For |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** | 49 | 8 (All) | Complete engineering suite: planning, antislop, design, security, hygiene, database | Everyday development across all runtimes |
-| **`minimal`** | 15 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer` | Fast workflows, lightweight laptops, beginners |
-| **`security`** | 12 | 4 | Security posture: `orchestrator`, `security-auditor`, `tester`, `reviewer` | Penetration testing & pre-deployment audits |
-| **`design`** | 14 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel` | Frontend development & design system work |
+| **`full`** | 15 Suites (50 modules) | 8 (All) | Complete engineering suite: planning, antislop, design, security, hygiene, database | Everyday development across all runtimes |
+| **`minimal`** | 16 modules | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer` | Fast workflows, lightweight laptops, beginners |
+| **`security`** | 12 modules | 4 | Security posture: `orchestrator`, `security-auditor`, `tester`, `reviewer` | Penetration testing & pre-deployment audits |
+| **`design`** | 14 modules | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel` | Frontend development & design system work |
 
 [↑ Back to top](#table-of-contents)
 
@@ -353,7 +353,7 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 <a id="predefined-agents-8-specialized-personas"></a>
 ## 8. Predefined Agent Roster (8 Specialized Personas)
 
-Heimdall equips your engineering harnesses with **8 specialized, model-agnostic agent personas**. Each agent is pre-configured with explicit behavioral contracts and bound to a curated subset of Heimdall's 49 skills.
+Heimdall equips your engineering harnesses with **8 specialized, model-agnostic agent personas**. Each agent is pre-configured with explicit behavioral contracts and bound to a curated subset of Heimdall's 50 skills.
 
 ### Model-Agnostic Execution (`model: inherit`)
 To prevent vendor lock-in and support single-vendor setups, all agent contracts declare `model: inherit` (or omit `model:`):
@@ -369,7 +369,7 @@ To prevent vendor lock-in and support single-vendor setups, all agent contracts 
 | **`security-auditor`** | `deep_assurance_audit` | Dynamic differential HTTP probing (anonymous vs unprivileged vs admin), OWASP Top 10 defenses, and Trail of Bits insecure defaults detection. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
 | **`database-architect`** | `schema_migration_safety` | Governs non-destructive schema migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL, NoSQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
 | **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments and defensive dead-code, and purges AI slop. | `karpathy-guidelines`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
-| **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions, verifies test assertions, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
+| **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions, verifies test assertions, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
 
 ### How Agents Are Deployed
 Running `node setup.mjs --clean --link --yes` (or `heimdall sync`) links all 8 agent contracts via Live Junctions into:
@@ -424,13 +424,13 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 
 ---
 
-<a id="skill-inventory-49-curated-skills"></a>
-## 10. Skill Inventory (49 Curated Skills)
+<a id="skill-inventory-15-curated-suites--toolkits--50-modules"></a>
+## 10. Skill Inventory (15 Curated Suites & Toolkits / 50 Modules)
 
-> For full trigger conditions, descriptions, and upstream repository links for every skill, see the complete [Skills Directory](docs/SKILLS.md).
+Heimdall organizes capabilities into **15 Primary Toolkits & Suites (50 modular capabilities)**. For full trigger conditions, descriptions, and upstream repository links for every skill, see the complete [Skills Directory](docs/SKILLS.md).
 
 <details open>
-<summary><b>1. Planning & Verification Discipline (10 skills)</b></summary>
+<summary><b>1. Superpowers Engineering Suite (10 planning & verification modules)</b></summary>
 
 - `brainstorming`: Surfaces implicit assumptions and explores alternatives before design lock.
 - `writing-plans`: Structures modular, bite-sized tasks with verifiable completion criteria.
@@ -446,7 +446,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 </details>
 
 <details>
-<summary><b>2. Anti-Slop Guardrails & Token Efficiency (7 skills)</b></summary>
+<summary><b>2. Anti-Slop Quality & Token Efficiency Suite (7 modules)</b></summary>
 
 - `antislop`: Core guardrail prohibiting generic AI filler, fake buzzwords, and decorative bloat.
 - `antislop-code`: Prohibits redundant comments, defensive dead code, and speculative abstractions.
@@ -459,7 +459,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 </details>
 
 <details>
-<summary><b>3. Design Engineering & Aesthetics (12 skills)</b></summary>
+<summary><b>3. Taste Design & Aesthetic Studio (12 modules)</b></summary>
 
 - `taste-skill`: Enforces cohesive design reads, purpose-driven typography, and brand-first color logic.
 - `taste-skill-v1`: Baseline visual hierarchy and layout balance heuristics.
@@ -477,7 +477,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 </details>
 
 <details>
-<summary><b>4. Security & Differential Probing (8 skills)</b></summary>
+<summary><b>4. Security & Differential Probing (8 modules)</b></summary>
 
 - `strix-security`: Dynamic differential HTTP probing across anonymous, unprivileged, and admin actors.
 - `security-audit-sweep`: Automated surface scan for exposed credentials, open ports, and risky calls.
@@ -491,7 +491,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 </details>
 
 <details>
-<summary><b>5. Architecture, Database & Platform (3 skills)</b></summary>
+<summary><b>5. Architecture, Database & Platform (3 modules)</b></summary>
 
 - `postgres-best-practices`: Supabase-curated guidelines for indexing, connection pooling, and migrations.
 - `project-hygiene`: Audits recoverable disk space, detects dead code, and purges build caches.
@@ -500,12 +500,13 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 </details>
 
 <details>
-<summary><b>6. Multi-Agent Orchestration & Review (9 skills)</b></summary>
+<summary><b>6. Multi-Agent Orchestration & Cross-Model Bridges (10 modules)</b></summary>
 
 - `subagent-driven-development`: Decomposes large tasks into isolated subagents with specialized briefs.
 - `dispatching-parallel-agents`: Coordinates concurrent subagent workers on independent branches.
 - `claude-collaborator`: Cross-model delegation bridge to Claude Opus / Sonnet for deep review.
 - `gemini-collaborator`: Cross-model delegation bridge to Gemini for high-velocity workspace scans.
+- `codex-collaborator`: Cross-model delegation bridge to OpenAI Codex CLI (Astra) for adversarial reviews.
 - `requesting-code-review`: Formats structured diff context for adversarial peer review.
 - `receiving-code-review`: Parses peer critiques objectively and implements verified recommendations.
 - `using-superpowers`: Multi-agent operational playbook for complex software development.

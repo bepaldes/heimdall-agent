@@ -698,8 +698,21 @@ function runAudit(options) {
     ? fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'))
     : [];
 
-  console.log(`Repository Canonical Skills:    ${colors.green}${availableSkills.length}${colors.reset}`);
-  console.log(`Repository Predefined Agents:   ${colors.green}${availableAgents.length}${colors.reset}\n`);
+  let suiteCountText = '';
+  if (fs.existsSync(skillsConfigPath)) {
+    try {
+      const catalog = JSON.parse(fs.readFileSync(skillsConfigPath, 'utf8'));
+      if (catalog.totalSuites) {
+        suiteCountText = `${catalog.totalSuites} Suites (${availableSkills.length} modular capabilities)`;
+      }
+    } catch {}
+  }
+  if (!suiteCountText) {
+    suiteCountText = `${availableSkills.length} modular capabilities`;
+  }
+
+  console.log(`Repository Canonical Skills:    ${colors.green}${suiteCountText}${colors.reset}`);
+  console.log(`Repository Predefined Agents:   ${colors.green}${availableAgents.length} Specialized Personas${colors.reset}\n`);
 
   const unlinkedTools = [];
 
@@ -878,7 +891,7 @@ async function runInteractive(options, detected) {
 }
 
 function runListSkills() {
-  console.log(`${colors.bold}${colors.cyan}=== Heimdall Canonical Skills Catalog ===${colors.reset}\n`);
+  console.log(`${colors.bold}${colors.cyan}=== Heimdall Canonical Skills & Suites Catalog ===${colors.reset}\n`);
 
   if (!fs.existsSync(skillsConfigPath)) {
     console.log(`${colors.red}Registry file not found at ${skillsConfigPath}${colors.reset}`);
@@ -887,25 +900,40 @@ function runListSkills() {
 
   const catalog = JSON.parse(fs.readFileSync(skillsConfigPath, 'utf8'));
   const skills = catalog.skills || {};
-  const skillNames = Object.keys(skills);
+  const suites = catalog.suites || {};
+  const totalSuites = catalog.totalSuites || Object.keys(suites).length;
+  const totalModules = catalog.totalModules || Object.keys(skills).length;
 
-  console.log(`Total Canonical Skills: ${colors.bold}${skillNames.length}${colors.reset}\n`);
+  console.log(`Architecture: ${colors.bold}${colors.green}${totalSuites} Primary Toolkits & Suites (${totalModules} modular capabilities)${colors.reset}\n`);
 
-  const groups = {};
-  for (const name of skillNames) {
-    const s = skills[name];
-    const cat = s.category || 'General';
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push(s);
-  }
-
-  for (const [cat, list] of Object.entries(groups)) {
-    console.log(`${colors.yellow}${colors.bold}${cat} (${list.length})${colors.reset}`);
-    for (const item of list) {
-      console.log(`  • ${colors.bold}${item.name.padEnd(32)}${colors.reset} ${colors.dim}${item.upstream}${colors.reset}`);
+  // 1. Multi-Skill Core Suites
+  console.log(`${colors.bold}${colors.yellow}CORE MULTI-SKILL SUITES:${colors.reset}`);
+  console.log(`${colors.dim}------------------------------------------------------------------------${colors.reset}`);
+  for (const [key, suite] of Object.entries(suites)) {
+    if (suite.type === 'Multi-Skill Suite') {
+      console.log(`\n📦 ${colors.bold}${colors.cyan}${suite.name}${colors.reset} (${suite.modules.length} modules)`);
+      console.log(`   ${colors.dim}Upstream: ${suite.upstream}${colors.reset}`);
+      for (const mod of suite.modules) {
+        const modInfo = skills[mod];
+        const descPreview = modInfo && modInfo.description ? `— ${modInfo.description.slice(0, 55)}...` : '';
+        console.log(`   • ${colors.bold}${mod.padEnd(32)}${colors.reset} ${colors.dim}${descPreview}${colors.reset}`);
+      }
     }
-    console.log('');
   }
+
+  // 2. Standalone Toolkits
+  console.log(`\n\n${colors.bold}${colors.yellow}STANDALONE POWER TOOLKITS:${colors.reset}`);
+  console.log(`${colors.dim}------------------------------------------------------------------------${colors.reset}`);
+  for (const [key, suite] of Object.entries(suites)) {
+    if (suite.type === 'Standalone Toolkit') {
+      const mod = suite.modules[0];
+      const modInfo = skills[mod];
+      const descPreview = modInfo && modInfo.description ? `— ${modInfo.description.slice(0, 48)}...` : '';
+      console.log(`⚡ ${colors.bold}${mod.padEnd(28)}${colors.reset} ${colors.dim}${descPreview}${colors.reset}`);
+    }
+  }
+
+  console.log(`\n${colors.dim}Run 'heimdall update-skill <name|all>' to inspect provenance and updates.${colors.reset}\n`);
 }
 
 function runUpdateSkill(targetSkill = 'all') {
