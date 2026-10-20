@@ -1,10 +1,52 @@
 # `heimdall-agent` — Autonomous Multi-Agent Sentinel & Quality Bootstrapper
 
-> Named after **Heimdall**, the all-seeing Norse guardian sentinel who perceives every sound, sees across all realms, and guards the Bifröst with unyielding vigilance. In your development environment, `heimdall-agent` guards against hallucinated AI slop, enforces boundary contracts, and orchestrates multi-agent pairing across **Google Antigravity**, **Claude Code**, and **OpenAI Codex CLI**.
+> Named after **Heimdall**, the all-seeing Norse guardian sentinel who perceives every sound, sees across all realms, and guards the Bifröst with unyielding vigilance. In your development environment, `heimdall-agent` guards against hallucinated AI slop, enforces boundary contracts, prevents speculative code bloat, and orchestrates multi-agent pairing across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
 
 ---
 
-## 1. Quickstart: 1-Click Bootstrap
+## 1. Why `heimdall-agent`? (The Core Benefits)
+
+Standard AI coding setups often degrade into a guessing game: agents hallucinate outdated library methods, produce generic "AI-slop" code, bypass architectural boundaries, and rush into writing speculative bloat without understanding edge cases.
+
+`heimdall-agent` transforms your AI from a sloppy assistant into a rigorous, disciplined engineering team:
+
+1. **Mandatory Interactive Grilling Gate**:
+   - Forbids any agent from touching code until it has surfaced hidden assumptions, asked 2–3 probing questions about edge cases, and proposed alternative architectural tradeoffs.
+2. **Fast Implementation, Deep Slow Verification**:
+   - Enforces **Karpathy simplicity guidelines** (minimal code, surgical edits, no bloat) while demanding **deep verification** (TDD failing tests first, Playwright E2E visible bounding-box assertions, and negative error coverage).
+3. **Specialized Subagent Orchestration**:
+   - Rather than relying on a single generalist prompt, `heimdall-agent` provides dedicated subagent role briefs:
+     - 🎨 **Designer**: Enforces design systems, tokens (`@podium/tokens`), and zero-clipping invariants.
+     - 🧪 **Tester**: Writes failing tests first, covers concurrency, error paths, and regression suites.
+     - 🛡️ **Security Auditor**: Conducts differential HTTP probing (`strix-security`) and least-privilege checks.
+     - 🧹 **Code Hygiene**: Scans for dead code (`knip`/`ts-prune`), removes unused exports, and polices module boundaries.
+     - ⚖️ **Adversarial Reviewer**: Conducts deep diff scrutiny before any branch is completed.
+4. **Live Documentation (Context7 MCP) & Database Safety**:
+   - Ships with **Context7 MCP** to fetch live, version-accurate documentation from Upstash, eliminating API hallucinations.
+   - Includes **`postgres-best-practices`** (maintained by Supabase) for query optimization, migration idempotency, composite index design, and connection pool sizing.
+5. **Universal Multi-Agent Parity & Version Freeze**:
+   - All 49 curated skills are version-frozen in this repository. Upstream breaking changes or external prompt alterations will never destabilize your workstation.
+   - Synchronizes 100% identically across Antigravity, Claude Code, and Codex CLI.
+
+---
+
+## 2. Universal Model Resilience & Quota Failover Matrix
+
+Rate limits and quota cooldowns are a reality across **all** frontier AI models (whether Gemini 4 Argon, Claude Opus 5.5, or GPT-6 Astra). When a model hits its quota limit, your workflow should **never stall**.
+
+`heimdall-agent` enforces an automatic cross-model fallback matrix:
+
+| Task Domain | Primary Flagship | High-Throughput Fallback | Cross-Provider Fallback |
+| :--- | :--- | :--- | :--- |
+| **Broad Context / Scaffolding** | Gemini 4 Argon (`argon`) | **Gemini 3.1 Pro** (2M context) | Claude Opus 5.5 (`claude-opus-5-5`) |
+| **High-Velocity Coding** | Claude Sonnet 5.5 (`claude-sonnet-5-5`) | **Gemini 3.8 Flash** (unlimited throughput) | GPT-6 Astra (`gpt-6-astra`) |
+| **Deep Reasoning & Bug Hunting**| Claude Opus 5.5 (`claude-opus-5-5`) | **GPT-6 Astra** (`gpt-6-astra`) | Gemini 3.1 Pro (`gemini-3.1-pro`) |
+| **Adversarial Diff Review** | Gemini 4 Argon (`gemini-bridge review`) | **Gemini 3.8 Flash** (`gemini-bridge review`) | GPT-6 Astra (`codex-bridge review`) |
+| **Fast Sanity Checks / Scans** | Gemini 3.8 Flash (`gemini-3.8-flash`) | Claude Haiku 4.5 (`claude-haiku-4-5`) | GPT-6 Astra (`gpt-6-astra`) |
+
+---
+
+## 3. Quickstart: 1-Click Bootstrap
 
 On any new workstation or fresh Windows install:
 
@@ -19,7 +61,7 @@ node setup.mjs
 
 Or run non-interactively with a preset profile:
 ```powershell
-# Full 48-skill multi-agent powerhouse
+# Full 49-skill multi-agent powerhouse
 node setup.mjs --profile full --yes
 
 # Minimal lean setup (Claude only, 15 core skills)
@@ -31,60 +73,50 @@ node setup.mjs --audit
 
 ---
 
-## 2. Supported AI Runtimes
+## 4. Supported AI Runtimes
 
-| Harness | Family | Target Directory | Discovery Mechanism |
+| Harness | Target Directory | Primary Models | Discovery Mechanism |
 | :--- | :--- | :--- | :--- |
-| **Google Antigravity** | Gemini 4 Argon / Gemini 3.8 Flash / Gemini 3.1 Pro | `~/.gemini/skills/` | Dynamic Progressive Disclosure |
-| **Claude Code** | Claude Opus 5.5 / Claude Sonnet 5.5 / Fable 5.1 | `~/.claude/skills/` | Dynamic Progressive Disclosure |
-| **OpenAI Codex CLI** | GPT-6 Astra (via GhostCLI) | `~/.codex/skills/` | Dynamic Progressive Disclosure |
-| **Shared Multi-Agent** | Portable fallback | `~/.agents/skills/` | Universal Hierarchical Traversal |
-| **Claude Desktop / Web**| Claude 3.7 / 3.5 Sonnet | `%APPDATA%\Claude\` & `playbooks/` | System Instructions & MCP Config |
+| **Google Antigravity** | `~/.gemini/skills/` | Gemini 4 Argon, 3.8 Flash, 3.1 Pro | Dynamic Progressive Disclosure |
+| **Claude Code** | `~/.claude/skills/` | Claude Opus 5.5, Sonnet 5.5, Fable 5.1 | Dynamic Progressive Disclosure |
+| **OpenAI Codex CLI** | `~/.codex/skills/` | GPT-6 Astra (via GhostCLI) | Dynamic Progressive Disclosure |
+| **Shared Multi-Agent** | `~/.agents/skills/` | Universal fallback registry | Universal Hierarchical Traversal |
+| **Claude Desktop** | `%APPDATA%\Claude\` | Claude 3.7 / 3.5 Sonnet | Automatic `claude_desktop_config.json` |
+| **Web AI & IDEs** | `playbooks/` & `.cursorrules` | Cursor, Windsurf, ChatGPT, Claude Projects | Standalone Prompt Packs |
 
 ---
 
-## 3. Profiles
+## 5. Companion Tools & Remote Workflow Recommendations
 
-Configure exactly which capabilities to deploy:
+For modern multi-agent development and remote orchestration, `heimdall-agent` integrates smoothly with the following complementary developer tools:
 
-- **`full` (Default, 48 skills)**: Everything. Process, Anti-Slop, Design Systems, Differential Security, Hygiene, and Cross-Agent Bridges.
-- **`minimal` (15 skills)**: Fast, lean, and surgical. Planning, TDD, Anti-Slop, Taste-Skill, and Project Hygiene.
-- **`security` (12 skills)**: Penetration testing, Strix differential HTTP probing, OWASP, Snyk, and Trail of Bits audits.
-- **`design` (14 skills)**: Frontend design engineering, token enforcement, GSAP motion, and Brandkit.
+1. **[Herdr (`herdr.dev`)](https://herdr.dev/)**:
+   - A terminal-native agent multiplexer written in Rust.
+   - Keeps your background agent tasks and terminal panes running persistently on remote servers or workstations even across network disconnects.
+   - Monitors agent states (`working`, `blocked`, `idle`) with a clean socket/CLI API.
+2. **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**:
+   - A specialized mobile SSH and Mosh client (iOS/Android) built specifically for monitoring and steering AI coding agents on the go.
+   - Pairs with `tmux` or `herdr` on your machine, enabling push notifications for agent decision gates, prompt approvals from your phone, and voice-to-terminal input.
 
 ---
 
-## 4. Desktop & Web AI Playbooks (`playbooks/`)
+## 6. Desktop & Web AI Playbooks (`playbooks/`)
 
 For AI assistants that don't support dynamic filesystem skill discovery (Claude Desktop, Cursor, ChatGPT, Claude Web Projects), `heimdall-agent` includes copy-pasteable prompt playbooks:
 
-- **`playbooks/01-interactive-grilling-gate.md`**: Enforces the 3-point questioning gate before any code is generated.
-- **`playbooks/02-fast-code-deep-verification.md`**: Mandates surgical Karpathy code paired with deep TDD verification.
-- **`playbooks/03-adversarial-code-review.md`**: Critical diff review and security sanity checks.
-- **`playbooks/04-design-system-and-taste.md`**: Design Read declaration, anti-default tokens, and zero-clipping overflow protection.
+- **[`playbooks/01-interactive-grilling-gate.md`](playbooks/01-interactive-grilling-gate.md)**: Enforces the 3-point questioning gate before any code is generated.
+- **[`playbooks/02-fast-code-deep-verification.md`](playbooks/02-fast-code-deep-verification.md)**: Mandates surgical Karpathy implementation paired with deep TDD verification.
+- **[`playbooks/03-adversarial-code-review.md`](playbooks/03-adversarial-code-review.md)**: Critical diff review and security sanity checks.
+- **[`playbooks/04-design-system-and-taste.md`](playbooks/04-design-system-and-taste.md)**: Design Read declaration, anti-default tokens, and zero-clipping invariants.
 
 ---
 
-## 5. Universal Doctrine (`doctrine/AGENTS.md`)
+## 7. Pushing to Your GitHub
 
-`heimdall-agent` installs the universal cross-agent doctrine at `C:\Apps\AGENTS.md`, establishing:
-1. **Interactive Grilling Gate**: Forbids unreviewed code generation.
-2. **Quota Resilience**: Instant fallback when Gemini 4 reaches quota limits (Gemini 3.8 Flash, 3.1 Pro, Claude Sonnet 5.5, GPT-6 Astra).
-3. **Specialized Subagent Roles**: Designer, Tester, Security Auditor, Code Hygiene, and Adversarial Reviewer.
-4. **Cross-Model Bridge Tools**: Bi-directional review loops via `claude-bridge`, `gemini-bridge`, and `codex-bridge`.
-
----
-
-## 6. Pushing to Your GitHub
-
-To link this local setup to your GitHub account:
+To publish this setup to your GitHub account:
 
 ```powershell
 cd C:\Apps\heimdall-agent
-git init
-git add .
-git commit -m "feat: initial release of heimdall-agent multi-agent sentinel"
-git branch -M main
 git remote add origin https://github.com/bepaldes/heimdall-agent.git
 git push -u origin main
 ```
