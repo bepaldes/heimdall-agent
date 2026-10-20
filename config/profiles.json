@@ -1,0 +1,68 @@
+{
+  "profiles": {
+    "full": {
+      "name": "Full Powerhouse",
+      "description": "Complete 48-skill suite: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
+      "skills": "*"
+    },
+    "minimal": {
+      "name": "Lean & Surgical",
+      "description": "Core 15-skill suite for essential planning, surgical coding, anti-slop, and verification.",
+      "skills": [
+        "brainstorming",
+        "writing-plans",
+        "subagent-driven-development",
+        "executing-plans",
+        "karpathy-guidelines",
+        "antislop",
+        "antislop-code",
+        "antislop-human",
+        "antislop-ui",
+        "taste-skill",
+        "test-driven-development",
+        "verification-before-completion",
+        "systematic-debugging",
+        "project-hygiene",
+        "finishing-a-development-branch"
+      ]
+    },
+    "security": {
+      "name": "Security & Pentesting Sentinel",
+      "description": "12-skill security posture, differential HTTP probing, OWASP, Snyk, and Trail of Bits audits.",
+      "skills": [
+        "security-audit-sweep",
+        "strix-security",
+        "cloudflare-security-audit",
+        "owasp-security",
+        "snyk-agent-scan",
+        "trailofbits-audit-context",
+        "trailofbits-insecure-defaults",
+        "trailofbits-triage-brocards",
+        "project-hygiene",
+        "systematic-debugging",
+        "verification-before-completion",
+        "antislop"
+      ]
+    },
+    "design": {
+      "name": "Frontend & Taste Studio",
+      "description": "14-skill design engineering, token systems, GSAP motion, and aesthetic craftsmanship.",
+      "skills": [
+        "taste-skill",
+        "taste-skill-v1",
+        "gpt-tasteskill",
+        "brandkit",
+        "stitch-skill",
+        "soft-skill",
+        "minimalist-skill",
+        "brutalist-skill",
+        "redesign-skill",
+        "antislop-ui",
+        "antislop-layoutmobile",
+        "image-to-code-skill",
+        "imagegen-frontend-web",
+        "imagegen-frontend-mobile"
+      ]
+    }
+  }
+}

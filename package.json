@@ -1,0 +1,31 @@
+{
+  "name": "heimdall-agent",
+  "version": "1.0.0",
+  "description": "Autonomous multi-agent engineering & quality sentinel. Manages 48 vetted skills, cross-model bridges, and universal doctrine across Gemini, Claude, Codex, and Claude Desktop.",
+  "type": "module",
+  "bin": {
+    "heimdall": "./setup.mjs"
+  },
+  "scripts": {
+    "setup": "node setup.mjs",
+    "audit": "node setup.mjs --audit",
+    "minimal": "node setup.mjs --profile minimal",
+    "full": "node setup.mjs --profile full"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bepaldes/heimdall-agent.git"
+  },
+  "keywords": [
+    "ai-agents",
+    "claude-code",
+    "antigravity",
+    "gemini",
+    "codex",
+    "superpowers",
+    "skills",
+    "quality-gates"
+  ],
+  "author": "Bernardo Paldes",
+  "license": "MIT"
+}
