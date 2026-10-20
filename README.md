@@ -65,7 +65,7 @@ node setup.mjs --clean --link --yes
 
 > **Prefer a guided wizard?** Simply run `node setup.mjs` without flags to interactively choose specific agent harnesses, custom directories, and profile tiers.
 >
-> **Global terminal access**: Setup automatically places `heimdall` on your PATH. You can also run `npm link` to register the package globally.
+> **Global terminal access**: Setup automatically places `heimdall` on your PATH (or run `npm link`). You can verify your installation and inspect all options anytime with `heimdall --help`.
 
 ### Step 2: Choose Your Profile
 * **`full` (Default, 49 skills)**: Complete engineering powerhouse (planning, security, UI, database, hygiene).
@@ -145,7 +145,61 @@ Selecting an option installs skills and configs strictly to the targeted runtime
 
 ## 5. Daily CLI Usage & Complete Parameter Reference
 
-> **`heimdall` vs. `node setup.mjs`**: They are the **exact same tool**. `heimdall` is the globally accessible terminal shortcut created by `setup.mjs` (or via `npm link`). Any command or flag shown below can be run as either `heimdall <command>` or `node setup.mjs <command>`.
+> **`heimdall` vs. `node setup.mjs`**: They are the **exact same tool**. `heimdall` is the globally accessible terminal shortcut created by `setup.mjs` (or via `npm link`). Any command or flag shown below can be run interchangeably as either `heimdall <command>` or `node setup.mjs <command>`.
+
+### Built-in Terminal Help (`heimdall --help`)
+
+You can view the full interactive reference anytime by running:
+
+```powershell
+heimdall --help
+# or
+heimdall help
+# or (from the repository root before global link)
+node setup.mjs --help
+```
+
+<details open>
+<summary><b>Click to preview <code>heimdall --help</code> terminal output</b></summary>
+
+```text
+Heimdall Agent CLI — Intelligent Multi-Agent Sentinel & Quality Bootstrapper
+
+USAGE:
+  heimdall [command] [options]
+  node setup.mjs [command] [options]
+
+Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is the global CLI shortcut.
+
+PRIMARY SUBCOMMANDS:
+  sync (or --sync)           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
+  audit (or --audit)         Audit installed harnesses, active API endpoints, and skill counts
+  sync-models (or --sync-models) Probe active proxy/endpoint (e.g. GhostCLI) and refresh models.json
+  help (or --help, -h)      Display this parameter and command reference
+
+SETUP & BOOTSTRAP OPTIONS:
+  --profile <name>       Skill profile tier: full (49), minimal (15), security (12), design (14) [default: full]
+  --agents <targets>     Comma-separated harnesses: claude, gemini, codex, desktop, all [default: all]
+  --link / --no-link     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
+  --clean                Wipe legacy skills from target directory before deploying
+  -y, --yes              Non-interactive mode (use defaults or provided CLI arguments)
+  --dry-run              Simulate execution without modifying the filesystem
+  --tools-dir <dir>      Custom directory to deploy cross-model bridge tools and 'heimdall' CLI
+  --doctrine-path <file> Custom file destination for AGENTS.md universal doctrine
+  --no-tools             Skip deploying bridge tools and CLI shims
+  --no-doctrine          Skip deploying AGENTS.md universal doctrine
+
+EXAMPLES:
+  heimdall sync                             # Instant sync after installing a new tool
+  heimdall audit                            # Environment health check
+  heimdall sync-models                      # Refresh model catalogs
+  node setup.mjs --clean --link --yes       # Recommended full automated setup with live junctions
+  node setup.mjs --profile minimal --yes    # Minimal install for lightweight laptop
+```
+
+</details>
+
+---
 
 ### Primary Subcommands
 
@@ -160,25 +214,49 @@ All primary actions can be called either as clean subcommands (`heimdall sync`) 
 
 ---
 
-### Everyday Workflow Examples
+### Real-World Recipes & Practical Examples
 
-#### 1. 1-Second Zero-Drift Sync (`heimdall sync`)
-If you only have one tool installed today (e.g., Claude Code), and later install **Google Antigravity** or **OpenAI Codex**, you never have to re-configure Heimdall from scratch. Simply run:
+#### Recipe 1: Fresh 1-Liner Installation (Recommended)
+Deploys all 49 canonical skills across all detected agent harnesses using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux), cleans up any stale legacy copies, and registers the global `heimdall` CLI:
+```powershell
+node setup.mjs --profile full --link --clean --yes
+```
+
+#### Recipe 2: Adding a Newly Installed AI Tool Later (Zero-Drift Auto-Sync)
+If you only have Claude Code installed today, and later install **Google Antigravity** or **OpenAI Codex**, never re-install from scratch. Just run:
 ```powershell
 heimdall sync
 ```
-Heimdall scans your `PATH`, detects the new tool binaries, and immediately links all 49 skills and MCP configurations. Furthermore, `heimdall audit` proactively detects if any newly installed tool is missing skill links and prompts you to run `heimdall sync`.
+Heimdall detects the new binary on `PATH` and links all 49 skills in under 1 second.
 
-#### 2. Environment Health Audit (`heimdall audit`)
-Verify the health of all agent harnesses, link modes (junction vs copy), active endpoints, and skill counts:
+#### Recipe 3: Checking Ecosystem Health & Endpoint Verification
+Verifies which harnesses are active, which API endpoints are probed, whether skills are live junctions or static copies, and checks doctrine file status:
 ```powershell
 heimdall audit
 ```
 
-#### 3. Live Model Catalog Refresh (`heimdall sync-models`)
-Queries live catalog endpoints from active proxy/vendor providers (e.g. GhostCLI, LiteLLM) and updates `config/models.json`:
+#### Recipe 4: Lightweight Laptop Setup (Minimal Profile)
+For smaller context windows or fast local tasks, deploy the lean 15-skill profile (planning, Karpathy simplicity, TDD, antislop) targeted only to Claude Code and Gemini:
+```powershell
+node setup.mjs --profile minimal --agents claude,gemini --link --yes
+```
+
+#### Recipe 5: Safe Non-Destructive Dry Run
+Inspect exactly which directories, junctions, and configs would be touched without modifying the filesystem:
+```powershell
+node setup.mjs --dry-run --yes
+```
+
+#### Recipe 6: Refresh Live Model Catalog from Proxy/Vendor
+Fetches dynamic models (e.g. `gemini-4`, `claude-opus-5-5`, `gpt-6-astra`) from your active endpoint (e.g. GhostCLI) and syncs `config/models.json`:
 ```powershell
 heimdall sync-models
+```
+
+#### Recipe 7: Headless Docker & CI Container Bootstrapping
+Automate deployment in container builds or CI runners with custom directories:
+```bash
+node setup.mjs --profile full --tools-dir /usr/local/bin --doctrine-path /workspace/AGENTS.md --clean --yes
 ```
 
 ---
@@ -189,31 +267,19 @@ These flags can be passed to either `node setup.mjs` or `heimdall` for headless 
 
 | Parameter | Type | Default | Description | Example |
 | :--- | :---: | :---: | :--- | :--- |
-| **`--profile <name>`** | String | `full` | Skill profile tier: `full` (49 skills), `minimal` (15), `security` (12), or `design` (14). | `node setup.mjs --profile minimal` |
-| **`--agents <targets>`** | String | `all` | Comma-separated list of harnesses to configure: `claude`, `gemini`, `codex`, `desktop`, or `all`. | `node setup.mjs --agents claude,gemini` |
-| **`--link`** | Flag | `false`* | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). *(Recommended)* | `node setup.mjs --link` |
-| **`--no-link`** | Flag | `true`* | Deploy skills as independent physical directory copies instead of live junctions. | `node setup.mjs --no-link` |
-| **`--clean`** | Flag | `false` | Wipes existing legacy skills in target directories before installing (preserves vendor files). | `node setup.mjs --clean` |
-| **`-y`, `--yes`** | Flag | `false` | Non-interactive mode (skips interactive wizard prompts and applies defaults or passed flags). | `node setup.mjs --yes` |
-| **`--dry-run`** | Flag | `false` | Simulates the full installation and prints planned actions without touching the filesystem. | `node setup.mjs --dry-run` |
-| **`--tools-dir <dir>`** | Path | Auto (`PATH`) | Custom destination directory to deploy cross-model bridge tools and global `heimdall` CLI shim. | `node setup.mjs --tools-dir ~/.local/bin` |
-| **`--doctrine-path <file>`** | Path | Auto (`AGENTS.md`) | Custom destination path for `AGENTS.md` universal doctrine. | `node setup.mjs --doctrine-path ~/.agents/AGENTS.md` |
-| **`--no-tools`** | Flag | `false` | Skips installing cross-model bridge tools and CLI shims. | `node setup.mjs --no-tools` |
-| **`--no-doctrine`** | Flag | `false` | Skips deploying `AGENTS.md` universal doctrine. | `node setup.mjs --no-doctrine` |
+| **`--profile <name>`** | String | `full` | Skill profile tier: `full` (49 skills), `minimal` (15), `security` (12), or `design` (14). | `--profile minimal` |
+| **`--agents <targets>`** | String | `all` | Comma-separated list of harnesses to configure: `claude`, `gemini`, `codex`, `desktop`, or `all`. | `--agents claude,gemini` |
+| **`--link`** | Flag | `false`* | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). *(Recommended)* | `--link` |
+| **`--no-link`** | Flag | `true`* | Deploy skills as independent physical directory copies instead of live junctions. | `--no-link` |
+| **`--clean`** | Flag | `false` | Wipes existing legacy skills in target directories before installing (preserves vendor files). | `--clean` |
+| **`-y`, `--yes`** | Flag | `false` | Non-interactive mode (skips interactive wizard prompts and applies defaults or passed flags). | `--yes` |
+| **`--dry-run`** | Flag | `false` | Simulates the full installation and prints planned actions without touching the filesystem. | `--dry-run` |
+| **`--tools-dir <dir>`** | Path | Auto (`PATH`) | Custom destination directory to deploy cross-model bridge tools and global `heimdall` CLI shim. | `--tools-dir ~/.local/bin` |
+| **`--doctrine-path <file>`** | Path | Auto (`AGENTS.md`) | Custom destination path for `AGENTS.md` universal doctrine. | `--doctrine-path ~/.agents/AGENTS.md` |
+| **`--no-tools`** | Flag | `false` | Skips installing cross-model bridge tools and CLI shims. | `--no-tools` |
+| **`--no-doctrine`** | Flag | `false` | Skips deploying `AGENTS.md` universal doctrine. | `--no-doctrine` |
 
 *Note: In the interactive wizard (`node setup.mjs`), Live Junctions (`--link`) is the recommended prompt default. In non-interactive mode without flags, specify `--link` to enable symlinks.
-
-#### Common One-Liner Recipes:
-```powershell
-# Full 49-skill deployment with live junctions across all detected tools (Recommended)
-node setup.mjs --profile full --link --clean --yes
-
-# Minimal 15-skill setup targeted strictly to Claude Code CLI
-node setup.mjs --profile minimal --agents claude --yes
-
-# Test installation safely with a non-destructive dry run
-node setup.mjs --dry-run --yes
-```
 
 ---
 
