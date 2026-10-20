@@ -25,7 +25,7 @@
 - [8. Predefined Agent Roster (8 Specialized Personas)](#predefined-agents-8-specialized-personas)
 - [9. Supported Runtimes & Cross-Platform Matrix](#supported-runtimes)
 - [10. Skill Inventory (49 Curated Skills)](#skill-inventory-49-curated-skills)
-- [11. Companion Remote Orchestrators](#11-companion-remote-orchestrators)
+- [11. Companion Remote Orchestrators & Architectural Memory](#11-companion-remote-orchestrators)
 - [License](#license)
 
 ---
@@ -204,10 +204,12 @@ PRIMARY SUBCOMMANDS:
   sync (or --sync)           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
   audit (or --audit)         Audit installed harnesses, active API endpoints, and skill counts
   sync-models (or --sync-models) Probe active proxy/endpoint (e.g. GhostCLI) and refresh models.json
+  skills (or --skills)       List all canonical skills, categories, and upstream provenance
+  update-skill <name|all>    Inspect upstream repository, updates, and bounded review protocol
   help (or --help, -h)      Display this parameter and command reference
 
 SETUP & BOOTSTRAP OPTIONS:
-  --profile <name>       Skill profile tier: full (49), minimal (15), security (12), design (14) [default: full]
+  --profile <name>       Skill profile tier: full (49), minimal (16), security (12), design (14) [default: full]
   --agents <targets>     Comma-separated harnesses: claude, gemini, codex, desktop, all [default: all]
   --link / --no-link     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   --clean                Wipe legacy skills from target directory before deploying
@@ -221,6 +223,9 @@ SETUP & BOOTSTRAP OPTIONS:
 EXAMPLES:
   heimdall sync                             # Instant sync after installing a new tool
   heimdall audit                            # Environment health check
+  heimdall skills                           # Browse canonical skills catalog
+  heimdall update-skill ponytail           # Inspect upstream provenance & review protocol for single skill
+  heimdall update-skill all                # Generate full bounded review audit report
   heimdall sync-models                      # Refresh model catalogs
   node setup.mjs --clean --link --yes       # Recommended full automated setup with live junctions
   node setup.mjs --profile minimal --yes    # Minimal install for lightweight laptop
@@ -239,6 +244,8 @@ All primary actions can be called either as clean subcommands (`heimdall sync`) 
 | **`sync`** | `--sync` | Scans `PATH` for newly installed AI tools and links canonical skills in 1 second. | `heimdall sync` |
 | **`audit`** | `--audit` | Audits installed harnesses, active API endpoints, link types, and skill counts. | `heimdall audit` |
 | **`sync-models`** | `--sync-models` | Probes active proxy/endpoints (e.g. GhostCLI) and refreshes `config/models.json`. | `heimdall sync-models` |
+| **`skills`** | `--skills` | Lists all 49 canonical skills, categories, and upstream repositories. | `heimdall skills` |
+| **`update-skill`** | `--update-skill` | Inspects upstream git sources, updates, and bounded review protocols. | `heimdall update-skill all` |
 | **`help`** | `--help`, `-h` | Displays the terminal help manual with all parameters and syntax. | `heimdall help` |
 
 ---
@@ -361,7 +368,7 @@ To prevent vendor lock-in and support single-vendor setups, all agent contracts 
 | **`tester`** | `fast_verification` | Enforces Test-Driven Development (TDD). Mandates authoring failing automated tests *before* code logic, plus boundary and negative coverage. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `executing-plans` |
 | **`security-auditor`** | `deep_assurance_audit` | Dynamic differential HTTP probing (anonymous vs unprivileged vs admin), OWASP Top 10 defenses, and Trail of Bits insecure defaults detection. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
 | **`database-architect`** | `schema_migration_safety` | Governs non-destructive schema migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL, NoSQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
-| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments and defensive dead-code, and purges AI slop. | `karpathy-guidelines`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch`, `document-organizer` |
+| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments and defensive dead-code, and purges AI slop. | `karpathy-guidelines`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
 | **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions, verifies test assertions, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
 
 ### How Agents Are Deployed
@@ -420,6 +427,8 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 <a id="skill-inventory-49-curated-skills"></a>
 ## 10. Skill Inventory (49 Curated Skills)
 
+> For full trigger conditions, descriptions, and upstream repository links for every skill, see the complete [Skills Directory](docs/SKILLS.md).
+
 <details open>
 <summary><b>1. Planning & Verification Discipline (10 skills)</b></summary>
 
@@ -427,17 +436,17 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 - `writing-plans`: Structures modular, bite-sized tasks with verifiable completion criteria.
 - `executing-plans`: Enforces step-by-step verification and halts execution upon unexpected failures.
 - `karpathy-guidelines`: Demands minimal surgical edits and rejects speculative configurability.
+- `ponytail`: Pragmatic senior developer YAGNI code restraint and anti-bloat Decision Ladder.
 - `test-driven-development`: Requires failing automated tests prior to implementation logic.
 - `systematic-debugging`: Isolates root causes using scientific hypothesis testing.
 - `verification-before-completion`: Mandates passing test suites and live verification before claiming completion.
 - `finishing-a-development-branch`: Verifies branch hygiene, tests, and documentation before merge.
 - `using-git-worktrees`: Manages parallel agent execution branches without dirtying working trees.
-- `document-organizer`: Prevents documentation drift and keeps architectural specs organized.
 
 </details>
 
 <details>
-<summary><b>2. Anti-Slop Guardrails (6 skills)</b></summary>
+<summary><b>2. Anti-Slop Guardrails & Token Efficiency (7 skills)</b></summary>
 
 - `antislop`: Core guardrail prohibiting generic AI filler, fake buzzwords, and decorative bloat.
 - `antislop-code`: Prohibits redundant comments, defensive dead code, and speculative abstractions.
@@ -445,6 +454,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 - `antislop-ui`: Rejects generic purple gradients, uniform pill radius, and unmotivated dark modes.
 - `antislop-human`: Enforces WCAG AAA contrast, semantic HTML, and accessible interactive targets.
 - `antislop-layoutmobile`: Guarantees responsive flex safety, zero clipping, and touch-target padding.
+- `caveman`: Token-efficiency protocol slashing conversational ceremony while preserving code and tool payloads.
 
 </details>
 
@@ -484,13 +494,13 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 <summary><b>5. Architecture, Database & Platform (3 skills)</b></summary>
 
 - `postgres-best-practices`: Supabase-curated guidelines for indexing, connection pooling, and migrations.
-- `podium-docs-sync`: Automated container inventory sync, API catalog verification, and docs hygiene.
+- `project-hygiene`: Audits recoverable disk space, detects dead code, and purges build caches.
 - `output-skill`: Structured output formatting for complex analysis artifacts.
 
 </details>
 
 <details>
-<summary><b>6. Multi-Agent Orchestration & Review (10 skills)</b></summary>
+<summary><b>6. Multi-Agent Orchestration & Review (9 skills)</b></summary>
 
 - `subagent-driven-development`: Decomposes large tasks into isolated subagents with specialized briefs.
 - `dispatching-parallel-agents`: Coordinates concurrent subagent workers on independent branches.
@@ -509,12 +519,13 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 ---
 
 <a id="11-companion-remote-orchestrators"></a>
-## 11. Companion Remote Orchestrators
+## 11. Companion Remote Orchestrators & Architectural Memory
 
-For multi-device pair programming and mobile monitoring, Heimdall integrates with:
+For multi-device pair programming, mobile monitoring, and project memory, Heimdall integrates with:
 
 - **[Herdr (`herdr.dev`)](https://herdr.dev/)**: A terminal-native agent multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`).
 - **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: A mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
+- **Graphify & Obsidian Vaults**: Developers managing large or legacy repositories can pair Graphify's AST-based dependency parser with local Obsidian Markdown vaults. By exporting codebase relationships into interconnected Markdown (`[[wikilinks]]`), AI coding assistants (like Claude Code) can load an immediate high-level architectural map on launch, drastically reducing startup token scans.
 
 [↑ Back to top](#table-of-contents)
 

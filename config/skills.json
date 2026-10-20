@@ -1,0 +1,399 @@
+{
+  "version": "1.0.0",
+  "description": "Heimdall Canonical Skill Registry & Upstream Provenance Catalog",
+  "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+  "skills": {
+    "antislop": {
+      "name": "antislop",
+      "category": "Anti-Slop & Token Efficiency",
+      "description": "\"Anti Slop: Rules for AI Coding Agents. The core filter. Load always to stop generic AI slop.\"",
+      "upstream": "https://github.com/obra/antislop",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "antislop-code": {
+      "name": "antislop-code",
+      "category": "Anti-Slop & Token Efficiency",
+      "description": "\"Code comment hygiene for AI coding agents: remove generic AI-slop comments, keep the valuable ones, never touch the code.\"",
+      "upstream": "https://github.com/obra/antislop",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "antislop-copywriting": {
+      "name": "antislop-copywriting",
+      "category": "Anti-Slop & Token Efficiency",
+      "description": "\"Copy and text skill for antislop. Use when writing or editing prose: headlines, tone, CTAs, and anti-AI-writing patterns. Load with the core.\"",
+      "upstream": "https://github.com/obra/antislop",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "antislop-human": {
+      "name": "antislop-human",
+      "category": "Anti-Slop & Token Efficiency",
+      "description": "\"Human and accessibility skill for antislop. Contrast, keyboard, focus, and states for real people. Includes the contrast checker.\"",
+      "upstream": "https://github.com/obra/antislop",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "antislop-layoutmobile": {
+      "name": "antislop-layoutmobile",
+      "category": "Anti-Slop & Token Efficiency",
+      "description": "\"Mobile layout skill for antislop. Use for layouts that reflow across screen sizes, phone to desktop: grids, overflow, tap targets. Load with the core.\"",
+      "upstream": "https://github.com/obra/antislop",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "antislop-ui": {
+      "name": "antislop-ui",
+      "category": "Anti-Slop & Token Efficiency",
+      "description": "\"UI and visual skill for antislop. Use when building or editing any interface: color, layout, components, motion. Load with the core.\"",
+      "upstream": "https://github.com/obra/antislop",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "brainstorming": {
+      "name": "brainstorming",
+      "category": "Planning & Verification",
+      "description": "\"You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.\"",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "brandkit": {
+      "name": "brandkit",
+      "category": "Design & Aesthetics",
+      "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "brutalist-skill": {
+      "name": "brutalist-skill",
+      "category": "Design & Aesthetics",
+      "description": "Raw mechanical interfaces fusing Swiss typographic print with military terminal aesthetics. Rigid grids, extreme type scale contrast, utilitarian color, analog degradation effects. For data-heavy dashboards, portfolios, or editorial sites that need to feel like declassified blueprints.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "caveman": {
+      "name": "caveman",
+      "category": "Anti-Slop & Token Efficiency",
+      "description": "Slashes chat token consumption by dropping conversational filler, pleasantries, and polite ceremony.",
+      "upstream": "https://github.com/JuliusBrussee/caveman",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "claude-collaborator": {
+      "name": "claude-collaborator",
+      "category": "Multi-Agent & Review",
+      "description": "Coordinate with Claude Code CLI (claude.exe) to cross-validate changes, request second-opinion reviews on git diffs, or validate test runs.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "cloudflare-security-audit": {
+      "name": "cloudflare-security-audit",
+      "category": "Security & Probing",
+      "description": "Security guidance and vulnerability review for codebases, APIs, services, CLI tools, libraries, and daemons. Use for security questions, focused reviews, vulnerability research, security audits, or pen tests. Run the complete workflow only for explicit codebase audit or pen-test requests, full/comprehensive/end-to-end reviews, or requested report artifacts.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "diagnosing-superpowers": {
+      "name": "diagnosing-superpowers",
+      "category": "Multi-Agent & Review",
+      "description": "Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, \"it took too long\", \"why is it so expensive\", \"what is it doing\" — or wants to build a bug report for the superpowers maintainers, for the current session or a past one identified by id or path, on any harness.",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "dispatching-parallel-agents": {
+      "name": "dispatching-parallel-agents",
+      "category": "Multi-Agent & Review",
+      "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "executing-plans": {
+      "name": "executing-plans",
+      "category": "Planning & Verification",
+      "description": "Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or no subagent tool is available",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "finishing-a-development-branch": {
+      "name": "finishing-a-development-branch",
+      "category": "Planning & Verification",
+      "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "gemini-collaborator": {
+      "name": "gemini-collaborator",
+      "category": "Multi-Agent & Review",
+      "description": "Coordinate with Google Antigravity / Gemini CLI (agy.exe) to cross-validate changes, request second opinions on architecture/diffs, or execute adversarial code reviews.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "gpt-tasteskill": {
+      "name": "gpt-tasteskill",
+      "category": "Design & Aesthetics",
+      "description": "Elite UX/UI & Advanced GSAP Motion Engineer. Enforces Python-driven true randomization for layout variance, strict AIDA page structure, wide editorial typography (bans 6-line wraps), gapless bento grids, strict GSAP ScrollTriggers (pinning, stacking, scrubbing), inline micro-images, and massive section spacing.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "image-to-code-skill": {
+      "name": "image-to-code-skill",
+      "category": "Design & Aesthetics",
+      "description": "Elite website image-to-code skill for Codex. For visually important web tasks, it must first generate the design image(s) itself, deeply analyze them, then implement the website to match them as closely as possible. In Codex, it must prefer large, readable, section-specific images instead of tiny compressed boards, generate fresh standalone images for sections or detail views instead of cropping old ones, avoid lazy under-generation, avoid cards-inside-cards-inside-cards UI, and keep the hero clean, spacious, readable, and visible on a small laptop.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "imagegen-frontend-mobile": {
+      "name": "imagegen-frontend-mobile",
+      "category": "Design & Aesthetics",
+      "description": "Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. Designed for iOS, Android, and cross-platform mobile products. Prioritizes clean hierarchy, comfortably readable text, strong multi-screen consistency, controlled color palettes, non-generic creative direction, textured surfaces, image-led composition, tasteful custom iconography, and clean phone mockup framing. By default, screens should be shown inside a subtle premium iPhone or similar phone mockup with a visible frame, while the main focus stays on the app content itself. This skill generates images only. It does not write code.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "imagegen-frontend-web": {
+      "name": "imagegen-frontend-web",
+      "category": "Design & Aesthetics",
+      "description": "Elite frontend image-direction skill for generating premium, conversion-aware website design references. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "karpathy-guidelines": {
+      "name": "karpathy-guidelines",
+      "category": "Planning & Verification",
+      "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
+      "upstream": "https://github.com/karpathy/guidelines",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "minimalist-skill": {
+      "name": "minimalist-skill",
+      "category": "Design & Aesthetics",
+      "description": "Clean editorial-style interfaces. Warm monochrome palette, typographic contrast, flat bento grids, muted pastels. No gradients, no heavy shadows.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "output-skill": {
+      "name": "output-skill",
+      "category": "Architecture & Database",
+      "description": "Overrides default LLM truncation behavior. Enforces complete code generation, bans placeholder patterns, and handles token-limit splits cleanly. Apply to any task requiring exhaustive, unabridged output.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "owasp-security": {
+      "name": "owasp-security",
+      "category": "Security & Probing",
+      "description": "Reviews code for security vulnerabilities and guides secure implementation using OWASP Top 10:2025, ASVS 5.0, the OWASP Top 10 for LLM Applications (2026), and the OWASP Top 10 for Agentic Applications (2026). Use when reviewing code or a diff for security issues, implementing authentication, authorization, sessions, or cryptography, handling untrusted input, files, or URLs, hardening config, dependencies, or CI, or building LLM and AI agent features.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "ponytail": {
+      "name": "ponytail",
+      "category": "Planning & Verification",
+      "description": "Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces the",
+      "upstream": "https://github.com/DietrichGebert/ponytail",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "postgres-best-practices": {
+      "name": "postgres-best-practices",
+      "category": "Architecture & Database",
+      "description": "\"Postgres best practices maintained by Supabase, for Postgres running anywhere. Load this skill BEFORE writing or changing anything that lives in a Postgres database: creating or altering tables and columns (including choosing column types), schema design, migrations and declarative schema files, RLS policies and the tests that verify them, indexes, triggers, database functions, queues and scheduled jobs (pg_cron, pgmq), vector/semantic search (pgvector), and restoring dumps (pg_restore) or importing data. Also load it when diagnosing slow queries, high CPU, timeouts, EXPLAIN plans, connection exhaustion, locking, bloat, or rows visible to the wrong user or tenant. This is not just a performance guide — schema, migration, security, and SQL authoring tasks need these rules too, even for a one-column change or a single query.\"",
+      "upstream": "https://github.com/supabase/postgres-best-practices",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "project-hygiene": {
+      "name": "project-hygiene",
+      "category": "Architecture & Database",
+      "description": "Audit and enforce codebase hygiene across any project: eliminate dead code, purge unused dependencies and exports, enforce architectural module boundaries, clear stale build caches, and verify type safety.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "receiving-code-review": {
+      "name": "receiving-code-review",
+      "category": "Multi-Agent & Review",
+      "description": "Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "redesign-skill": {
+      "name": "redesign-skill",
+      "category": "Design & Aesthetics",
+      "description": "Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Works with any CSS framework or vanilla CSS.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "requesting-code-review": {
+      "name": "requesting-code-review",
+      "category": "Multi-Agent & Review",
+      "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "security-audit-sweep": {
+      "name": "security-audit-sweep",
+      "category": "Security & Probing",
+      "description": "Generic security audit sweep for web applications, APIs, and microservices: performs dynamic differential HTTP probing, validates IAM role entitlements, scans dependency vulnerabilities, and checks for secret leakage.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "snyk-agent-scan": {
+      "name": "snyk-agent-scan",
+      "category": "Security & Probing",
+      "description": "Scans AI agent skills, MCP configurations, prompts, and tooling environments for prompt injections, secret leakage, tool poisoning, and security vulnerabilities using Snyk Agent Scan CLI. Use when reviewing installed skills, testing agent security, auditing MCP servers, or auditing agent supply chain risks.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "soft-skill": {
+      "name": "soft-skill",
+      "category": "Design & Aesthetics",
+      "description": "Teaches the AI to design like a high-end agency. Defines the exact fonts, spacing, shadows, card structures, and animations that make a website feel expensive. Blocks all the common defaults that make AI designs look cheap or generic.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "stitch-skill": {
+      "name": "stitch-skill",
+      "category": "Design & Aesthetics",
+      "description": "Semantic Design System Skill for Google Stitch. Generates agent-friendly DESIGN.md files that enforce premium, anti-generic UI standards — strict typography, calibrated color, asymmetric layouts, perpetual micro-motion, and hardware-accelerated performance.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "strix-security": {
+      "name": "strix-security",
+      "category": "Security & Probing",
+      "description": "Autonomous AI penetration testing and dynamic HTTP differential probing methodology (based on usestrix/strix). Never trust code comments alone; verify every mounted route, static asset prefix, reverse-proxy rule, and Host-header boundary with concrete Proof-of-Concept (PoC) HTTP probes across Anonymous, Unprivileged, Cross-Tenant/Venue, and Authorized principals.",
+      "upstream": "https://github.com/strix-security/strix",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "subagent-driven-development": {
+      "name": "subagent-driven-development",
+      "category": "Multi-Agent & Review",
+      "description": "Use when executing implementation plans with independent tasks in the current session",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "systematic-debugging": {
+      "name": "systematic-debugging",
+      "category": "Planning & Verification",
+      "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "taste-skill": {
+      "name": "taste-skill",
+      "category": "Design & Aesthetics",
+      "description": "Frontend craft, anti-slop, and high-taste design skill for UI adjustments, interactive interfaces, new features, components, redesigns, landing pages, and web apps. The agent infers the right design direction, eliminates generic AI defaults, enforces design tokens and design systems, and ships polished, intentional interfaces.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "taste-skill-v1": {
+      "name": "taste-skill-v1",
+      "category": "Design & Aesthetics",
+      "description": "The original v1 taste-skill, preserved for projects depending on its exact behavior. The current default is `design-taste-frontend` (v2 experimental), which is a substantial rewrite. Use this v1 install name only if you need exact backward compatibility.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "test-driven-development": {
+      "name": "test-driven-development",
+      "category": "Planning & Verification",
+      "description": "Use when implementing any feature or bugfix, before writing implementation code",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "trailofbits-audit-context": {
+      "name": "trailofbits-audit-context",
+      "category": "Security & Probing",
+      "description": "Understand a codebase before looking for bugs in it - what each function assumes, what it guarantees, and what it depends on elsewhere. Use when starting an audit, threat model, or architecture review on unfamiliar code, and before any vulnerability-hunting pass.",
+      "upstream": "https://github.com/trailofbits/skills",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "trailofbits-insecure-defaults": {
+      "name": "trailofbits-insecure-defaults",
+      "category": "Security & Probing",
+      "description": "Audits codebases for insecure defaults, fail-open patterns, fallback credentials, permissive access control, debug endpoints, and weak cryptography using Trail of Bits vulnerability patterns. Use when reviewing configuration, authentication, encryption, authorization bypasses, or security controls.",
+      "upstream": "https://github.com/trailofbits/skills",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "trailofbits-triage-brocards": {
+      "name": "trailofbits-triage-brocards",
+      "category": "Security & Probing",
+      "description": "-",
+      "upstream": "https://github.com/trailofbits/skills",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "using-git-worktrees": {
+      "name": "using-git-worktrees",
+      "category": "Planning & Verification",
+      "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "using-superpowers": {
+      "name": "using-superpowers",
+      "category": "Multi-Agent & Review",
+      "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "verification-before-completion": {
+      "name": "verification-before-completion",
+      "category": "Planning & Verification",
+      "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "writing-plans": {
+      "name": "writing-plans",
+      "category": "Planning & Verification",
+      "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "writing-skills": {
+      "name": "writing-skills",
+      "category": "Multi-Agent & Review",
+      "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
+      "upstream": "https://github.com/obra/superpowers",
+      "sourceRevision": "v1.0.0",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    }
+  }
+}

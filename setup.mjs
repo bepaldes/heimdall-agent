@@ -43,6 +43,7 @@ const doctrineDir = path.join(__dirname, 'doctrine');
 const profilesPath = path.join(__dirname, 'config', 'profiles.json');
 const modelsPath = path.join(__dirname, 'config', 'models.json');
 const agentsConfigPath = path.join(__dirname, 'config', 'agents.json');
+const skillsConfigPath = path.join(__dirname, 'config', 'skills.json');
 
 const targetPaths = {
   claude: path.join(userHome, '.claude', 'skills'),
@@ -307,10 +308,12 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}sync${colors.reset} (or ${colors.dim}--sync${colors.reset})           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
   ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. GhostCLI) and refresh models.json
+  ${colors.green}skills${colors.reset} (or ${colors.dim}--skills${colors.reset})         List all canonical skills, categories, and upstream provenance
+  ${colors.green}update-skill <name|all>${colors.reset}     Inspect upstream repository, updates, and bounded review protocol
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
-  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (49), minimal (15), security (12), design (14) [default: full]
+  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (49), minimal (16), security (12), design (14) [default: full]
   ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, desktop, all [default: all]
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
@@ -324,6 +327,9 @@ ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
 ${colors.bold}EXAMPLES:${colors.reset}
   heimdall sync                             # Instant sync after installing a new tool
   heimdall audit                            # Environment health check
+  heimdall skills                           # Browse canonical skills catalog
+  heimdall update-skill ponytail           # Inspect upstream provenance & review protocol for single skill
+  heimdall update-skill all                # Generate full bounded review audit report
   heimdall sync-models                      # Refresh model catalogs
   node setup.mjs --clean --link --yes       # Recommended full automated setup with live junctions
   node setup.mjs --profile minimal --yes    # Minimal install for lightweight laptop
@@ -345,6 +351,8 @@ function parseArgs() {
     dryRun: false,
     audit: false,
     syncModels: false,
+    listSkills: false,
+    updateSkill: null,
     help: false,
     yes: false
   };
@@ -357,6 +365,10 @@ function parseArgs() {
     else if (arg === 'audit' || arg === '--audit') options.audit = true;
     else if (arg === 'sync' || arg === '--sync') options.sync = true;
     else if (arg === 'sync-models' || arg === '--sync-models' || arg === 'syncmodels') options.syncModels = true;
+    else if (arg === 'skills' || arg === '--skills') options.listSkills = true;
+    else if (arg === 'update-skill' || arg === '--update-skill' || arg === 'updateskill') {
+      options.updateSkill = args[i + 1] && !args[i + 1].startsWith('-') ? args[++i] : 'all';
+    }
     else if (arg === '--dry-run') options.dryRun = true;
     else if (arg === '--link') options.link = true;
     else if (arg === '--no-link') options.link = false;
@@ -865,6 +877,105 @@ async function runInteractive(options, detected) {
   }
 }
 
+function runListSkills() {
+  console.log(`${colors.bold}${colors.cyan}=== Heimdall Canonical Skills Catalog ===${colors.reset}\n`);
+
+  if (!fs.existsSync(skillsConfigPath)) {
+    console.log(`${colors.red}Registry file not found at ${skillsConfigPath}${colors.reset}`);
+    return;
+  }
+
+  const catalog = JSON.parse(fs.readFileSync(skillsConfigPath, 'utf8'));
+  const skills = catalog.skills || {};
+  const skillNames = Object.keys(skills);
+
+  console.log(`Total Canonical Skills: ${colors.bold}${skillNames.length}${colors.reset}\n`);
+
+  const groups = {};
+  for (const name of skillNames) {
+    const s = skills[name];
+    const cat = s.category || 'General';
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(s);
+  }
+
+  for (const [cat, list] of Object.entries(groups)) {
+    console.log(`${colors.yellow}${colors.bold}${cat} (${list.length})${colors.reset}`);
+    for (const item of list) {
+      console.log(`  • ${colors.bold}${item.name.padEnd(32)}${colors.reset} ${colors.dim}${item.upstream}${colors.reset}`);
+    }
+    console.log('');
+  }
+}
+
+function runUpdateSkill(targetSkill = 'all') {
+  console.log(`${colors.bold}${colors.cyan}=== Upstream Skill Provenance & Bounded Review Protocol ===${colors.reset}\n`);
+
+  if (!fs.existsSync(skillsConfigPath)) {
+    console.log(`${colors.red}Registry file not found at ${skillsConfigPath}${colors.reset}`);
+    return;
+  }
+
+  const catalog = JSON.parse(fs.readFileSync(skillsConfigPath, 'utf8'));
+  const skills = catalog.skills || {};
+  const protocol = catalog.updateProtocol;
+
+  console.log(`${colors.bold}Standard Verification Directive:${colors.reset}`);
+  console.log(`${colors.dim}"${protocol}"${colors.reset}\n`);
+
+  if (targetSkill.toLowerCase() === 'all') {
+    const skillList = Object.entries(skills);
+    console.log(`${colors.bold}Canonical Skills Provenance Table (${skillList.length} skills):${colors.reset}\n`);
+    console.log(`${'Skill Name'.padEnd(32)} ${'Category'.padEnd(28)} Upstream Source`);
+    console.log(`${'-'.repeat(31)} ${'-'.repeat(27)} ${'-'.repeat(45)}`);
+    for (const [name, info] of skillList) {
+      console.log(`${name.padEnd(32)} ${(info.category || '').padEnd(28)} ${colors.cyan}${info.upstream}${colors.reset}`);
+    }
+
+    console.log(`\n${colors.bold}${colors.green}Bounded Review Private Report Template:${colors.reset}`);
+    console.log(`------------------------------------------------------------------------`);
+    console.log(`Skill Name:           <name>`);
+    console.log(`Upstream Repository:  <source URL>`);
+    console.log(`Source Revision:      <commit hash / release tag>`);
+    console.log(`Reviewed Range:       <diff range: e.g. v1.0.0..v1.1.0>`);
+    console.log(`Actual Tests Run:     node setup.mjs audit && <skill-specific-tests>`);
+    console.log(`Remaining Validation: <sign-off status>`);
+    console.log(`------------------------------------------------------------------------\n`);
+    console.log(`To inspect a single skill in detail, run: ${colors.bold}heimdall update-skill <name>${colors.reset}\n`);
+    return;
+  }
+
+  const skillInfo = skills[targetSkill];
+  if (!skillInfo) {
+    console.log(`${colors.red}Skill '${targetSkill}' not found in canonical registry.${colors.reset}`);
+    console.log(`Run ${colors.bold}heimdall skills${colors.reset} to view all available skills.\n`);
+    return;
+  }
+
+  console.log(`${colors.bold}Skill Target:${colors.reset}         ${colors.green}${skillInfo.name}${colors.reset}`);
+  console.log(`${colors.bold}Category:${colors.reset}             ${skillInfo.category}`);
+  console.log(`${colors.bold}Description:${colors.reset}          ${skillInfo.description || '(none)'}`);
+  console.log(`${colors.bold}Upstream Repository:${colors.reset}  ${colors.cyan}${skillInfo.upstream}${colors.reset}`);
+  console.log(`${colors.bold}Frozen Revision:${colors.reset}      ${skillInfo.sourceRevision || 'v1.0.0'}\n`);
+
+  console.log(`${colors.bold}Recommended Update Steps:${colors.reset}`);
+  console.log(`1. Inspect upstream changes:`);
+  console.log(`   ${colors.dim}git ls-remote ${skillInfo.upstream}${colors.reset}`);
+  console.log(`2. Review changed instructions / references in the updated upstream commit.`);
+  console.log(`3. Apply surgical edits to ${colors.cyan}skills/${skillInfo.name}/SKILL.md${colors.reset}.`);
+  console.log(`4. Run boundary and audit checks:`);
+  console.log(`   ${colors.dim}node setup.mjs audit${colors.reset}`);
+  console.log(`5. Record your bounded review report:`);
+  console.log(`   ---------------------------------------------------------------------`);
+  console.log(`   Skill Name:           ${skillInfo.name}`);
+  console.log(`   Upstream Repository:  ${skillInfo.upstream}`);
+  console.log(`   Source Revision:      <new-commit-hash>`);
+  console.log(`   Reviewed Range:       <diff range>`);
+  console.log(`   Actual Tests Run:     node setup.mjs audit`);
+  console.log(`   Remaining Validation: Verified compatible with multi-agent runtimes`);
+  console.log(`   ---------------------------------------------------------------------\n`);
+}
+
 async function main() {
   printBanner();
   const options = parseArgs();
@@ -877,6 +988,16 @@ async function main() {
 
   if (options.audit) {
     runAudit(options);
+    process.exit(0);
+  }
+
+  if (options.listSkills) {
+    runListSkills();
+    process.exit(0);
+  }
+
+  if (options.updateSkill) {
+    runUpdateSkill(options.updateSkill);
     process.exit(0);
   }
 
