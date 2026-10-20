@@ -215,16 +215,42 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 
 ---
 
-## 9. Supported Runtimes
+## 9. Supported Runtimes & Cross-Platform Matrix
 
-| Harness | Deployment Target | Integration Mechanism |
+Heimdall operates across **Windows**, **macOS**, and **Linux**. It automatically selects native directory junctions (`junction`) on Windows or standard directory symlinks (`ln -s`) on POSIX systems.
+
+| Harness | Deployment Target (Windows / macOS / Linux) | Integration Mechanism |
 | :--- | :--- | :--- |
-| **Google Antigravity** | `~/.gemini/skills/` | Dynamic Progressive Disclosure (Junction / Copy) • Google OAuth Native |
-| **Claude Code** | `~/.claude/skills/` | Dynamic Progressive Disclosure (Junction / Copy) |
-| **OpenAI Codex CLI** | `~/.codex/skills/` | Dynamic Progressive Disclosure (Junction / Copy) |
+| **Google Antigravity** | `~/.gemini/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) • Google OAuth Native |
+| **Claude Code** | `~/.claude/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) |
+| **OpenAI Codex CLI** | `~/.codex/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) |
 | **Shared Multi-Agent** | `~/.agents/skills/` | Hierarchical Workspace Traversal |
-| **Claude Desktop** | `%APPDATA%\Claude\` | Automated `claude_desktop_config.json` + Playbooks |
+| **Claude Desktop** | Windows: `%APPDATA%\Claude\`<br>macOS: `~/Library/Application Support/Claude/`<br>Linux: `~/.config/Claude/` | Automated `claude_desktop_config.json` + Playbooks |
 | **IDEs / Editors** | Workspace Root | Standalone Playbooks & Cursorrules |
+
+### Consumer Desktop Chat Apps vs. Agentic Coding CLIs
+
+A common point of confusion is the distinction between consumer desktop chat apps and developer agent CLIs:
+
+* **Gemini for Desktop (`gemini.google/desktop`) & ChatGPT Desktop**:
+  * These are consumer chat GUIs. They run in sandboxed webviews/Electron environments and do **not** support automated local skill directory loading (`~/.<tool>/skills`) or arbitrary local shell tool execution loops.
+  * *To use Heimdall principles with them*: Upload [`doctrine/AGENTS.md`](doctrine/AGENTS.md) or specific playbooks from [`playbooks/`](playbooks/) into a **Gemini Custom Gem** or **ChatGPT Project / Custom GPT** system prompt.
+* **Google Antigravity (`agy`), Claude Code (`claude`), & OpenAI Codex CLI (`codex`)**:
+  * These are full autonomous agent harnesses with terminal access, progressive skill disclosure, and filesystem mutation capabilities. Heimdall is engineered natively for these runtimes.
+
+### OpenAI Codex CLI on Windows
+
+OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matrix:
+1. **Binary Detection**: Heimdall automatically discovers `codex.exe` on `PATH`, `%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe`, or `%USERPROFILE%\.codex\packages\standalone\current\bin\codex.exe`.
+2. **Windows Sandboxing Flag**: Unlike macOS (Seatbelt) or Linux (Landlock/Bubblewrap), Windows does not possess native POSIX sandbox isolation primitives. For headless cross-agent reviews and automated non-interactive tasks, [`tools/codex-bridge.ps1`](tools/codex-bridge.ps1) executes Codex with `--dangerously-bypass-approvals-and-sandbox` to allow uninterrupted execution.
+3. **Endpoint Flexibility**: Codex can route either to official OpenAI endpoints or via GhostCLI (`https://ghostcli.cloud/v1`) using the `gpt-6-astra` model catalog.
+4. **NTFS Junctions**: All 49 skills are linked directly into `%USERPROFILE%\.codex\skills` as NTFS junctions, ensuring zero file duplication and instantaneous sync.
+
+### Linux & macOS Parity
+
+* **Installer**: `setup.mjs` runs on Node.js >= 18 on all OSes, dynamically selecting `which` vs `where.exe`, and creating native directory symlinks.
+* **Bridge Scripts**: `tools/` contains native Windows wrappers (`.cmd`, `.ps1`) and portable POSIX shell shims (`claude-bridge.sh`, `gemini-bridge.sh`, `codex-bridge.sh`) that invoke PowerShell Core (`pwsh`).
+* **Skills**: 100% platform-agnostic Markdown, Python, and shell scripts.
 
 ---
 

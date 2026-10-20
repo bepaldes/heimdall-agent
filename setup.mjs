@@ -72,6 +72,56 @@ function checkCommand(cmd) {
 }
 
 /**
+ * Resolves the platform-specific Claude Desktop configuration directory:
+ * - Windows: %APPDATA%\Claude
+ * - macOS:   ~/Library/Application Support/Claude
+ * - Linux:   $XDG_CONFIG_HOME/Claude or ~/.config/Claude
+ */
+function getClaudeDesktopDir() {
+  const platform = os.platform();
+  if (platform === 'darwin') {
+    return path.join(userHome, 'Library', 'Application Support', 'Claude');
+  }
+  if (platform === 'win32') {
+    const appData = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
+    return path.join(appData, 'Claude');
+  }
+  const configHome = process.env.XDG_CONFIG_HOME || path.join(userHome, '.config');
+  return path.join(configHome, 'Claude');
+}
+
+/**
+ * Resiliently discovers the OpenAI Codex CLI binary on PATH and standard Windows/POSIX install paths.
+ */
+function detectCodexBinary() {
+  const onPath = checkCommand('codex');
+  if (onPath) return onPath;
+
+  if (os.platform() === 'win32') {
+    const candidates = [
+      path.join(process.env.LOCALAPPDATA || '', 'Programs', 'OpenAI', 'Codex', 'bin', 'codex.exe'),
+      path.join(userHome, '.codex', 'packages', 'standalone', 'current', 'bin', 'codex.exe'),
+      path.join(userHome, '.local', 'bin', 'codex.exe'),
+      'C:\\Program Files\\OpenAI\\Codex\\bin\\codex.exe',
+      'C:\\Apps\\codex\\codex.exe'
+    ];
+    for (const cand of candidates) {
+      if (cand && fs.existsSync(cand)) return cand;
+    }
+  } else {
+    const posixCandidates = [
+      path.join(userHome, '.local', 'bin', 'codex'),
+      path.join(userHome, '.codex', 'bin', 'codex'),
+      '/usr/local/bin/codex'
+    ];
+    for (const cand of posixCandidates) {
+      if (cand && fs.existsSync(cand)) return cand;
+    }
+  }
+  return null;
+}
+
+/**
  * Dynamically discovers candidate tools/bin directories registered in the user's PATH.
  * Never assumes a hardcoded system path.
  */
@@ -161,16 +211,15 @@ function detectEnvironment() {
     doctrineCandidates: detectDoctrineCandidates()
   };
 
-  // 1. Check CLI binaries on PATH
+  // 1. Check CLI binaries on PATH / standard install paths
   detected.tools.claude = checkCommand('claude');
   detected.tools.agy = checkCommand('agy');
-  detected.tools.codex = checkCommand('codex');
+  detected.tools.codex = detectCodexBinary();
   detected.tools.cursor = checkCommand('cursor');
   detected.tools.windsurf = checkCommand('windsurf');
 
-  // 2. Check Claude Desktop directory
-  const appData = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
-  const claudeDesktopDir = path.join(appData, 'Claude');
+  // 2. Check Claude Desktop directory (Windows, macOS, Linux)
+  const claudeDesktopDir = getClaudeDesktopDir();
   detected.tools.claudeDesktop = fs.existsSync(claudeDesktopDir) ? claudeDesktopDir : null;
 
   // 3. Check Claude Code endpoint
@@ -769,8 +818,7 @@ async function main() {
 
   // 4. Configure Claude Desktop if selected or in 'all'
   if (options.agents.includes('desktop') || options.agents.includes('all')) {
-    const appData = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
-    const claudeDesktopDir = path.join(appData, 'Claude');
+    const claudeDesktopDir = getClaudeDesktopDir();
     const claudeDesktopFile = path.join(claudeDesktopDir, 'claude_desktop_config.json');
 
     console.log(`\n-> Configuring Claude Desktop (${claudeDesktopFile})...`);
@@ -802,6 +850,9 @@ async function main() {
       const dest = path.join(options.toolsDir, tool);
       if (!options.dryRun) {
         fs.copyFileSync(src, dest);
+        if (os.platform() !== 'win32' && tool.endsWith('.sh')) {
+          try { fs.chmodSync(dest, 0o755); } catch {}
+        }
       }
     }
     // Deploy global heimdall shim
