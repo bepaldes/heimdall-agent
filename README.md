@@ -162,9 +162,17 @@ npm link
 ```
 Now you can run `heimdall` anywhere:
 ```powershell
-heimdall --audit          # Verify health of all agent harnesses
+heimdall sync             # 1-second auto-sync: detects newly installed tools and links skills
+heimdall --audit          # Verify health of all agent harnesses and auth status
 heimdall --sync-models    # Fetch latest models from active proxy/vendor
 ```
+
+### Future Tool Installation & Zero-Drift Sync
+If you only have one tool installed today (e.g., Claude Code), and later install **Google Antigravity** or **OpenAI Codex**, you never have to re-configure Heimdall from scratch. Simply run:
+```powershell
+heimdall sync
+```
+Heimdall scans your `PATH`, detects the new tool binaries, and immediately links all 49 skills and MCP configurations. Furthermore, `heimdall --audit` proactively detects if any newly installed tool is missing skill links and prompts you to run `heimdall sync`.
 
 ### Headless & CI Installation Flags
 Automate setup using profiles and non-interactive flags:
@@ -211,7 +219,7 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 
 | Harness | Deployment Target | Integration Mechanism |
 | :--- | :--- | :--- |
-| **Google Antigravity** | `~/.gemini/skills/` | Dynamic Progressive Disclosure (Junction / Copy) |
+| **Google Antigravity** | `~/.gemini/skills/` | Dynamic Progressive Disclosure (Junction / Copy) • Google OAuth Native |
 | **Claude Code** | `~/.claude/skills/` | Dynamic Progressive Disclosure (Junction / Copy) |
 | **OpenAI Codex CLI** | `~/.codex/skills/` | Dynamic Progressive Disclosure (Junction / Copy) |
 | **Shared Multi-Agent** | `~/.agents/skills/` | Hierarchical Workspace Traversal |

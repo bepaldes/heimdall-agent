@@ -5,8 +5,9 @@
  * Heimdall Agent — Intelligent Multi-Agent Sentinel & Environment Bootstrapper
  * ==============================================================================
  * Detects installed tools (Claude Code, Antigravity, Codex CLI, Claude Desktop),
- * inspects active API endpoints (GhostCLI, Custom Proxy, or Official APIs),
+ * inspects active API endpoints (GhostCLI, Google OAuth, or Official APIs),
  * dynamically discovers user PATH & doctrine directories (zero hardcoded paths),
+ * provides 1-second auto-sync ('heimdall sync') for newly installed AI tools,
  * and deploys skills via native live junctions (--link) or isolated copies.
  * ==============================================================================
  */
@@ -205,11 +206,16 @@ function detectEnvironment() {
     detected.endpoints.codex = 'https://api.openai.com (Official)';
   }
 
-  // 5. Check Gemini
-  if (process.env.GEMINI_API_KEY) {
-    detected.endpoints.gemini = 'Google GenAI API (Direct)';
+  // 5. Check Gemini / Google Antigravity
+  // Antigravity connects via Google OAuth / Cloud credentials by default unless a custom API key or proxy is set.
+  if (process.env.GEMINI_BASE_URL) {
+    detected.endpoints.gemini = `Custom Proxy (${process.env.GEMINI_BASE_URL})`;
+  } else if (process.env.GEMINI_API_KEY) {
+    detected.endpoints.gemini = 'Google GenAI API Key (Custom Direct API)';
+  } else if (detected.tools.agy || fs.existsSync(path.join(userHome, '.gemini', 'antigravity-cli'))) {
+    detected.endpoints.gemini = 'Google OAuth (Default Native Account)';
   } else {
-    detected.endpoints.gemini = 'Google GenAI API (Unconfigured/Bridge)';
+    detected.endpoints.gemini = 'Not Installed / Unconfigured';
   }
 
   return detected;
@@ -222,6 +228,7 @@ function parseArgs() {
     agents: null,
     link: false,
     clean: false,
+    sync: false,
     tools: true,
     doctrine: true,
     toolsDir: null,
@@ -237,6 +244,7 @@ function parseArgs() {
     if (arg === '--audit') options.audit = true;
     else if (arg === '--dry-run') options.dryRun = true;
     else if (arg === '--sync-models') options.syncModels = true;
+    else if (arg === 'sync' || arg === '--sync') options.sync = true;
     else if (arg === '--link') options.link = true;
     else if (arg === '--no-link') options.link = false;
     else if (arg === '--clean') options.clean = true;
@@ -395,6 +403,80 @@ async function syncModelsFromEndpoint() {
   }
 }
 
+async function runSync(options, detected) {
+  console.log(`${colors.bold}${colors.cyan}=== Heimdall Auto-Sync Engine ===${colors.reset}\n`);
+  console.log(`Scanning for newly installed AI tools on PATH...\n`);
+
+  const allAvailableSkills = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => d.name);
+
+  let syncedAny = false;
+
+  for (const [agent, targetDir] of Object.entries(targetPaths)) {
+    let toolInstalled = false;
+    if (agent === 'claude' && detected.tools.claude) toolInstalled = true;
+    else if (agent === 'gemini' && (detected.tools.agy || fs.existsSync(path.join(userHome, '.gemini', 'antigravity-cli')))) toolInstalled = true;
+    else if (agent === 'codex' && detected.tools.codex) toolInstalled = true;
+    else if (agent === 'agents') toolInstalled = true;
+
+    if (toolInstalled) {
+      const exists = fs.existsSync(targetDir);
+      const currentSkills = exists
+        ? fs.readdirSync(targetDir, { withFileTypes: true }).filter(d => d.name !== '.system')
+        : [];
+
+      if (!exists || currentSkills.length < allAvailableSkills.length) {
+        console.log(`-> Newly active harness detected: ${colors.bold}${agent.toUpperCase()}${colors.reset} (${targetDir})`);
+        if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+
+        let count = 0;
+        for (const skill of allAvailableSkills) {
+          const srcSkill = path.join(skillsDir, skill);
+          const destSkill = path.join(targetDir, skill);
+          linkDirectory(srcSkill, destSkill, false);
+          count++;
+        }
+        console.log(`   ${colors.green}✔ Linked ${count} skills via NTFS Junctions${colors.reset}\n`);
+        syncedAny = true;
+      } else {
+        console.log(`  ${colors.green}✔${colors.reset} ${agent.toUpperCase().padEnd(8)}: 100% in sync (${currentSkills.length} skills active)`);
+      }
+    }
+  }
+
+  // Check Claude Desktop
+  if (detected.tools.claudeDesktop) {
+    const claudeDesktopFile = path.join(detected.tools.claudeDesktop, 'claude_desktop_config.json');
+    let deskConfig = { mcpServers: {} };
+    if (fs.existsSync(claudeDesktopFile)) {
+      try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
+    }
+    if (!deskConfig.mcpServers?.context7) {
+      if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
+      deskConfig.mcpServers.context7 = {
+        command: "npx",
+        args: ["-y", "@upstash/context7-mcp"]
+      };
+      fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
+      console.log(`  ${colors.green}✔${colors.reset} Configured Context7 MCP for Claude Desktop`);
+      syncedAny = true;
+    }
+  }
+
+  // Refresh bridge tools & shims
+  const activeToolsDir = options.toolsDir || detected.pathCandidates[0];
+  if (activeToolsDir && fs.existsSync(activeToolsDir)) {
+    deployGlobalShims(activeToolsDir, false);
+  }
+
+  if (syncedAny) {
+    console.log(`\n${colors.bold}${colors.green}✔ Auto-sync complete! All active AI tools are now synchronized.${colors.reset}\n`);
+  } else {
+    console.log(`\n${colors.bold}${colors.green}✔ All detected AI tools are already up to date.${colors.reset}\n`);
+  }
+}
+
 function runAudit(options) {
   console.log(`${colors.bold}${colors.cyan}=== Heimdall Environment Audit ===${colors.reset}\n`);
 
@@ -414,6 +496,8 @@ function runAudit(options) {
     .map(d => d.name);
 
   console.log(`Repository Canonical Skills: ${colors.green}${availableSkills.length}${colors.reset}\n`);
+
+  const unlinkedTools = [];
 
   for (const [agent, targetDir] of Object.entries(targetPaths)) {
     if (fs.existsSync(targetDir)) {
@@ -437,9 +521,23 @@ function runAudit(options) {
         : linkedCount > 0 ? ` (${linkedCount} linked, ${installed.length - linkedCount} copies)` : ' (Static copies)';
 
       console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${statusColor}${installed.length} skills${colors.reset} in ${targetDir}${linkLabel}`);
+
+      if (installed.length === 0) {
+        unlinkedTools.push(agent);
+      }
     } else {
       console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${colors.dim}NOT INSTALLED (${targetDir})${colors.reset}`);
+      if ((agent === 'claude' && detected.tools.claude) ||
+          (agent === 'gemini' && detected.tools.agy) ||
+          (agent === 'codex' && detected.tools.codex)) {
+        unlinkedTools.push(agent);
+      }
     }
+  }
+
+  if (unlinkedTools.length > 0) {
+    console.log(`\n${colors.yellow}${colors.bold}[!] Notice:${colors.reset} Installed tools missing skill links: ${unlinkedTools.join(', ')}`);
+    console.log(`    Run ${colors.cyan}heimdall sync${colors.reset} to link skills automatically in 1 second.`);
   }
 
   const activeToolsDir = options.toolsDir || detected.pathCandidates[0];
@@ -582,6 +680,11 @@ async function main() {
 
   if (options.syncModels) {
     await syncModelsFromEndpoint();
+    process.exit(0);
+  }
+
+  if (options.sync) {
+    await runSync(options, detected);
     process.exit(0);
   }
 
