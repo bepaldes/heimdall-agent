@@ -5,10 +5,10 @@
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#predefined-agents-8-specialized-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
   <a href="#skill-inventory-16-curated-toolkits--suites--50-modules"><img src="https://img.shields.io/badge/skills-16%20toolkits%20%26%20suites%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 16 Toolkits & Suites (50 Modules)" /></a>
-  <a href="#supported-runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Desktop-black.svg?style=flat-square" alt="Runtimes" /></a>
+  <a href="#supported-runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
-**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **16 curated skill toolkits & suites (50 modular capabilities)** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
+**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **16 curated skill toolkits & suites (50 modular capabilities)** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, and **Claude Desktop**.
 
 ---
 
@@ -376,6 +376,8 @@ Running `node setup.mjs --clean --link --yes` (or `heimdall sync`) links all 8 a
 * **Claude Code**: `~/.claude/agents/` (natively invokable by name)
 * **Google Antigravity**: `~/.gemini/agents/` & universal `.agents/`
 * **OpenAI Codex CLI**: `~/.codex/agents/`
+* **Hermes Agent**: `%LOCALAPPDATA%\hermes\agents\` or `~/.hermes/agents/`
+* **OpenClaw**: `~/.openclaw/agents/`
 * **Shared Multi-Agent**: `~/.agents/agents/`
 
 [↑ Back to top](#table-of-contents)
@@ -392,6 +394,8 @@ Heimdall operates across **Windows**, **macOS**, and **Linux**. It automatically
 | **Google Antigravity** | `~/.gemini/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) • Google OAuth Native |
 | **Claude Code** | `~/.claude/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) |
 | **OpenAI Codex CLI** | `~/.codex/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) |
+| **Hermes Agent** | Windows: `%LOCALAPPDATA%\hermes\skills\` (or `~/.hermes/skills/`)<br>macOS/Linux: `~/.hermes/skills/` | Dynamic Progressive Disclosure • `external_dirs` in `config.yaml` |
+| **OpenClaw** | `~/.openclaw/skills/` | Dynamic Progressive Disclosure • `AGENTS.md` / `SOUL.md` auto-injection |
 | **Shared Multi-Agent** | `~/.agents/skills/` | Hierarchical Workspace Traversal |
 | **Claude Desktop** | Windows: `%APPDATA%\Claude\`<br>macOS: `~/Library/Application Support/Claude/`<br>Linux: `~/.config/Claude/` | Automated `claude_desktop_config.json` + Playbooks |
 | **IDEs / Editors** | Workspace Root | Standalone Playbooks & Cursorrules |
@@ -413,6 +417,18 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 2. **Windows Sandboxing Flag**: Unlike macOS (Seatbelt) or Linux (Landlock/Bubblewrap), Windows does not possess native POSIX sandbox isolation primitives. For headless cross-agent reviews and automated non-interactive tasks, [`tools/codex-bridge.ps1`](tools/codex-bridge.ps1) executes Codex with `--dangerously-bypass-approvals-and-sandbox` to allow uninterrupted execution.
 3. **Endpoint Flexibility**: Codex can route either to official OpenAI endpoints or via GhostCLI (`https://ghostcli.cloud/v1`) using the `gpt-6-astra` model catalog.
 4. **NTFS Junctions**: All 50 skills are linked directly into `%USERPROFILE%\.codex\skills` as NTFS junctions, ensuring zero file duplication and instantaneous sync.
+
+### Hermes Agent & OpenClaw Integration
+
+Heimdall delivers first-class support for **Hermes Agent** (Nous Research) and **OpenClaw**:
+1. **Hermes Agent (`hermes`)**:
+   - **Cross-Platform Auto-Detection**: Discovers `hermes.cmd` on Windows (`%LOCALAPPDATA%\hermes\bin\hermes.cmd`) or `which hermes` / `~/.hermes/bin/hermes` on macOS/Linux.
+   - **Zero-Drift Live Junctions**: All 50 skills are linked directly into `%LOCALAPPDATA%\hermes\skills\` (or `~/.hermes/skills/`), appearing instantly in `hermes skills list` as enabled local skills.
+   - **Native External Dirs Hook**: `setup.mjs` configures `skills.external_dirs: - ~/.agents/skills` in `config.yaml`, ensuring Nous Research's built-in skills resolver loads Heimdall skills without collisions.
+   - **Universal Doctrine**: `AGENTS.md` is automatically copied into the Hermes root, where Hermes natively auto-injects it into system prompts.
+2. **OpenClaw (`openclaw`)**:
+   - **Cross-Platform Auto-Detection**: Discovers `openclaw` on `PATH` or standard install paths (`~/.openclaw`).
+   - **Modular Skills & Soul**: Links all 50 skills into `~/.openclaw/skills` and synchronizes `AGENTS.md` / `SOUL.md` to govern behavioral boundaries and anti-slop rules.
 
 ### Linux & macOS Parity
 

@@ -45,31 +45,73 @@ const modelsPath = path.join(__dirname, 'config', 'models.json');
 const agentsConfigPath = path.join(__dirname, 'config', 'agents.json');
 const skillsConfigPath = path.join(__dirname, 'config', 'skills.json');
 
+/**
+ * Resolves the platform-specific Hermes Agent directory:
+ * - Windows: %LOCALAPPDATA%\hermes or ~/.hermes
+ * - macOS/Linux: ~/.hermes
+ */
+function getHermesDir() {
+  const platform = os.platform();
+  if (platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA || path.join(userHome, 'AppData', 'Local');
+    const winPath = path.join(localAppData, 'hermes');
+    if (fs.existsSync(winPath)) return winPath;
+  }
+  const homePath = path.join(userHome, '.hermes');
+  if (fs.existsSync(homePath)) return homePath;
+  return platform === 'win32'
+    ? path.join(process.env.LOCALAPPDATA || path.join(userHome, 'AppData', 'Local'), 'hermes')
+    : homePath;
+}
+
+/**
+ * Resolves the platform-specific OpenClaw directory:
+ * - Windows/macOS/Linux: ~/.openclaw (or %LOCALAPPDATA%\openclaw on Windows if present)
+ */
+function getOpenClawDir() {
+  const homePath = path.join(userHome, '.openclaw');
+  if (fs.existsSync(homePath)) return homePath;
+  if (os.platform() === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA || path.join(userHome, 'AppData', 'Local');
+    const winPath = path.join(localAppData, 'openclaw');
+    if (fs.existsSync(winPath)) return winPath;
+  }
+  return homePath;
+}
+
 const targetPaths = {
   claude: path.join(userHome, '.claude', 'skills'),
   gemini: path.join(userHome, '.gemini', 'skills'),
   codex: path.join(userHome, '.codex', 'skills'),
-  agents: path.join(userHome, '.agents', 'skills')
+  agents: path.join(userHome, '.agents', 'skills'),
+  hermes: path.join(getHermesDir(), 'skills'),
+  openclaw: path.join(getOpenClawDir(), 'skills')
 };
 
 const targetAgentPaths = {
   claude: path.join(userHome, '.claude', 'agents'),
   gemini: path.join(userHome, '.gemini', 'agents'),
   codex: path.join(userHome, '.codex', 'agents'),
-  agents: path.join(userHome, '.agents', 'agents')
+  agents: path.join(userHome, '.agents', 'agents'),
+  hermes: path.join(getHermesDir(), 'agents'),
+  openclaw: path.join(getOpenClawDir(), 'agents')
 };
 
 const targetDoctrinePaths = {
   claude: path.join(userHome, '.claude', 'CLAUDE.md'),
   gemini: path.join(userHome, '.gemini', 'GEMINI.md'),
   codex: path.join(userHome, '.codex', 'AGENTS.md'),
-  agents: path.join(userHome, '.agents', 'AGENTS.md')
+  agents: path.join(userHome, '.agents', 'AGENTS.md'),
+  hermes: path.join(getHermesDir(), 'AGENTS.md'),
+  openclaw: path.join(getOpenClawDir(), 'AGENTS.md')
 };
 
 const targetPlaybookPaths = {
   claude: path.join(userHome, '.claude', 'playbooks'),
   gemini: path.join(userHome, '.gemini', 'playbooks'),
-  agents: path.join(userHome, '.agents', 'playbooks')
+  agents: path.join(userHome, '.agents', 'playbooks'),
+  hermes: path.join(getHermesDir(), 'playbooks'),
+  openclaw: path.join(getOpenClawDir(), 'playbooks')
 };
 
 function printBanner() {
@@ -143,6 +185,91 @@ function detectCodexBinary() {
     }
   }
   return null;
+}
+
+/**
+ * Resiliently discovers the Hermes Agent CLI binary on PATH and standard Windows/POSIX install paths.
+ */
+function detectHermesBinary() {
+  const onPath = checkCommand('hermes');
+  if (onPath) return onPath;
+
+  if (os.platform() === 'win32') {
+    const candidates = [
+      path.join(process.env.LOCALAPPDATA || '', 'hermes', 'bin', 'hermes.cmd'),
+      path.join(process.env.LOCALAPPDATA || '', 'hermes', 'bin', 'hermes.exe'),
+      path.join(userHome, '.hermes', 'bin', 'hermes.cmd'),
+      path.join(userHome, '.local', 'bin', 'hermes.cmd')
+    ];
+    for (const cand of candidates) {
+      if (cand && fs.existsSync(cand)) return cand;
+    }
+  } else {
+    const posixCandidates = [
+      path.join(userHome, '.local', 'bin', 'hermes'),
+      path.join(userHome, '.hermes', 'bin', 'hermes'),
+      '/usr/local/bin/hermes'
+    ];
+    for (const cand of posixCandidates) {
+      if (cand && fs.existsSync(cand)) return cand;
+    }
+  }
+  return null;
+}
+
+/**
+ * Resiliently discovers the OpenClaw binary on PATH and standard Windows/POSIX install paths.
+ */
+function detectOpenClawBinary() {
+  const onPath = checkCommand('openclaw');
+  if (onPath) return onPath;
+
+  if (os.platform() === 'win32') {
+    const candidates = [
+      path.join(userHome, '.openclaw', 'bin', 'openclaw.exe'),
+      path.join(userHome, '.openclaw', 'bin', 'openclaw.cmd'),
+      path.join(process.env.LOCALAPPDATA || '', 'openclaw', 'bin', 'openclaw.exe'),
+      path.join(userHome, '.local', 'bin', 'openclaw.cmd')
+    ];
+    for (const cand of candidates) {
+      if (cand && fs.existsSync(cand)) return cand;
+    }
+  } else {
+    const posixCandidates = [
+      path.join(userHome, '.local', 'bin', 'openclaw'),
+      path.join(userHome, '.openclaw', 'bin', 'openclaw'),
+      '/usr/local/bin/openclaw'
+    ];
+    for (const cand of posixCandidates) {
+      if (cand && fs.existsSync(cand)) return cand;
+    }
+  }
+  return null;
+}
+
+/**
+ * Ensures ~/.agents/skills is registered under external_dirs in Hermes's config.yaml.
+ */
+function configureHermesExternalDirs(hermesDir, dryRun = false) {
+  const configPath = path.join(hermesDir, 'config.yaml');
+  if (!fs.existsSync(configPath)) return false;
+  try {
+    const content = fs.readFileSync(configPath, 'utf8');
+    if (content.includes('.agents/skills') || content.includes('.agents\\skills')) {
+      return true;
+    }
+    if (/^\s*external_dirs:\s*$/m.test(content)) {
+      const updated = content.replace(/(external_dirs:\s*[\r\n]+)/m, `$1    - ~/.agents/skills\r\n`);
+      if (!dryRun) fs.writeFileSync(configPath, updated, 'utf8');
+      return true;
+    }
+    if (content.includes('#   external_dirs:')) {
+      const updated = content.replace(/#\s*external_dirs:\s*[\r\n]+#\s*-\s*~\/\.agents\/skills/, `  external_dirs:\r\n    - ~/.agents/skills`);
+      if (!dryRun) fs.writeFileSync(configPath, updated, 'utf8');
+      return true;
+    }
+  } catch {}
+  return false;
 }
 
 /**
@@ -239,6 +366,8 @@ function detectEnvironment() {
   detected.tools.claude = checkCommand('claude');
   detected.tools.agy = checkCommand('agy');
   detected.tools.codex = detectCodexBinary();
+  detected.tools.hermes = detectHermesBinary();
+  detected.tools.openclaw = detectOpenClawBinary();
   detected.tools.cursor = checkCommand('cursor');
   detected.tools.windsurf = checkCommand('windsurf');
 
@@ -291,6 +420,43 @@ function detectEnvironment() {
     detected.endpoints.gemini = 'Not Installed / Unconfigured';
   }
 
+  // 6. Check Hermes Agent
+  const hermesDir = getHermesDir();
+  const hermesConfigPath = path.join(hermesDir, 'config.yaml');
+  if (fs.existsSync(hermesConfigPath)) {
+    try {
+      const content = fs.readFileSync(hermesConfigPath, 'utf8');
+      const defaultMatch = content.match(/^\s*default:\s*["']?([^"'#\r\n]+)["']?/m);
+      const modelMatch = content.match(/^\s*model:\s*["']?([^"'#\r\n]+)["']?/m);
+      const providerMatch = content.match(/^\s*provider:\s*["']?([^"'#\r\n]+)["']?/m);
+      const resolvedModel = (defaultMatch && defaultMatch[1].trim()) || (modelMatch && modelMatch[1].trim());
+      if (resolvedModel) {
+        const prov = providerMatch ? `${providerMatch[1].trim()}/` : '';
+        detected.endpoints.hermes = `${prov}${resolvedModel}`;
+      }
+    } catch {}
+  }
+  if (!detected.endpoints.hermes && (detected.tools.hermes || fs.existsSync(hermesDir))) {
+    detected.endpoints.hermes = 'Nous Research / Configured Provider';
+  } else if (!detected.endpoints.hermes) {
+    detected.endpoints.hermes = 'Not Installed / Unconfigured';
+  }
+
+  // 7. Check OpenClaw
+  const openclawDir = getOpenClawDir();
+  const openclawConfigPath = path.join(openclawDir, 'openclaw.json');
+  if (fs.existsSync(openclawConfigPath)) {
+    try {
+      const cfg = JSON.parse(fs.readFileSync(openclawConfigPath, 'utf8'));
+      if (cfg.model) detected.endpoints.openclaw = cfg.model;
+    } catch {}
+  }
+  if (!detected.endpoints.openclaw && (detected.tools.openclaw || fs.existsSync(openclawDir))) {
+    detected.endpoints.openclaw = 'Local-First Gateway';
+  } else if (!detected.endpoints.openclaw) {
+    detected.endpoints.openclaw = 'Not Installed / Unconfigured';
+  }
+
   return detected;
 }
 
@@ -314,7 +480,7 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
   ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (49), minimal (16), security (12), design (14) [default: full]
-  ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, desktop, all [default: all]
+  ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, desktop, all [default: all]
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
   ${colors.yellow}-y, --yes${colors.reset}              Non-interactive mode (use defaults or provided CLI arguments)
@@ -592,6 +758,11 @@ async function runSync(options, detected) {
     else if (agent === 'gemini' && (detected.tools.agy || fs.existsSync(path.join(userHome, '.gemini', 'antigravity-cli')))) toolInstalled = true;
     else if (agent === 'codex' && detected.tools.codex) toolInstalled = true;
     else if (agent === 'agents') toolInstalled = true;
+    else if (agent === 'hermes' && (detected.tools.hermes || fs.existsSync(getHermesDir()))) {
+      toolInstalled = true;
+      configureHermesExternalDirs(getHermesDir(), false);
+    }
+    else if (agent === 'openclaw' && (detected.tools.openclaw || fs.existsSync(getOpenClawDir()))) toolInstalled = true;
 
     if (toolInstalled) {
       const exists = fs.existsSync(targetDir);
@@ -687,6 +858,14 @@ function runAudit(options) {
   console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.gemini}${colors.reset}`);
   console.log(`  OpenAI Codex CLI:   ${detected.tools.codex ? colors.green + detected.tools.codex + colors.reset : colors.dim + 'Not on PATH' + colors.reset}`);
   console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.codex}${colors.reset}`);
+  if (detected.tools.hermes || fs.existsSync(getHermesDir())) {
+    console.log(`  Hermes Agent:       ${detected.tools.hermes ? colors.green + detected.tools.hermes + colors.reset : colors.dim + getHermesDir() + colors.reset}`);
+    console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.hermes}${colors.reset}`);
+  }
+  if (detected.tools.openclaw || fs.existsSync(getOpenClawDir())) {
+    console.log(`  OpenClaw Agent:     ${detected.tools.openclaw ? colors.green + detected.tools.openclaw + colors.reset : colors.dim + getOpenClawDir() + colors.reset}`);
+    console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.openclaw}${colors.reset}`);
+  }
   console.log(`  Claude Desktop:     ${detected.tools.claudeDesktop ? colors.green + detected.tools.claudeDesktop + colors.reset : colors.dim + 'Not found' + colors.reset}`);
   console.log('');
 
@@ -748,10 +927,17 @@ function runAudit(options) {
         unlinkedTools.push(agent);
       }
     } else {
-      console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${colors.dim}NOT INSTALLED (${targetDir})${colors.reset}`);
+      const isHermesOrOpenClaw = agent === 'hermes' || agent === 'openclaw';
+      const isToolDetected = (agent === 'hermes' && (detected.tools.hermes || fs.existsSync(getHermesDir()))) ||
+                             (agent === 'openclaw' && (detected.tools.openclaw || fs.existsSync(getOpenClawDir())));
+      if (!isHermesOrOpenClaw || isToolDetected) {
+        console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${colors.dim}NOT LINKED (${targetDir})${colors.reset}`);
+      }
       if ((agent === 'claude' && detected.tools.claude) ||
           (agent === 'gemini' && detected.tools.agy) ||
-          (agent === 'codex' && detected.tools.codex)) {
+          (agent === 'codex' && detected.tools.codex) ||
+          (agent === 'hermes' && (detected.tools.hermes || fs.existsSync(getHermesDir()))) ||
+          (agent === 'openclaw' && (detected.tools.openclaw || fs.existsSync(getOpenClawDir())))) {
         unlinkedTools.push(agent);
       }
     }
@@ -793,6 +979,10 @@ async function runInteractive(options, detected) {
     console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.gemini}${colors.reset}`);
     console.log(`  [${detected.tools.codex ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] OpenAI Codex CLI     ${detected.tools.codex ? '(' + detected.tools.codex + ')' : '(Not found)'}`);
     console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.codex}${colors.reset}`);
+    console.log(`  [${detected.tools.hermes ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] Hermes Agent        ${detected.tools.hermes ? '(' + detected.tools.hermes + ')' : '(Not found)'}`);
+    console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.hermes}${colors.reset}`);
+    console.log(`  [${detected.tools.openclaw ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] OpenClaw            ${detected.tools.openclaw ? '(' + detected.tools.openclaw + ')' : '(Not found)'}`);
+    console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.openclaw}${colors.reset}`);
     console.log(`  [${detected.tools.claudeDesktop ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] Claude Desktop       ${detected.tools.claudeDesktop ? '(' + detected.tools.claudeDesktop + ')' : '(Not found)'}`);
     console.log('');
 
@@ -801,23 +991,27 @@ async function runInteractive(options, detected) {
     console.log(`  2. Claude Code CLI only`);
     console.log(`  3. Google Antigravity CLI only`);
     console.log(`  4. OpenAI Codex CLI only`);
-    console.log(`  5. Claude Desktop only (MCP & Playbooks)`);
-    console.log(`  6. Custom Multi-Selection (e.g. Claude + Gemini)`);
+    console.log(`  5. Hermes Agent only`);
+    console.log(`  6. OpenClaw only`);
+    console.log(`  7. Claude Desktop only (MCP & Playbooks)`);
+    console.log(`  8. Custom Multi-Selection (e.g. Claude + Hermes)`);
 
-    const tChoice = await rl.question(`Choose installation targets [1-6, default: 1]: `);
+    const tChoice = await rl.question(`Choose installation targets [1-8, default: 1]: `);
     if (tChoice === '2') options.agents = ['claude'];
     else if (tChoice === '3') options.agents = ['gemini'];
     else if (tChoice === '4') options.agents = ['codex'];
-    else if (tChoice === '5') options.agents = ['desktop'];
-    else if (tChoice === '6') {
-      const custom = await rl.question(`Enter comma-separated targets (claude, gemini, codex, desktop): `);
+    else if (tChoice === '5') options.agents = ['hermes'];
+    else if (tChoice === '6') options.agents = ['openclaw'];
+    else if (tChoice === '7') options.agents = ['desktop'];
+    else if (tChoice === '8') {
+      const custom = await rl.question(`Enter comma-separated targets (claude, gemini, codex, hermes, openclaw, desktop): `);
       options.agents = custom.split(',').map(s => s.trim().toLowerCase());
     } else {
       options.agents = ['all'];
     }
 
     console.log(`\n${colors.yellow}Select Installation Profile Tier:${colors.reset}`);
-    console.log(`  1. full     - All 49 curated skills (Complete Powerhouse)`);
+    console.log(`  1. full     - All 50 curated skills (Complete Powerhouse)`);
     console.log(`  2. minimal  - 15 core skills (Planning, TDD, Anti-Slop, Taste, Hygiene)`);
     console.log(`  3. security - 12 security skills (Differential HTTP probing, OWASP, Trail of Bits)`);
     console.log(`  4. design   - 14 frontend skills (Taste, GSAP motion, Brandkit, Tokens)`);
@@ -1079,7 +1273,11 @@ async function main() {
   // 2. Resolve destination agent directories
   let activeDestinations = [];
   if (options.agents.includes('all')) {
-    activeDestinations = Object.entries(targetPaths);
+    activeDestinations = Object.entries(targetPaths).filter(([agent]) => {
+      if (agent === 'openclaw') return Boolean(detected.tools.openclaw || fs.existsSync(getOpenClawDir()));
+      if (agent === 'hermes') return Boolean(detected.tools.hermes || fs.existsSync(getHermesDir()));
+      return true;
+    });
   } else {
     for (const agent of options.agents) {
       if (targetPaths[agent]) {
@@ -1116,6 +1314,13 @@ async function main() {
     }
     const modeVerb = options.link ? 'Linked (NTFS Junctions)' : 'Synchronized';
     console.log(`   ${colors.green}✔ ${modeVerb} ${installedCount} skills to ${agent}${colors.reset}`);
+
+    if (agent === 'hermes') {
+      const hermesConfigured = configureHermesExternalDirs(getHermesDir(), options.dryRun);
+      if (hermesConfigured) {
+        console.log(`   ${colors.green}✔ Registered ~/.agents/skills in Hermes config.yaml external_dirs${colors.reset}`);
+      }
+    }
   }
 
   // 3.b Deploy Predefined Agents

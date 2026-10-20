@@ -1,7 +1,7 @@
 {
   "name": "heimdall-agent",
   "version": "1.0.0",
-  "description": "Autonomous multi-agent engineering sentinel & bootstrapper. Synchronizes specialized agent personas, curated skills, and universal doctrine across Google Antigravity, Claude Code, OpenAI Codex CLI, and Claude Desktop.",
+  "description": "Autonomous multi-agent engineering sentinel & bootstrapper. Synchronizes specialized agent personas, curated skills, and universal doctrine across Google Antigravity, Claude Code, OpenAI Codex CLI, Hermes Agent, OpenClaw, and Claude Desktop.",
   "type": "module",
   "bin": {
     "heimdall": "./setup.mjs"
@@ -22,6 +22,8 @@
     "antigravity",
     "gemini",
     "codex",
+    "hermes",
+    "openclaw",
     "superpowers",
     "skills",
     "quality-gates"
