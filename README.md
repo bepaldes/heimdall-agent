@@ -49,23 +49,31 @@ Instead of relying on a generic chatbot to guess how to write secure database qu
 
 ---
 
-## 3. Your First Day: 3 Steps to Better Code
+## 3. Quickstart: 3 Steps to Better Code
 
-### Step 1: Install Heimdall on Your Machine
+### Step 1: Install & Bootstrap Heimdall
 Open your terminal and run:
+
 ```powershell
+# 1. Clone repository
 git clone https://github.com/bepaldes/heimdall-agent.git
 cd heimdall-agent
-node setup.mjs
+
+# 2. Run automated setup with live junctions/symlinks & global CLI shortcut
+node setup.mjs --clean --link --yes
 ```
-Heimdall inspects your machine, detects your installed AI tools, and links all 49 skills.
+
+> **Prefer a guided wizard?** Simply run `node setup.mjs` without flags to interactively choose specific agent harnesses, custom directories, and profile tiers.
+>
+> **Global terminal access**: Setup automatically places `heimdall` on your PATH. You can also run `npm link` to register the package globally.
 
 ### Step 2: Choose Your Profile
 * **`full` (Default, 49 skills)**: Complete engineering powerhouse (planning, security, UI, database, hygiene).
 * **`minimal` (15 skills)**: Fast and lean for quick tasks or lightweight laptops.
+*(See [Section 7: Profiles](#7-profiles) for specialized Security and Design tiers).*
 
 ### Step 3: Type Your First Prompt
-Open **Claude Code**, **Google Antigravity**, or **Codex**, and try this prompt:
+Open **Google Antigravity**, **Claude Code**, or **Codex**, and try this prompt:
 ```text
 /plan Build a user registration flow. Grill me on edge cases and requirements first.
 ```
@@ -73,15 +81,15 @@ Notice the difference immediately: the AI stops, challenges your assumptions, pr
 
 ---
 
-## 4. Architecture & Pipeline
+## 4. Architecture & Environment Detection
 
-Heimdall dynamically adapts to any user's directory structure without hardcoded paths:
+Heimdall dynamically inspects the host system without assuming default locations, hardcoded usernames, or preset credentials:
 
 ```
                ┌────────────────────────────────────────────────────────┐
                │                Heimdall Detection Engine              │
-               │  • CLI Tools: claude.exe, agy.exe, codex.exe, cursor   │
-               │  • Desktop: %APPDATA%\Claude                           │
+               │  • CLI Tools: claude, agy, codex, cursor, windsurf     │
+               │  • Desktop: Windows APPDATA / macOS Library / Linux    │
                │  • PATH Discovery: Discovers candidate bin/tool dirs   │
                │  • Endpoints: GhostCLI Proxy / Vendor Direct APIs      │
                └───────────────────────────┬────────────────────────────┘
@@ -106,11 +114,7 @@ Heimdall dynamically adapts to any user's directory structure without hardcoded 
                └────────────────────────────────────────────────────────┘
 ```
 
----
-
-## 5. Interactive Environment Detection
-
-When you run `node setup.mjs`, Heimdall audits the host system without assuming default locations or credentials:
+When run interactively (`node setup.mjs`), Heimdall surfaces all detected tools and endpoints before making any changes:
 
 ```text
 ==================================================
@@ -139,43 +143,28 @@ Selecting an option installs skills and configs strictly to the targeted runtime
 
 ---
 
-## 6. Quickstart & CLI Usage
+## 5. Daily CLI Usage & Workflows
 
-### Interactive Setup
-```powershell
-# 1. Clone repository
-git clone https://github.com/bepaldes/heimdall-agent.git
-cd heimdall-agent
+Once installed, use the global `heimdall` command for daily operations:
 
-# 2. Run interactive setup
-node setup.mjs
-```
-
-### Global CLI Installation
-You can use Heimdall as a global command from any terminal:
-```powershell
-# Option A: Run setup with live NTFS junctions & global shortcut
-node setup.mjs --clean --link --yes
-
-# Option B: Standard npm global link
-npm link
-```
-Now you can run `heimdall` anywhere:
-```powershell
-heimdall sync             # 1-second auto-sync: detects newly installed tools and links skills
-heimdall --audit          # Verify health of all agent harnesses and auth status
-heimdall --sync-models    # Fetch latest models from active proxy/vendor
-```
-
-### Future Tool Installation & Zero-Drift Sync
+### 1-Second Zero-Drift Sync (`heimdall sync`)
 If you only have one tool installed today (e.g., Claude Code), and later install **Google Antigravity** or **OpenAI Codex**, you never have to re-configure Heimdall from scratch. Simply run:
+
 ```powershell
 heimdall sync
 ```
 Heimdall scans your `PATH`, detects the new tool binaries, and immediately links all 49 skills and MCP configurations. Furthermore, `heimdall --audit` proactively detects if any newly installed tool is missing skill links and prompts you to run `heimdall sync`.
 
+### Environment Health Audit (`heimdall --audit`)
+Verify the health of all agent harnesses, link modes (junction vs copy), active endpoints, and skill counts:
+
+```powershell
+heimdall --audit
+```
+
 ### Headless & CI Installation Flags
-Automate setup using profiles and non-interactive flags:
+Automate setup using non-interactive flags in scripts or container setups:
+
 ```powershell
 # Full 49-skill deployment with live junctions across all detected tools
 node setup.mjs --profile full --link --clean --yes
@@ -186,13 +175,13 @@ node setup.mjs --profile minimal --agents claude --yes
 # Custom tool directory and doctrine paths
 node setup.mjs --tools-dir ~/.local/bin --doctrine-path ~/.agents/AGENTS.md --yes
 
-# Verify current environment health
-node setup.mjs --audit
+# Non-destructive dry run
+node setup.mjs --dry-run --yes
 ```
 
 ---
 
-## 7. Dynamic Model Registry (`--sync-models`)
+## 6. Dynamic Model Registry (`--sync-models`)
 
 Rather than relying on outdated static model lists, Heimdall discovers available model catalogs dynamically from active provider or proxy endpoints (e.g. GhostCLI, LiteLLM, or native vendor APIs):
 
@@ -204,7 +193,7 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 
 ---
 
-## 8. Profiles
+## 7. Profiles
 
 | Profile | Skills | Primary Focus | Best For |
 | :--- | :---: | :--- | :--- |
@@ -215,7 +204,8 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 
 ---
 
-## 9. Supported Runtimes & Cross-Platform Matrix
+<a id="supported-runtimes"></a>
+## 8. Supported Runtimes & Cross-Platform Matrix
 
 Heimdall operates across **Windows**, **macOS**, and **Linux**. It automatically selects native directory junctions (`junction`) on Windows or standard directory symlinks (`ln -s`) on POSIX systems.
 
@@ -254,7 +244,8 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 
 ---
 
-## 10. Skill Inventory (49 Curated Skills)
+<a id="skill-inventory-49-curated-skills"></a>
+## 9. Skill Inventory (49 Curated Skills)
 
 <details open>
 <summary><b>1. Planning & Verification Discipline (10 skills)</b></summary>
@@ -342,7 +333,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 
 ---
 
-## 11. Companion Remote Orchestrators
+## 10. Companion Remote Orchestrators
 
 For multi-device pair programming and mobile monitoring, Heimdall integrates with:
 
