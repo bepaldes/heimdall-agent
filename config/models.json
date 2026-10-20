@@ -1,0 +1,73 @@
+{
+  "google": [
+    {
+      "id": "gemini-4",
+      "displayName": "Gemini 4 (Argon)",
+      "family": "google",
+      "specialization": "Next-generation flagship Gemini reasoning, complex multi-file architecture, deep cross-workspace synthesis.",
+      "context": "1M / 2M",
+      "effort": [
+        "low",
+        "medium",
+        "high",
+        "xhigh"
+      ]
+    },
+    {
+      "id": "gemini-3.8-flash",
+      "displayName": "Gemini 3.8 Flash",
+      "family": "google",
+      "specialization": "Fast scans, workspace audits, boilerplate generation, unit test scaffolding, responsive styling.",
+      "context": "1M",
+      "effort": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    {
+      "id": "gemini-3.1-pro",
+      "displayName": "Gemini 3.1 Pro",
+      "family": "google",
+      "specialization": "Massive context analysis, repository-wide multi-file refactoring, deep documentation synthesis.",
+      "context": "2M",
+      "effort": [
+        "medium",
+        "high",
+        "xhigh"
+      ]
+    }
+  ],
+  "ghostcli": [
+    {
+      "id": "claude-opus-5-5",
+      "displayName": "Claude Opus 5.5",
+      "context": "256K",
+      "description": "Melhor equilíbrio entre capacidade e custo"
+    },
+    {
+      "id": "claude-sonnet-5",
+      "displayName": "Claude Sonnet 5",
+      "context": "256K",
+      "description": "O mais rápido sem abrir mão de qualidade"
+    },
+    {
+      "id": "claude-fable-5.1",
+      "displayName": "Claude Fable 5.1",
+      "context": "256K",
+      "description": "Máxima capacidade disponível"
+    },
+    {
+      "id": "z-ai/glm-5.3",
+      "displayName": "GLM 5.3",
+      "context": "1000K",
+      "description": "Código agêntico com contexto de 1M"
+    },
+    {
+      "id": "gpt-6-astra",
+      "displayName": "GPT-6 Astra",
+      "context": "1000K",
+      "description": "Trabalho agêntico longo com janela de 1M"
+    }
+  ]
+}

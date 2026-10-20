@@ -30,23 +30,53 @@ Standard AI coding setups often degrade into a guessing game: agents hallucinate
 
 ---
 
-## 2. Universal Model Resilience & Quota Failover Matrix
+## 2. Interactive Tool & Environment Auto-Detection
 
-Rate limits and quota cooldowns are a reality across **all** frontier AI models (whether Gemini 4 Argon, Claude Opus 5.5, or GPT-6 Astra). When a model hits its quota limit, your workflow should **never stall**.
+Heimdall **does not assume** what tools or endpoints you run. When you run `node setup.mjs`, it scans your system:
+- **CLI Tools on PATH**: Detects `claude.exe`, `agy.exe`, `codex.exe`, `cursor`, `windsurf`.
+- **Desktop Apps**: Checks for Claude Desktop (`%APPDATA%\Claude`).
+- **Active Endpoints & Keys**: Inspects whether you use custom proxies (e.g. GhostCLI, LiteLLM) or official vendor APIs.
 
-`heimdall-agent` enforces an automatic cross-model fallback matrix:
+It then presents an interactive menu and **asks you** where you want it installed:
 
-| Task Domain | Primary Flagship | High-Throughput Fallback | Cross-Provider Fallback |
-| :--- | :--- | :--- | :--- |
-| **Broad Context / Scaffolding** | Gemini 4 Argon (`argon`) | **Gemini 3.1 Pro** (2M context) | Claude Opus 5.5 (`claude-opus-5-5`) |
-| **High-Velocity Coding** | Claude Sonnet 5.5 (`claude-sonnet-5-5`) | **Gemini 3.8 Flash** (unlimited throughput) | GPT-6 Astra (`gpt-6-astra`) |
-| **Deep Reasoning & Bug Hunting**| Claude Opus 5.5 (`claude-opus-5-5`) | **GPT-6 Astra** (`gpt-6-astra`) | Gemini 3.1 Pro (`gemini-3.1-pro`) |
-| **Adversarial Diff Review** | Gemini 4 Argon (`gemini-bridge review`) | **Gemini 3.8 Flash** (`gemini-bridge review`) | GPT-6 Astra (`codex-bridge review`) |
-| **Fast Sanity Checks / Scans** | Gemini 3.8 Flash (`gemini-3.8-flash`) | Claude Haiku 4.5 (`claude-haiku-4-5`) | GPT-6 Astra (`gpt-6-astra`) |
+```
+==================================================
+        Heimdall Environment Detection
+==================================================
+[✔] Claude Code CLI     -> Found (C:\Users\Bernardo\.local\bin\claude.exe)
+                           Endpoint: https://ghostcli.cloud
+[✔] Google Antigravity  -> Found (C:\Users\Bernardo\AppData\Local\agy\bin\agy.exe)
+                           Endpoint: Google GenAI Direct
+[✔] OpenAI Codex CLI    -> Found (C:\Users\Bernardo\AppData\Local\Programs\OpenAI\Codex\bin\codex.exe)
+                           Endpoint: https://ghostcli.cloud/v1
+[✔] Claude Desktop      -> Found (%APPDATA%\Claude)
+[ ] Cursor / Windsurf   -> Not detected on PATH
+
+--------------------------------------------------
+Where would you like Heimdall installed?
+  1. All Detected Tools (Full Ecosystem) [Recommended]
+  2. Claude Code CLI only
+  3. Google Antigravity CLI only
+  4. OpenAI Codex CLI only
+  5. Claude Desktop only (MCP & Playbooks)
+  6. Custom Multi-Selection (e.g. Claude + Gemini)
+```
+
+You stay in full control. If you choose `2`, Heimdall touches *only* `~/.claude/skills/` and leaves other tools intact.
 
 ---
 
-## 3. Quickstart: 1-Click Bootstrap
+## 3. Dynamic Model Syncing (`--sync-models`)
+
+Whenever new models drop on your proxy or provider, run:
+```powershell
+node setup.mjs --sync-models
+```
+Heimdall queries live endpoints (e.g. `https://ghostcli.cloud/v1/models`), discovers new model IDs dynamically, and refreshes `config/models.json` with zero manual editing.
+
+---
+
+## 4. Quickstart: 1-Click Bootstrap
 
 On any new workstation or fresh Windows install:
 
@@ -73,45 +103,44 @@ node setup.mjs --audit
 
 ---
 
-## 4. Supported AI Runtimes
+## 5. Supported AI Runtimes
 
-| Harness | Target Directory | Primary Models | Discovery Mechanism |
-| :--- | :--- | :--- | :--- |
-| **Google Antigravity** | `~/.gemini/skills/` | Gemini 4 Argon, 3.8 Flash, 3.1 Pro | Dynamic Progressive Disclosure |
-| **Claude Code** | `~/.claude/skills/` | Claude Opus 5.5, Sonnet 5.5, Fable 5.1 | Dynamic Progressive Disclosure |
-| **OpenAI Codex CLI** | `~/.codex/skills/` | GPT-6 Astra (via GhostCLI) | Dynamic Progressive Disclosure |
-| **Shared Multi-Agent** | `~/.agents/skills/` | Universal fallback registry | Universal Hierarchical Traversal |
-| **Claude Desktop** | `%APPDATA%\Claude\` | Claude 3.7 / 3.5 Sonnet | Automatic `claude_desktop_config.json` |
-| **Web AI & IDEs** | `playbooks/` & `.cursorrules` | Cursor, Windsurf, ChatGPT, Claude Projects | Standalone Prompt Packs |
+| Harness | Target Directory | Discovery Mechanism |
+| :--- | :--- | :--- |
+| **Google Antigravity** | `~/.gemini/skills/` | Dynamic Progressive Disclosure |
+| **Claude Code** | `~/.claude/skills/` | Dynamic Progressive Disclosure |
+| **OpenAI Codex CLI** | `~/.codex/skills/` | Dynamic Progressive Disclosure |
+| **Shared Multi-Agent** | `~/.agents/skills/` | Universal Hierarchical Traversal |
+| **Claude Desktop** | `%APPDATA%\Claude\` | Automatic `claude_desktop_config.json` |
+| **Web AI & IDEs** | `playbooks/` & `.cursorrules` | Standalone Prompt Packs |
 
 ---
 
-## 5. Companion Tools & Remote Workflow Recommendations
+## 6. Profiles
 
-For modern multi-agent development and remote orchestration, `heimdall-agent` integrates smoothly with the following complementary developer tools:
+Configure exactly which capabilities to deploy:
+
+- **`full` (Default, 49 skills)**: Everything. Process, Anti-Slop, Design Systems, Differential Security, Hygiene, Postgres Best Practices, and Cross-Agent Bridges.
+- **`minimal` (15 skills)**: Fast, lean, and surgical. Planning, TDD, Anti-Slop, Taste-Skill, and Project Hygiene.
+- **`security` (12 skills)**: Penetration testing, Strix differential HTTP probing, OWASP, Snyk, and Trail of Bits audits.
+- **`design` (14 skills)**: Frontend design engineering, token enforcement, GSAP motion, and Brandkit.
+
+---
+
+## 7. Companion Remote Orchestrators
+
+For remote pair programming and mobile monitoring, `heimdall-agent` pairs cleanly with:
 
 1. **[Herdr (`herdr.dev`)](https://herdr.dev/)**:
-   - A terminal-native agent multiplexer written in Rust.
-   - Keeps your background agent tasks and terminal panes running persistently on remote servers or workstations even across network disconnects.
-   - Monitors agent states (`working`, `blocked`, `idle`) with a clean socket/CLI API.
+   - A terminal-native agent multiplexer in Rust.
+   - Keeps your background agent tasks and panes alive across network drops and tracks agent state (`working`, `blocked`, `idle`).
 2. **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**:
-   - A specialized mobile SSH and Mosh client (iOS/Android) built specifically for monitoring and steering AI coding agents on the go.
-   - Pairs with `tmux` or `herdr` on your machine, enabling push notifications for agent decision gates, prompt approvals from your phone, and voice-to-terminal input.
+   - A specialized mobile client (iOS/Android) pairing with `herdr` or `tmux`.
+   - Receive push notifications on plan gates, approve prompts from your phone, and use voice-to-terminal input.
 
 ---
 
-## 6. Desktop & Web AI Playbooks (`playbooks/`)
-
-For AI assistants that don't support dynamic filesystem skill discovery (Claude Desktop, Cursor, ChatGPT, Claude Web Projects), `heimdall-agent` includes copy-pasteable prompt playbooks:
-
-- **[`playbooks/01-interactive-grilling-gate.md`](playbooks/01-interactive-grilling-gate.md)**: Enforces the 3-point questioning gate before any code is generated.
-- **[`playbooks/02-fast-code-deep-verification.md`](playbooks/02-fast-code-deep-verification.md)**: Mandates surgical Karpathy implementation paired with deep TDD verification.
-- **[`playbooks/03-adversarial-code-review.md`](playbooks/03-adversarial-code-review.md)**: Critical diff review and security sanity checks.
-- **[`playbooks/04-design-system-and-taste.md`](playbooks/04-design-system-and-taste.md)**: Design Read declaration, anti-default tokens, and zero-clipping invariants.
-
----
-
-## 7. Pushing to Your GitHub
+## 8. Pushing to Your GitHub
 
 To publish this setup to your GitHub account:
 

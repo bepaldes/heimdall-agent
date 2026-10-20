@@ -2,15 +2,11 @@
 
 /**
  * ==============================================================================
- * Heimdall Agent — Autonomous Multi-Agent Sentinel & Environment Bootstrapper
+ * Heimdall Agent — Intelligent Multi-Agent Sentinel & Environment Bootstrapper
  * ==============================================================================
- * Zero-dependency Node.js installer that configures and synchronizes 48 vetted
- * skills, cross-model bridges, and universal doctrine across:
- *   1. Google Antigravity / Gemini CLI (~/.gemini)
- *   2. Claude Code CLI (~/.claude)
- *   3. OpenAI Codex CLI (~/.codex)
- *   4. Universal Shared Agents Registry (~/.agents)
- *   5. Claude Desktop (%APPDATA%\Claude\claude_desktop_config.json)
+ * Detects installed tools (Claude Code, Antigravity, Codex CLI, Claude Desktop),
+ * inspects active API endpoints (GhostCLI, Custom Proxy, or Official APIs),
+ * presents an interactive selection prompt, and synchronizes skills & doctrine.
  * ==============================================================================
  */
 
@@ -24,7 +20,7 @@ import { execSync } from 'node:child_process';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Colors for terminal output
+// Terminal color formatting
 const colors = {
   reset: '\x1b[0m',
   bold: '\x1b[1m',
@@ -41,10 +37,11 @@ const skillsDir = path.join(__dirname, 'skills');
 const toolsDir = path.join(__dirname, 'tools');
 const doctrineDir = path.join(__dirname, 'doctrine');
 const profilesPath = path.join(__dirname, 'config', 'profiles.json');
+const modelsPath = path.join(__dirname, 'config', 'models.json');
 
 const targetPaths = {
-  gemini: path.join(userHome, '.gemini', 'skills'),
   claude: path.join(userHome, '.claude', 'skills'),
+  gemini: path.join(userHome, '.gemini', 'skills'),
   codex: path.join(userHome, '.codex', 'skills'),
   agents: path.join(userHome, '.agents', 'skills')
 };
@@ -60,19 +57,92 @@ ${colors.cyan}${colors.bold}   ██╗  ██╗███████╗█�
    ██╔══██║██╔══╝  ██║██║╚██╔╝██║██║  ██║██╔══██║██║     ██║     
    ██║  ██║███████╗██║██║ ╚═╝ ██║██████╔╝██║  ██║███████╗███████╗
    ╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝${colors.reset}
-   ${colors.dim}Autonomous Multi-Agent Sentinel & Quality Bootstrapper${colors.reset}
+   ${colors.dim}Intelligent Multi-Agent Sentinel & Quality Bootstrapper${colors.reset}
 `);
+}
+
+function checkCommand(cmd) {
+  try {
+    const isWin = os.platform() === 'win32';
+    const checkCmd = isWin ? `where.exe ${cmd}` : `which ${cmd}`;
+    const result = execSync(checkCmd, { stdio: ['pipe', 'pipe', 'ignore'], encoding: 'utf8' });
+    return result.split('\r\n')[0].split('\n')[0].trim();
+  } catch {
+    return null;
+  }
+}
+
+function detectEnvironment() {
+  const detected = {
+    tools: {},
+    endpoints: {}
+  };
+
+  // 1. Check CLI binaries on PATH
+  detected.tools.claude = checkCommand('claude');
+  detected.tools.agy = checkCommand('agy');
+  detected.tools.codex = checkCommand('codex');
+  detected.tools.cursor = checkCommand('cursor');
+  detected.tools.windsurf = checkCommand('windsurf');
+
+  // 2. Check Claude Desktop directory
+  const appData = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
+  const claudeDesktopDir = path.join(appData, 'Claude');
+  detected.tools.claudeDesktop = fs.existsSync(claudeDesktopDir) ? claudeDesktopDir : null;
+
+  // 3. Check Claude Code endpoint
+  const claudeSettingsPath = path.join(userHome, '.claude', 'settings.json');
+  if (fs.existsSync(claudeSettingsPath)) {
+    try {
+      const settings = JSON.parse(fs.readFileSync(claudeSettingsPath, 'utf8'));
+      if (settings.env?.ANTHROPIC_BASE_URL || settings.env?.CLAUDE_BASE_URL) {
+        detected.endpoints.claude = settings.env.ANTHROPIC_BASE_URL || settings.env.CLAUDE_BASE_URL;
+      }
+    } catch {}
+  }
+  if (!detected.endpoints.claude && process.env.ANTHROPIC_BASE_URL) {
+    detected.endpoints.claude = process.env.ANTHROPIC_BASE_URL;
+  }
+  if (!detected.endpoints.claude) {
+    detected.endpoints.claude = 'https://api.anthropic.com (Official)';
+  }
+
+  // 4. Check Codex endpoint
+  const codexConfigPath = path.join(userHome, '.codex', 'config.toml');
+  if (fs.existsSync(codexConfigPath)) {
+    try {
+      const content = fs.readFileSync(codexConfigPath, 'utf8');
+      const match = content.match(/base_url\s*=\s*"([^"]+)"/);
+      if (match) detected.endpoints.codex = match[1];
+    } catch {}
+  }
+  if (!detected.endpoints.codex && process.env.OPENAI_BASE_URL) {
+    detected.endpoints.codex = process.env.OPENAI_BASE_URL;
+  }
+  if (!detected.endpoints.codex) {
+    detected.endpoints.codex = 'https://api.openai.com (Official)';
+  }
+
+  // 5. Check Gemini
+  if (process.env.GEMINI_API_KEY) {
+    detected.endpoints.gemini = 'Google GenAI API (Direct)';
+  } else {
+    detected.endpoints.gemini = 'Google GenAI API (Unconfigured/Bridge)';
+  }
+
+  return detected;
 }
 
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
     profile: 'full',
-    agents: ['all'],
+    agents: null,
     tools: true,
     doctrine: true,
     dryRun: false,
     audit: false,
+    syncModels: false,
     yes: false
   };
 
@@ -80,6 +150,7 @@ function parseArgs() {
     const arg = args[i];
     if (arg === '--audit') options.audit = true;
     else if (arg === '--dry-run') options.dryRun = true;
+    else if (arg === '--sync-models') options.syncModels = true;
     else if (arg === '--yes' || arg === '-y') options.yes = true;
     else if (arg === '--no-tools') options.tools = false;
     else if (arg === '--no-doctrine') options.doctrine = false;
@@ -119,8 +190,59 @@ function copyDirectory(src, dest, dryRun = false) {
   return count;
 }
 
+async function syncModelsFromEndpoint() {
+  console.log(`${colors.cyan}${colors.bold}=== Live Model Synchronization ===${colors.reset}\n`);
+  const detected = detectEnvironment();
+  let proxyUrl = detected.endpoints.claude || detected.endpoints.codex;
+
+  if (proxyUrl.includes('ghostcli.cloud')) {
+    const targetUrl = 'https://ghostcli.cloud/v1/models';
+    console.log(`Probing GhostCLI Models API: ${colors.yellow}${targetUrl}${colors.reset}...`);
+    try {
+      const res = await fetch(targetUrl);
+      if (res.ok) {
+        const data = await res.json();
+        const modelsList = data.data || data.models || [];
+        console.log(`${colors.green}✔ Successfully discovered ${modelsList.length} live models from GhostCLI!${colors.reset}\n`);
+
+        let currentModels = {};
+        if (fs.existsSync(modelsPath)) {
+          currentModels = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
+        }
+
+        currentModels.ghostcli = modelsList.map(m => ({
+          id: m.id || m.slug,
+          displayName: m.display_name || m.id,
+          context: m.context_window ? `${Math.round(m.context_window / 1000)}K` : '1M',
+          description: m.description || ''
+        }));
+
+        fs.writeFileSync(modelsPath, JSON.stringify(currentModels, null, 2));
+        console.log(`${colors.green}✔ Synchronized models catalog to config/models.json${colors.reset}\n`);
+      } else {
+        console.log(`${colors.yellow}Notice: Endpoint returned HTTP ${res.status}. Preserving cached models.json.${colors.reset}\n`);
+      }
+    } catch (err) {
+      console.log(`${colors.yellow}Notice: Could not reach remote models API (${err.message}). Using local models.json.${colors.reset}\n`);
+    }
+  } else {
+    console.log(`Using configured models from ${modelsPath}.\n`);
+  }
+}
+
 function runAudit() {
   console.log(`${colors.bold}${colors.cyan}=== Heimdall Environment Audit ===${colors.reset}\n`);
+
+  const detected = detectEnvironment();
+  console.log(`${colors.bold}Detected Tools on Machine:${colors.reset}`);
+  console.log(`  Claude Code CLI:    ${detected.tools.claude ? colors.green + detected.tools.claude + colors.reset : colors.dim + 'Not on PATH' + colors.reset}`);
+  console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.claude}${colors.reset}`);
+  console.log(`  Google Antigravity: ${detected.tools.agy ? colors.green + detected.tools.agy + colors.reset : colors.dim + 'Not on PATH' + colors.reset}`);
+  console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.gemini}${colors.reset}`);
+  console.log(`  OpenAI Codex CLI:   ${detected.tools.codex ? colors.green + detected.tools.codex + colors.reset : colors.dim + 'Not on PATH' + colors.reset}`);
+  console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.codex}${colors.reset}`);
+  console.log(`  Claude Desktop:     ${detected.tools.claudeDesktop ? colors.green + detected.tools.claudeDesktop + colors.reset : colors.dim + 'Not found' + colors.reset}`);
+  console.log('');
 
   const availableSkills = fs.readdirSync(skillsDir, { withFileTypes: true })
     .filter(d => d.isDirectory())
@@ -135,16 +257,8 @@ function runAudit() {
         .map(d => d.name);
 
       const missing = availableSkills.filter(s => !installed.includes(s));
-      const extra = installed.filter(s => !availableSkills.includes(s));
-
       const statusColor = missing.length === 0 ? colors.green : colors.yellow;
       console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${statusColor}${installed.length} skills${colors.reset} in ${targetDir}`);
-      if (missing.length > 0) {
-        console.log(`    ${colors.red}Missing (${missing.length}):${colors.reset} ${missing.join(', ')}`);
-      }
-      if (extra.length > 0) {
-        console.log(`    ${colors.yellow}Extra (${extra.length}):${colors.reset} ${extra.join(', ')}`);
-      }
     } else {
       console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${colors.dim}NOT INSTALLED (${targetDir})${colors.reset}`);
     }
@@ -168,39 +282,57 @@ function runAudit() {
   console.log('');
 }
 
-async function runInteractive(options) {
+async function runInteractive(options, detected) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
   try {
-    console.log(`${colors.yellow}Select Installation Profile:${colors.reset}`);
-    console.log(`  1. full     - All 48 curated skills (Default powerhouse)`);
+    console.log(`${colors.bold}${colors.cyan}--- Detected Environment on Your Machine ---${colors.reset}`);
+    console.log(`  [${detected.tools.claude ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] Claude Code CLI      ${detected.tools.claude ? '(' + detected.tools.claude + ')' : '(Not found)'}`);
+    console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.claude}${colors.reset}`);
+    console.log(`  [${detected.tools.agy ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] Google Antigravity   ${detected.tools.agy ? '(' + detected.tools.agy + ')' : '(Not found)'}`);
+    console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.gemini}${colors.reset}`);
+    console.log(`  [${detected.tools.codex ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] OpenAI Codex CLI     ${detected.tools.codex ? '(' + detected.tools.codex + ')' : '(Not found)'}`);
+    console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.codex}${colors.reset}`);
+    console.log(`  [${detected.tools.claudeDesktop ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] Claude Desktop       ${detected.tools.claudeDesktop ? '(' + detected.tools.claudeDesktop + ')' : '(Not found)'}`);
+    console.log('');
+
+    console.log(`${colors.yellow}Where would you like Heimdall installed?${colors.reset}`);
+    console.log(`  1. All Detected Tools (Full Ecosystem) [Recommended]`);
+    console.log(`  2. Claude Code CLI only`);
+    console.log(`  3. Google Antigravity CLI only`);
+    console.log(`  4. OpenAI Codex CLI only`);
+    console.log(`  5. Claude Desktop only (MCP & Playbooks)`);
+    console.log(`  6. Custom Multi-Selection (e.g. Claude + Gemini)`);
+
+    const tChoice = await rl.question(`Choose installation targets [1-6, default: 1]: `);
+    if (tChoice === '2') options.agents = ['claude'];
+    else if (tChoice === '3') options.agents = ['gemini'];
+    else if (tChoice === '4') options.agents = ['codex'];
+    else if (tChoice === '5') options.agents = ['desktop'];
+    else if (tChoice === '6') {
+      const custom = await rl.question(`Enter comma-separated targets (claude, gemini, codex, desktop): `);
+      options.agents = custom.split(',').map(s => s.trim().toLowerCase());
+    } else {
+      options.agents = ['all'];
+    }
+
+    console.log(`\n${colors.yellow}Select Installation Profile Tier:${colors.reset}`);
+    console.log(`  1. full     - All 49 curated skills (Complete Powerhouse)`);
     console.log(`  2. minimal  - 15 core skills (Planning, TDD, Anti-Slop, Taste, Hygiene)`);
     console.log(`  3. security - 12 security skills (Differential HTTP probing, OWASP, Trail of Bits)`);
     console.log(`  4. design   - 14 frontend skills (Taste, GSAP motion, Brandkit, Tokens)`);
 
-    const pChoice = await rl.question(`Choose profile [1-4, default: 1]: `);
+    const pChoice = await rl.question(`Choose profile tier [1-4, default: 1]: `);
     if (pChoice === '2') options.profile = 'minimal';
     else if (pChoice === '3') options.profile = 'security';
     else if (pChoice === '4') options.profile = 'design';
     else options.profile = 'full';
 
-    console.log(`\n${colors.yellow}Select Target Agent Runtimes:${colors.reset}`);
-    console.log(`  1. all      - Gemini, Claude Code, Codex, and .agents (Recommended)`);
-    console.log(`  2. claude   - Claude Code CLI only (~/.claude)`);
-    console.log(`  3. gemini   - Antigravity / Gemini CLI only (~/.gemini)`);
-    console.log(`  4. codex    - OpenAI Codex CLI only (~/.codex)`);
+    const toolsChoice = await rl.question(`Install cross-model bridge tools to C:\\Apps\\tools? (y/n, default: y): `);
+    options.tools = toolsChoice.toLowerCase() !== 'n';
 
-    const aChoice = await rl.question(`Choose agent runtime [1-4, default: 1]: `);
-    if (aChoice === '2') options.agents = ['claude'];
-    else if (aChoice === '3') options.agents = ['gemini'];
-    else if (aChoice === '4') options.agents = ['codex'];
-    else options.agents = ['all'];
-
-    const tChoice = await rl.question(`Install cross-model bridge tools to C:\\Apps\\tools? (y/n, default: y): `);
-    options.tools = tChoice.toLowerCase() !== 'n';
-
-    const dChoice = await rl.question(`Deploy universal doctrine to C:\\Apps\\AGENTS.md? (y/n, default: y): `);
-    options.doctrine = dChoice.toLowerCase() !== 'n';
+    const docChoice = await rl.question(`Deploy universal doctrine to C:\\Apps\\AGENTS.md? (y/n, default: y): `);
+    options.doctrine = docChoice.toLowerCase() !== 'n';
   } finally {
     rl.close();
   }
@@ -209,14 +341,22 @@ async function runInteractive(options) {
 async function main() {
   printBanner();
   const options = parseArgs();
+  const detected = detectEnvironment();
 
   if (options.audit) {
     runAudit();
     process.exit(0);
   }
 
+  if (options.syncModels) {
+    await syncModelsFromEndpoint();
+    process.exit(0);
+  }
+
   if (!options.yes) {
-    await runInteractive(options);
+    await runInteractive(options, detected);
+  } else if (!options.agents) {
+    options.agents = ['all'];
   }
 
   const profilesData = JSON.parse(fs.readFileSync(profilesPath, 'utf8'));
@@ -224,7 +364,7 @@ async function main() {
 
   console.log(`\n${colors.bold}${colors.cyan}=== Executing Heimdall Installation ===${colors.reset}`);
   console.log(`Profile:   ${colors.bold}${selectedProfile.name}${colors.reset} (${options.profile})`);
-  console.log(`Agents:    ${options.agents.join(', ')}`);
+  console.log(`Targets:   ${options.agents.join(', ')}`);
   console.log(`Tools:     ${options.tools ? 'Yes (C:\\Apps\\tools)' : 'No'}`);
   console.log(`Doctrine:  ${options.doctrine ? 'Yes (C:\\Apps\\AGENTS.md)' : 'No'}`);
   console.log(`Dry Run:   ${options.dryRun ? colors.yellow + 'ENABLED' + colors.reset : 'No'}\n`);
@@ -269,7 +409,30 @@ async function main() {
     console.log(`   ${colors.green}✔ Synchronized ${installedCount} skills to ${agent}${colors.reset}`);
   }
 
-  // 4. Deploy tools if requested
+  // 4. Configure Claude Desktop if selected or in 'all'
+  if (options.agents.includes('desktop') || options.agents.includes('all')) {
+    const appData = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
+    const claudeDesktopDir = path.join(appData, 'Claude');
+    const claudeDesktopFile = path.join(claudeDesktopDir, 'claude_desktop_config.json');
+
+    console.log(`\n-> Configuring Claude Desktop (${claudeDesktopFile})...`);
+    if (!options.dryRun) {
+      if (!fs.existsSync(claudeDesktopDir)) fs.mkdirSync(claudeDesktopDir, { recursive: true });
+      let deskConfig = { mcpServers: {} };
+      if (fs.existsSync(claudeDesktopFile)) {
+        try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
+      }
+      if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
+      deskConfig.mcpServers.context7 = {
+        command: "npx",
+        args: ["-y", "@upstash/context7-mcp"]
+      };
+      fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
+    }
+    console.log(`   ${colors.green}✔ Configured Context7 MCP for Claude Desktop${colors.reset}`);
+  }
+
+  // 5. Deploy tools if requested
   if (options.tools) {
     console.log(`\n-> Deploying Bridge Tools to ${colors.bold}${globalToolsPath}${colors.reset}...`);
     if (!options.dryRun && !fs.existsSync(globalToolsPath)) {
@@ -286,7 +449,7 @@ async function main() {
     console.log(`   ${colors.green}✔ Deployed ${tools.length} cross-model bridge tools${colors.reset}`);
   }
 
-  // 5. Deploy universal doctrine if requested
+  // 6. Deploy universal doctrine if requested
   if (options.doctrine) {
     console.log(`\n-> Deploying Universal Doctrine to ${colors.bold}${globalDoctrinePath}${colors.reset}...`);
     const srcDoc = path.join(doctrineDir, 'AGENTS.md');
