@@ -526,7 +526,8 @@ For multi-device pair programming, mobile monitoring, and project memory, Heimda
 
 - **[Herdr (`herdr.dev`)](https://herdr.dev/)**: A terminal-native agent multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`).
 - **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: A mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
-- **Graphify & Obsidian Vaults**: Developers managing large or legacy repositories can pair Graphify's AST-based dependency parser with local Obsidian Markdown vaults. By exporting codebase relationships into interconnected Markdown (`[[wikilinks]]`), AI coding assistants (like Claude Code) can load an immediate high-level architectural map on launch, drastically reducing startup token scans.
+- **[Graphify (`github.com/Graphify-Labs/graphify`)](https://github.com/Graphify-Labs/graphify)**: An open-source, local-first code knowledge graph builder. Uses Tree-sitter AST parsing across 40+ programming languages to build deterministic dependency maps with zero LLM API costs, and exports directly to Obsidian vaults (`--obsidian`).
+- **[Obsidian (`obsidian.md`)](https://obsidian.md/)**: A local-first, extensible Markdown knowledge base. Paired with Graphify-generated vaults (`[[wikilinks]]`), it serves as persistent external memory for AI coding agents (like Claude Code), loading immediate architectural context on startup without expensive token scanning.
 
 [↑ Back to top](#table-of-contents)
 
