@@ -270,6 +270,43 @@ function detectEnvironment() {
   return detected;
 }
 
+function printHelp() {
+  console.log(`
+${colors.bold}${colors.cyan}Heimdall Agent CLI${colors.reset} — Intelligent Multi-Agent Sentinel & Quality Bootstrapper
+
+${colors.bold}USAGE:${colors.reset}
+  heimdall [command] [options]
+  node setup.mjs [command] [options]
+
+${colors.dim}Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is the global CLI shortcut.${colors.reset}
+
+${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
+  ${colors.green}sync${colors.reset} (or ${colors.dim}--sync${colors.reset})           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
+  ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
+  ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. GhostCLI) and refresh models.json
+  ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
+
+${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
+  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (49), minimal (15), security (12), design (14) [default: full]
+  ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, desktop, all [default: all]
+  ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
+  ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
+  ${colors.yellow}-y, --yes${colors.reset}              Non-interactive mode (use defaults or provided CLI arguments)
+  ${colors.yellow}--dry-run${colors.reset}              Simulate execution without modifying the filesystem
+  ${colors.yellow}--tools-dir <dir>${colors.reset}      Custom directory to deploy cross-model bridge tools and 'heimdall' CLI
+  ${colors.yellow}--doctrine-path <file>${colors.reset} Custom file destination for AGENTS.md universal doctrine
+  ${colors.yellow}--no-tools${colors.reset}             Skip deploying bridge tools and CLI shims
+  ${colors.yellow}--no-doctrine${colors.reset}          Skip deploying AGENTS.md universal doctrine
+
+${colors.bold}EXAMPLES:${colors.reset}
+  heimdall sync                             # Instant sync after installing a new tool
+  heimdall audit                            # Environment health check
+  heimdall sync-models                      # Refresh model catalogs
+  node setup.mjs --clean --link --yes       # Recommended full automated setup with live junctions
+  node setup.mjs --profile minimal --yes    # Minimal install for lightweight laptop
+`);
+}
+
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
@@ -285,15 +322,19 @@ function parseArgs() {
     dryRun: false,
     audit: false,
     syncModels: false,
+    help: false,
     yes: false
   };
 
   for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg === '--audit') options.audit = true;
-    else if (arg === '--dry-run') options.dryRun = true;
-    else if (arg === '--sync-models') options.syncModels = true;
+    const rawArg = args[i];
+    const arg = rawArg.toLowerCase();
+
+    if (arg === 'help' || arg === '--help' || arg === '-h') options.help = true;
+    else if (arg === 'audit' || arg === '--audit') options.audit = true;
     else if (arg === 'sync' || arg === '--sync') options.sync = true;
+    else if (arg === 'sync-models' || arg === '--sync-models' || arg === 'syncmodels') options.syncModels = true;
+    else if (arg === '--dry-run') options.dryRun = true;
     else if (arg === '--link') options.link = true;
     else if (arg === '--no-link') options.link = false;
     else if (arg === '--clean') options.clean = true;
@@ -301,7 +342,7 @@ function parseArgs() {
     else if (arg === '--no-tools') options.tools = false;
     else if (arg === '--no-doctrine') options.doctrine = false;
     else if (arg === '--profile' && args[i + 1]) {
-      options.profile = args[++i];
+      options.profile = args[++i].toLowerCase();
     } else if (arg === '--agents' && args[i + 1]) {
       options.agents = args[++i].split(',').map(s => s.trim().toLowerCase());
     } else if (arg === '--tools-dir' && args[i + 1]) {
@@ -721,6 +762,11 @@ async function main() {
   printBanner();
   const options = parseArgs();
   const detected = detectEnvironment();
+
+  if (options.help) {
+    printHelp();
+    process.exit(0);
+  }
 
   if (options.audit) {
     runAudit(options);
