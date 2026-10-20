@@ -1,7 +1,7 @@
 {
   "version": "1.2.0",
-  "description": "Heimdall Canonical Skill Registry & 15-Suite Hierarchy",
-  "totalSuites": 15,
+  "description": "Heimdall Canonical Skill Registry & 16-Suite Hierarchy",
+  "totalSuites": 16,
   "totalModules": 50,
   "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
   "suites": {
@@ -56,8 +56,7 @@
         "antislop-copywriting",
         "antislop-ui",
         "antislop-human",
-        "antislop-layoutmobile",
-        "caveman"
+        "antislop-layoutmobile"
       ]
     },
     "cross-model-bridges": {
@@ -102,6 +101,14 @@
       "upstream": "https://github.com/strix-security/strix",
       "modules": [
         "strix-security"
+      ]
+    },
+    "security-audit-sweep": {
+      "name": "Security Audit Sweep Sentinel",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "security-audit-sweep"
       ]
     },
     "owasp-security": {
@@ -364,8 +371,8 @@
     },
     "ponytail": {
       "name": "ponytail",
-      "category": "Planning & Verification",
-      "description": "Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces the",
+      "category": "Code Quality & YAGNI Restraint",
+      "description": "Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces the Decision Ladder: YAGNI checks, codebase reuse, standard library first, native platform features, and zero premature abstractions while strictly preserving security and error handling.",
       "upstream": "https://github.com/DietrichGebert/ponytail",
       "sourceRevision": "v1.0.0",
       "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
@@ -509,7 +516,7 @@
     "trailofbits-triage-brocards": {
       "name": "trailofbits-triage-brocards",
       "category": "Security & Probing",
-      "description": "-",
+      "description": "Systematically evaluates incoming vulnerability reports against 7 principled brocards to accept, dismiss, or request clarification before committing engineering resources.",
       "upstream": "https://github.com/trailofbits/skills",
       "sourceRevision": "v1.0.0",
       "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."

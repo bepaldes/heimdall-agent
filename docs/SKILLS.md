@@ -21,7 +21,7 @@ heimdall update-skill all
 ### Core Multi-Skill Suites
 - [📦 Superpowers Software Engineering Suite (15 modules)](#superpowers)
 - [📦 Taste Design & Aesthetic Studio (12 modules)](#taste-studio)
-- [📦 Anti-Slop Quality & Token Efficiency Suite (7 modules)](#antislop)
+- [📦 Anti-Slop Quality & Token Efficiency Suite (6 modules)](#antislop)
 - [📦 Tri-Directional Cross-Model Bridges (3 modules)](#cross-model-bridges)
 - [📦 Trail of Bits High-Assurance AppSec Suite (3 modules)](#trailofbits-appsec)
 
@@ -29,6 +29,7 @@ heimdall update-skill all
 - [⚡ Ponytail Code Restraint](#ponytail)
 - [⚡ Karpathy Simplicity Guidelines](#karpathy-guidelines)
 - [⚡ Strix Differential Security Probing](#strix-security)
+- [⚡ Security Audit Sweep Sentinel](#security-audit-sweep)
 - [⚡ OWASP Top 10 Web Defense](#owasp-security)
 - [⚡ Cloudflare Edge & WAF Security](#cloudflare-security-audit)
 - [⚡ Snyk Dependency & Vulnerability Scan](#snyk-agent-scan)
@@ -95,7 +96,7 @@ heimdall update-skill all
 ---
 
 <a id="antislop"></a>
-### 📦 Anti-Slop Quality & Token Efficiency Suite (7 modules)
+### 📦 Anti-Slop Quality & Token Efficiency Suite (6 modules)
 
 - **Upstream Source**: [https://github.com/obra/antislop](https://github.com/obra/antislop)
 - **Suite Type**: Multi-Skill Suite
@@ -108,7 +109,6 @@ heimdall update-skill all
 * **`antislop-ui`**: "UI and visual skill for antislop. Use when building or editing any interface: color, layout, components, motion. Load with the core." ([Contract File](../skills/antislop-ui/SKILL.md))
 * **`antislop-human`**: "Human and accessibility skill for antislop. Contrast, keyboard, focus, and states for real people. Includes the contrast checker." ([Contract File](../skills/antislop-human/SKILL.md))
 * **`antislop-layoutmobile`**: "Mobile layout skill for antislop. Use for layouts that reflow across screen sizes, phone to desktop: grids, overflow, tap targets. Load with the core." ([Contract File](../skills/antislop-layoutmobile/SKILL.md))
-* **`caveman`**: Slashes chat token consumption by dropping conversational filler, pleasantries, and polite ceremony. ([Contract File](../skills/caveman/SKILL.md))
 
 [↑ Back to top](#toc)
 
@@ -140,7 +140,7 @@ heimdall update-skill all
 
 * **`trailofbits-audit-context`**: Understand a codebase before looking for bugs in it - what each function assumes, what it guarantees, and what it depends on elsewhere. Use when starting an audit, threat model, or architecture review on unfamiliar code, and before any vulnerability-hunting pass. ([Contract File](../skills/trailofbits-audit-context/SKILL.md))
 * **`trailofbits-insecure-defaults`**: Audits codebases for insecure defaults, fail-open patterns, fallback credentials, permissive access control, debug endpoints, and weak cryptography using Trail of Bits vulnerability patterns. Use when reviewing configuration, authentication, encryption, authorization bypasses, or security controls. ([Contract File](../skills/trailofbits-insecure-defaults/SKILL.md))
-* **`trailofbits-triage-brocards`**: - ([Contract File](../skills/trailofbits-triage-brocards/SKILL.md))
+* **`trailofbits-triage-brocards`**: Systematically evaluates incoming vulnerability reports against 7 principled brocards to accept, dismiss, or request clarification before committing engineering resources. ([Contract File](../skills/trailofbits-triage-brocards/SKILL.md))
 
 [↑ Back to top](#toc)
 
@@ -152,7 +152,7 @@ heimdall update-skill all
 ### ⚡ Ponytail Code Restraint
 
 - **Module Name**: `ponytail`
-- **Description**: Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces the
+- **Description**: Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces the Decision Ladder: YAGNI checks, codebase reuse, standard library first, native platform features, and zero premature abstractions while strictly preserving security and error handling.
 - **Upstream Source**: [https://github.com/DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
 - **Contract File**: [`skills/ponytail/SKILL.md`](../skills/ponytail/SKILL.md)
 
@@ -179,6 +179,18 @@ heimdall update-skill all
 - **Description**: Autonomous AI penetration testing and dynamic HTTP differential probing methodology (based on usestrix/strix). Never trust code comments alone; verify every mounted route, static asset prefix, reverse-proxy rule, and Host-header boundary with concrete Proof-of-Concept (PoC) HTTP probes across Anonymous, Unprivileged, Cross-Tenant/Venue, and Authorized principals.
 - **Upstream Source**: [https://github.com/strix-security/strix](https://github.com/strix-security/strix)
 - **Contract File**: [`skills/strix-security/SKILL.md`](../skills/strix-security/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="security-audit-sweep"></a>
+### ⚡ Security Audit Sweep Sentinel
+
+- **Module Name**: `security-audit-sweep`
+- **Description**: Generic security audit sweep for web applications, APIs, and microservices: performs dynamic differential HTTP probing, validates IAM role entitlements, scans dependency vulnerabilities, and checks for secret leakage.
+- **Upstream Source**: [https://github.com/bepaldes/heimdall-agent](https://github.com/bepaldes/heimdall-agent)
+- **Contract File**: [`skills/security-audit-sweep/SKILL.md`](../skills/security-audit-sweep/SKILL.md)
 
 [↑ Back to top](#toc)
 

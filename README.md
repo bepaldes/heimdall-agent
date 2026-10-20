@@ -4,11 +4,11 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#predefined-agents-8-specialized-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
-  <a href="#skill-inventory-15-curated-suites--toolkits--50-modules"><img src="https://img.shields.io/badge/skills-15%20suites%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 15 Suites (50 Modules)" /></a>
+  <a href="#skill-inventory-16-curated-toolkits--suites--50-modules"><img src="https://img.shields.io/badge/skills-16%20toolkits%20%26%20suites%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 16 Toolkits & Suites (50 Modules)" /></a>
   <a href="#supported-runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Desktop-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
-**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **15 curated skill suites (50 modular capabilities)** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
+**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **16 curated skill toolkits & suites (50 modular capabilities)** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, and **Claude Desktop**.
 
 ---
 
@@ -24,7 +24,7 @@
 - [7. Profiles](#7-profiles)
 - [8. Predefined Agent Roster (8 Specialized Personas)](#predefined-agents-8-specialized-personas)
 - [9. Supported Runtimes & Cross-Platform Matrix](#supported-runtimes)
-- [10. Skill Inventory (15 Curated Suites & Toolkits / 50 Modules)](#skill-inventory-15-curated-suites--toolkits--50-modules)
+- [10. Skill Inventory (16 Curated Toolkits & Suites / 50 Modules)](#skill-inventory-16-curated-toolkits--suites--50-modules)
 - [11. Companion Remote Orchestrators & Architectural Memory](#11-companion-remote-orchestrators)
 - [License](#license)
 
@@ -412,7 +412,7 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 1. **Binary Detection**: Heimdall automatically discovers `codex.exe` on `PATH`, `%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe`, or `%USERPROFILE%\.codex\packages\standalone\current\bin\codex.exe`.
 2. **Windows Sandboxing Flag**: Unlike macOS (Seatbelt) or Linux (Landlock/Bubblewrap), Windows does not possess native POSIX sandbox isolation primitives. For headless cross-agent reviews and automated non-interactive tasks, [`tools/codex-bridge.ps1`](tools/codex-bridge.ps1) executes Codex with `--dangerously-bypass-approvals-and-sandbox` to allow uninterrupted execution.
 3. **Endpoint Flexibility**: Codex can route either to official OpenAI endpoints or via GhostCLI (`https://ghostcli.cloud/v1`) using the `gpt-6-astra` model catalog.
-4. **NTFS Junctions**: All 49 skills are linked directly into `%USERPROFILE%\.codex\skills` as NTFS junctions, ensuring zero file duplication and instantaneous sync.
+4. **NTFS Junctions**: All 50 skills are linked directly into `%USERPROFILE%\.codex\skills` as NTFS junctions, ensuring zero file duplication and instantaneous sync.
 
 ### Linux & macOS Parity
 
@@ -424,42 +424,36 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 
 ---
 
-<a id="skill-inventory-15-curated-suites--toolkits--50-modules"></a>
-## 10. Skill Inventory (15 Curated Suites & Toolkits / 50 Modules)
+<a id="skill-inventory-16-curated-toolkits--suites--50-modules"></a>
+## 10. Skill Inventory (16 Curated Toolkits & Suites / 50 Modules)
 
-Heimdall organizes capabilities into **15 Primary Toolkits & Suites (50 modular capabilities)**. For full trigger conditions, descriptions, and upstream repository links for every skill, see the complete [Skills Directory](docs/SKILLS.md).
+Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** and **11 Standalone Power Toolkits (11 modules)** for a total of **50 modular capabilities**. For full trigger conditions, descriptions, and upstream repository links for every skill, see the complete [Skills Directory](docs/SKILLS.md).
+
+### Core Multi-Skill Suites (5 Suites / 39 Modules)
 
 <details open>
-<summary><b>1. Superpowers Engineering Suite (10 planning & verification modules)</b></summary>
+<summary><b>1. Superpowers Engineering Suite (15 modules) — Jesse Vincent / obra</b></summary>
 
 - `brainstorming`: Surfaces implicit assumptions and explores alternatives before design lock.
 - `writing-plans`: Structures modular, bite-sized tasks with verifiable completion criteria.
 - `executing-plans`: Enforces step-by-step verification and halts execution upon unexpected failures.
-- `karpathy-guidelines`: Demands minimal surgical edits and rejects speculative configurability.
-- `ponytail`: Pragmatic senior developer YAGNI code restraint and anti-bloat Decision Ladder.
+- `subagent-driven-development`: Decomposes large tasks into isolated subagents with specialized briefs.
+- `dispatching-parallel-agents`: Coordinates concurrent subagent workers on independent branches.
 - `test-driven-development`: Requires failing automated tests prior to implementation logic.
 - `systematic-debugging`: Isolates root causes using scientific hypothesis testing.
 - `verification-before-completion`: Mandates passing test suites and live verification before claiming completion.
 - `finishing-a-development-branch`: Verifies branch hygiene, tests, and documentation before merge.
 - `using-git-worktrees`: Manages parallel agent execution branches without dirtying working trees.
+- `requesting-code-review`: Formats structured diff context for adversarial peer review.
+- `receiving-code-review`: Parses peer critiques objectively and implements verified recommendations.
+- `using-superpowers`: Multi-agent operational playbook for complex software development.
+- `diagnosing-superpowers`: Health check and triage harness for agent tooling and skill resolution.
+- `writing-skills`: Authors new modular skills adhering to standard frontmatter and trigger contracts.
 
 </details>
 
 <details>
-<summary><b>2. Anti-Slop Quality & Token Efficiency Suite (7 modules)</b></summary>
-
-- `antislop`: Core guardrail prohibiting generic AI filler, fake buzzwords, and decorative bloat.
-- `antislop-code`: Prohibits redundant comments, defensive dead code, and speculative abstractions.
-- `antislop-copywriting`: Bans AI buzzwords (*unlock, elevate, robust*), signposting, and fake authority tropes.
-- `antislop-ui`: Rejects generic purple gradients, uniform pill radius, and unmotivated dark modes.
-- `antislop-human`: Enforces WCAG AAA contrast, semantic HTML, and accessible interactive targets.
-- `antislop-layoutmobile`: Guarantees responsive flex safety, zero clipping, and touch-target padding.
-- `caveman`: Token-efficiency protocol slashing conversational ceremony while preserving code and tool payloads.
-
-</details>
-
-<details>
-<summary><b>3. Taste Design & Aesthetic Studio (12 modules)</b></summary>
+<summary><b>2. Taste Design & Aesthetic Studio (12 modules)</b></summary>
 
 - `taste-skill`: Enforces cohesive design reads, purpose-driven typography, and brand-first color logic.
 - `taste-skill-v1`: Baseline visual hierarchy and layout balance heuristics.
@@ -477,41 +471,51 @@ Heimdall organizes capabilities into **15 Primary Toolkits & Suites (50 modular 
 </details>
 
 <details>
-<summary><b>4. Security & Differential Probing (8 modules)</b></summary>
+<summary><b>3. Anti-Slop Quality Suite (6 modules) — Jesse Vincent / obra</b></summary>
 
-- `strix-security`: Dynamic differential HTTP probing across anonymous, unprivileged, and admin actors.
-- `security-audit-sweep`: Automated surface scan for exposed credentials, open ports, and risky calls.
-- `owasp-security`: Web application defense against injection, broken auth, and SSRF.
-- `cloudflare-security-audit`: Edge proxy, WAF rule, and CORS header verification.
-- `snyk-agent-scan`: Dependency vulnerability analysis and license compliance validation.
-- `trailofbits-audit-context`: High-assurance security analysis modeled on Trail of Bits practices.
-- `trailofbits-insecure-defaults`: Detection of insecure default configurations and permission creep.
-- `trailofbits-triage-brocards`: Structured security triaging and vulnerability risk prioritization.
+- `antislop`: Core guardrail prohibiting generic AI filler, fake buzzwords, and decorative bloat.
+- `antislop-code`: Prohibits redundant comments, defensive dead code, and speculative abstractions.
+- `antislop-copywriting`: Bans AI buzzwords (*unlock, elevate, robust*), signposting, and fake authority tropes.
+- `antislop-ui`: Rejects generic purple gradients, uniform pill radius, and unmotivated dark modes.
+- `antislop-human`: Enforces WCAG AAA contrast, semantic HTML, and accessible interactive targets.
+- `antislop-layoutmobile`: Guarantees responsive flex safety, zero clipping, and touch-target padding.
 
 </details>
 
 <details>
-<summary><b>5. Architecture, Database & Platform (3 modules)</b></summary>
+<summary><b>4. Tri-Directional Cross-Model Bridges (3 modules)</b></summary>
 
-- `postgres-best-practices`: Supabase-curated guidelines for indexing, connection pooling, and migrations.
-- `project-hygiene`: Audits recoverable disk space, detects dead code, and purges build caches.
-- `output-skill`: Structured output formatting for complex analysis artifacts.
+- `claude-collaborator`: Cross-model delegation bridge to Claude Opus / Sonnet for deep architectural review.
+- `gemini-collaborator`: Cross-model delegation bridge to Google Antigravity / Gemini for high-velocity scans.
+- `codex-collaborator`: Cross-model delegation bridge to OpenAI Codex CLI (Astra) for adversarial peer reviews.
 
 </details>
 
 <details>
-<summary><b>6. Multi-Agent Orchestration & Cross-Model Bridges (10 modules)</b></summary>
+<summary><b>5. Trail of Bits High-Assurance AppSec Suite (3 modules) — Trail of Bits</b></summary>
 
-- `subagent-driven-development`: Decomposes large tasks into isolated subagents with specialized briefs.
-- `dispatching-parallel-agents`: Coordinates concurrent subagent workers on independent branches.
-- `claude-collaborator`: Cross-model delegation bridge to Claude Opus / Sonnet for deep review.
-- `gemini-collaborator`: Cross-model delegation bridge to Gemini for high-velocity workspace scans.
-- `codex-collaborator`: Cross-model delegation bridge to OpenAI Codex CLI (Astra) for adversarial reviews.
-- `requesting-code-review`: Formats structured diff context for adversarial peer review.
-- `receiving-code-review`: Parses peer critiques objectively and implements verified recommendations.
-- `using-superpowers`: Multi-agent operational playbook for complex software development.
-- `diagnosing-superpowers`: Health check and triage harness for agent tooling and skill resolution.
-- `writing-skills`: Authors new modular skills adhering to standard frontmatter and trigger contracts.
+- `trailofbits-audit-context`: High-assurance code assumption, guarantee, and architectural dependency mapping.
+- `trailofbits-insecure-defaults`: Detection of insecure default configurations, fail-open patterns, and permissive access.
+- `trailofbits-triage-brocards`: Systematic evaluation of incoming vulnerability reports against 7 principled brocards.
+
+</details>
+
+### Standalone Power Toolkits (11 Curated Toolkits / 11 Modules)
+
+<details open>
+<summary><b>Browse Standalone Toolkits (including ponytail, karpathy, caveman, and security sentinels)</b></summary>
+
+- **`ponytail`**: Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces Dietrich Gebert's 7-step Decision Ladder: YAGNI checks, codebase reuse, built-in standard library, native platform features, and zero premature abstractions while strictly preserving security and error handling.
+- **`karpathy-guidelines`**: Andrej Karpathy's simplicity heuristics: write minimal surgical code, reject speculative configurability, surface hidden assumptions, and never touch adjacent working code.
+- **`caveman`**: Julius Brussee's token-reduction protocol slashing conversational ceremony, pleasantries, and AI sycophancy while preserving raw code, shell commands, and structured diffs.
+- **`strix-security`**: Autonomous dynamic HTTP differential probing across Anonymous, Unprivileged, and Privileged identity contexts.
+- **`security-audit-sweep`**: 4-phase security audit sweeping route gates, IAM entitlement least-privilege, dependency vulnerabilities, and secret leakage.
+- **`owasp-security`**: Hardens code against OWASP Top 10:2025, ASVS 5.0, LLM Top 10, and Agentic Application risks.
+- **`cloudflare-security-audit`**: Edge security, WAF configuration, and CORS boundary enforcement.
+- **`snyk-agent-scan`**: Automated scanning of AI skills, MCP configurations, and supply chains for prompt injection and credential leaks.
+- **`postgres-best-practices`**: Supabase-curated architectural guidelines for PostgreSQL schema design, indexing, connection pooling, and RLS policies.
+- **`project-hygiene`**: Sweeps workspaces for dead code, unused exports, circular dependencies, and stale build caches.
+- **`output-skill`**: Guarantees unabridged LLM output without ellipses (`...`), incomplete code blocks, or truncation.
 
 </details>
 
