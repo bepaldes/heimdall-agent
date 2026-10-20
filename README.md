@@ -12,6 +12,24 @@
 
 ---
 
+<a id="table-of-contents"></a>
+## Table of Contents
+
+- [1. New to AI Coding? Start Here](#1-new-to-ai-coding-start-here)
+- [2. The Old Way vs. The Heimdall Way](#2-the-old-way-vs-the-heimdall-way)
+- [3. Quickstart: 3 Steps to Better Code](#3-quickstart-3-steps-to-better-code)
+- [4. Architecture & Environment Detection](#4-architecture--environment-detection)
+- [5. Daily CLI Usage & Complete Parameter Reference](#5-daily-cli-usage--complete-parameter-reference)
+- [6. Dynamic Model Registry (`sync-models`)](#6-dynamic-model-registry-sync-models)
+- [7. Profiles](#7-profiles)
+- [8. Predefined Agent Roster (8 Specialized Personas)](#predefined-agents-8-specialized-personas)
+- [9. Supported Runtimes & Cross-Platform Matrix](#supported-runtimes)
+- [10. Skill Inventory (49 Curated Skills)](#skill-inventory-49-curated-skills)
+- [11. Companion Remote Orchestrators](#11-companion-remote-orchestrators)
+- [License](#license)
+
+---
+
 ## 1. New to AI Coding? Start Here
 
 If you have tried coding with AI assistants (ChatGPT, Claude, Cursor, or Copilot), you have likely run into the **Beginner AI Trap**:
@@ -36,6 +54,8 @@ Senior engineers do not let AI models rush into writing code. They force the AI 
 
 Instead of relying on a generic chatbot to guess how to write secure database queries or accessible CSS, Heimdall equips your agent with 49 specialized toolkits. When your AI is asked to touch a database, it automatically activates `postgres-best-practices` (curated by Supabase). When it works on UI, it activates `taste-skill` and `antislop-ui`. When it audits an API, it activates `strix-security`.
 
+[↑ Back to top](#table-of-contents)
+
 ---
 
 ## 2. The Old Way vs. The Heimdall Way
@@ -47,6 +67,8 @@ Instead of relying on a generic chatbot to guess how to write secure database qu
 | **Code Style** | AI-slop: redundant comments, excessive abstractions, purple gradients. | **Antislop Guardrails**: Clean, minimal, readable code adhering to your design system. |
 | **Verification** | AI claims "done!" blindly; breaks existing features. | **Mandatory Testing**: Writes failing tests first, verifies edge cases, checks error paths. |
 | **Architecture** | Scattered duplicate configs drifting across tools. | **Single Source of Truth**: Linked via native junctions; one central repository. |
+
+[↑ Back to top](#table-of-contents)
 
 ---
 
@@ -80,8 +102,11 @@ Open **Google Antigravity**, **Claude Code**, or **Codex**, and try this prompt:
 ```
 Notice the difference immediately: the AI stops, challenges your assumptions, proposes clean architecture, and writes surgical, tested code.
 
+[↑ Back to top](#table-of-contents)
+
 ---
 
+<a id="4-architecture--environment-detection"></a>
 ## 4. Architecture & Environment Detection
 
 Heimdall dynamically inspects the host system without assuming default locations, hardcoded usernames, or preset credentials:
@@ -142,8 +167,11 @@ Where would you like Heimdall installed?
 
 Selecting an option installs skills and configs strictly to the targeted runtimes, leaving untouched tools completely isolated.
 
+[↑ Back to top](#table-of-contents)
+
 ---
 
+<a id="5-daily-cli-usage--complete-parameter-reference"></a>
 ## 5. Daily CLI Usage & Complete Parameter Reference
 
 > **`heimdall` vs. `node setup.mjs`**: They are the **exact same tool**. `heimdall` is the globally accessible terminal shortcut created by `setup.mjs` (or via `npm link`). Any command or flag shown below can be run interchangeably as either `heimdall <command>` or `node setup.mjs <command>`.
@@ -282,8 +310,11 @@ These flags can be passed to either `node setup.mjs` or `heimdall` for headless 
 
 *Note: In the interactive wizard (`node setup.mjs`), Live Junctions (`--link`) is the recommended prompt default. In non-interactive mode without flags, specify `--link` to enable symlinks.
 
+[↑ Back to top](#table-of-contents)
+
 ---
 
+<a id="6-dynamic-model-registry-sync-models"></a>
 ## 6. Dynamic Model Registry (`sync-models`)
 
 Rather than relying on outdated static model lists, Heimdall discovers available model catalogs dynamically from active provider or proxy endpoints (e.g. GhostCLI, LiteLLM, or native vendor APIs):
@@ -294,8 +325,11 @@ heimdall sync-models
 
 This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `claude-opus-5-5`, `gpt-6-astra`), and updates `config/models.json` automatically.
 
+[↑ Back to top](#table-of-contents)
+
 ---
 
+<a id="7-profiles"></a>
 ## 7. Profiles
 
 | Profile | Skills | Predefined Agents | Primary Focus | Best For |
@@ -304,6 +338,8 @@ This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `cla
 | **`minimal`** | 15 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer` | Fast workflows, lightweight laptops, beginners |
 | **`security`** | 12 | 4 | Security posture: `orchestrator`, `security-auditor`, `tester`, `reviewer` | Penetration testing & pre-deployment audits |
 | **`design`** | 14 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel` | Frontend development & design system work |
+
+[↑ Back to top](#table-of-contents)
 
 ---
 
@@ -334,6 +370,8 @@ Running `node setup.mjs --clean --link --yes` (or `heimdall sync`) links all 8 a
 * **Google Antigravity**: `~/.gemini/agents/` & universal `.agents/`
 * **OpenAI Codex CLI**: `~/.codex/agents/`
 * **Shared Multi-Agent**: `~/.agents/agents/`
+
+[↑ Back to top](#table-of-contents)
 
 ---
 
@@ -374,6 +412,8 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 * **Installer**: `setup.mjs` runs on Node.js >= 18 on all OSes, dynamically selecting `which` vs `where.exe`, and creating native directory symlinks.
 * **Bridge Scripts**: `tools/` contains native Windows wrappers (`.cmd`, `.ps1`) and portable POSIX shell shims (`claude-bridge.sh`, `gemini-bridge.sh`, `codex-bridge.sh`) that invoke PowerShell Core (`pwsh`).
 * **Skills**: 100% platform-agnostic Markdown, Python, and shell scripts.
+
+[↑ Back to top](#table-of-contents)
 
 ---
 
@@ -464,8 +504,11 @@ OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matri
 
 </details>
 
+[↑ Back to top](#table-of-contents)
+
 ---
 
+<a id="11-companion-remote-orchestrators"></a>
 ## 11. Companion Remote Orchestrators
 
 For multi-device pair programming and mobile monitoring, Heimdall integrates with:
@@ -473,8 +516,13 @@ For multi-device pair programming and mobile monitoring, Heimdall integrates wit
 - **[Herdr (`herdr.dev`)](https://herdr.dev/)**: A terminal-native agent multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`).
 - **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: A mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
 
+[↑ Back to top](#table-of-contents)
+
 ---
 
+<a id="license"></a>
 ## License
 
 MIT © [Bernardo Paldes](https://github.com/bepaldes)
+
+[↑ Back to top](#table-of-contents)
