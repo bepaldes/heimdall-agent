@@ -136,7 +136,7 @@ if ($Headless -or ($env:CI -eq "true") -or ($env:PODIUM_BRIDGE_HEADLESS -eq "1")
 }
 
 # Resolve action, prompt, and display information
-$prompt = ""
+$resolvedPrompt = ""
 $displaySummary = ""
 $diffSummary = ""
 $sessionLabel = "Gemini: $($Action.ToUpper())"
@@ -156,7 +156,7 @@ switch ($Action) {
         if ($fileToReview) {
             $fileContent = Get-Content -Raw $fileToReview
             $displaySummary = "Review file: $fileToReview"
-            $prompt = @"
+            $resolvedPrompt = @"
 Review this document/file against Podium platform doctrine, requirements, and best practices. Be concise and actionable.
 File: $fileToReview
 
@@ -178,7 +178,7 @@ $fileContent
             if (-not $diff) {
                 if ($promptInput) {
                     $displaySummary = $promptInput
-                    $prompt = $promptInput
+                    $resolvedPrompt = $promptInput
                     $sessionLabel = "Gemini: Review"
                 } else {
                     Write-Output "No uncommitted git changes found to review."
@@ -188,7 +188,7 @@ $fileContent
                 $instructions = if ($promptInput) { $promptInput } else { "Review this git diff against Podium platform rules, monorepo boundaries, and security controls. Be concise and actionable." }
                 $displaySummary = $instructions
                 $diffSummary = ($diffStat | Out-String).Trim()
-                $prompt = @"
+                $resolvedPrompt = @"
 $instructions
 
 === GIT DIFF ===
@@ -210,7 +210,7 @@ $diff
             $rawQuery
         }
         $displaySummary = if ($query.Length -gt 200) { $query.Substring(0, 200) + "..." } else { $query }
-        $prompt = $query
+        $resolvedPrompt = $query
         $sessionLabel = "Gemini: Ask"
     }
 
@@ -224,7 +224,7 @@ $diff
         $exitCode = $LASTEXITCODE
 
         $displaySummary = "Validate Command: $cmd (Exit code: $exitCode)"
-        $prompt = @"
+        $resolvedPrompt = @"
 Analyze this test/build command run.
 Command: $cmd
 Exit Code: $exitCode
@@ -248,7 +248,7 @@ If there are failures or errors, explain the root cause and propose the exact fi
             $rawTask
         }
         $displaySummary = if ($task.Length -gt 200) { $task.Substring(0, 200) + "..." } else { $task }
-        $prompt = $task
+        $resolvedPrompt = $task
         $sessionLabel = "Gemini: Exec"
     }
 
@@ -258,14 +258,14 @@ If there are failures or errors, explain the root cause and propose the exact fi
             Write-Error "Please provide what to scan for."
         }
         $displaySummary = "Scan monorepo for: $topic"
-        $prompt = "Scan the entire repository for references to '$topic', analyze their consistency with project doctrine, and summarize findings."
+        $resolvedPrompt = "Scan the entire repository for references to '$topic', analyze their consistency with project doctrine, and summarize findings."
         $sessionLabel = "Gemini: Scan"
     }
 
     "interactive" {
         $task = if ($Prompt) { $Prompt } elseif ($Arguments) { $Arguments -join " " } else { "" }
         $displaySummary = if ($task) { $task } else { "(Interactive Session)" }
-        $prompt = $task
+        $resolvedPrompt = $task
         $Interactive = $true
         $sessionLabel = "Gemini: Interactive"
     }
@@ -278,7 +278,7 @@ if ($targetMode -eq "headless") {
     if ($agyModelFlags.Count -gt 0) {
         $flags += $agyModelFlags
     }
-    $prompt | & agy @flags
+    $resolvedPrompt | & agy @flags
     $ec = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } else { 0 }
     exit $ec
 }
@@ -294,7 +294,7 @@ $diffSummaryFile = "$tempBase.diffstat.txt"
 $doneFile = "$tempBase.done"
 $projectRoot = (Get-Location).Path
 
-Set-Content -Path $promptFile -Value $prompt -Encoding utf8
+Set-Content -Path $promptFile -Value $resolvedPrompt -Encoding utf8
 
 $displayBannerText = if ($displaySummary.Length -gt 500) { $displaySummary.Substring(0, 500) + "... [truncated in banner; full content sent to Gemini]" } else { $displaySummary }
 Set-Content -Path $summaryFile -Value $displayBannerText -Encoding utf8

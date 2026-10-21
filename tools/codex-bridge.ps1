@@ -2,7 +2,7 @@
 .SYNOPSIS
     Bridge helper for bidirectional coordination between Antigravity, Claude Code, and OpenAI Codex CLI (Astra).
 .DESCRIPTION
-    Invokes Codex CLI (defaulting to the Astra model via Custom Proxies / API or Custom Vendors) by splitting the current Herdr screen to the right,
+    Invokes Codex CLI (defaulting to the Astra model via GhostCLI) by splitting the current Herdr screen to the right,
     streaming live output, and automatically closing the pane when done. Supports Herdr tabs, visible windows, or headless mode.
 #>
 param(
@@ -70,7 +70,7 @@ function Ensure-CodexEnv {
         }
     }
 
-    $keys = @("CUSTOM_API_KEY", "GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
+    $keys = @("GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
     foreach ($k in $keys) {
         $userVal = [System.Environment]::GetEnvironmentVariable($k, "User")
         if (-not $userVal) {
@@ -81,10 +81,8 @@ function Ensure-CodexEnv {
         }
     }
 
-    # Support CUSTOM_API_KEY, GHOSTCLI_API_KEY, or fallback to ANTHROPIC_API_KEY
-    if (-not $env:GHOSTCLI_API_KEY -and $env:CUSTOM_API_KEY) {
-        $env:GHOSTCLI_API_KEY = $env:CUSTOM_API_KEY
-    } elseif (-not $env:GHOSTCLI_API_KEY -and $env:ANTHROPIC_API_KEY) {
+    # If GHOSTCLI_API_KEY is not set, fallback to ANTHROPIC_API_KEY (GhostCLI token)
+    if (-not $env:GHOSTCLI_API_KEY -and $env:ANTHROPIC_API_KEY) {
         $env:GHOSTCLI_API_KEY = $env:ANTHROPIC_API_KEY
     }
 }
@@ -166,7 +164,7 @@ if ($Headless -or ($env:CI -eq "true") -or ($env:PODIUM_BRIDGE_HEADLESS -eq "1")
 }
 
 # Resolve action, prompt, and display information
-$prompt = ""
+$resolvedPrompt = ""
 $displaySummary = ""
 $diffSummary = ""
 $sessionLabel = "Codex: $($Action.ToUpper())"
@@ -186,7 +184,7 @@ switch ($Action) {
         if ($fileToReview) {
             $fileContent = Get-Content -Raw $fileToReview
             $displaySummary = "Review file: $fileToReview"
-            $prompt = @"
+            $resolvedPrompt = @"
 Review this document/file for logic bugs, security risks, type errors, architectural regressions, or plan gaps. Be concise and actionable.
 File: $fileToReview
 
@@ -208,7 +206,7 @@ $fileContent
             if (-not $diff) {
                 if ($promptInput) {
                     $displaySummary = $promptInput
-                    $prompt = $promptInput
+                    $resolvedPrompt = $promptInput
                     $sessionLabel = "Codex: Review"
                 } else {
                     Write-Output "No uncommitted git changes found to review."
@@ -218,7 +216,7 @@ $fileContent
                 $instructions = if ($promptInput) { $promptInput } else { "Review this git diff for logic bugs, security risks, type errors, or architectural regressions. Be concise and actionable." }
                 $displaySummary = $instructions
                 $diffSummary = ($diffStat | Out-String).Trim()
-                $prompt = @"
+                $resolvedPrompt = @"
 $instructions
 
 === GIT DIFF ===
@@ -240,7 +238,7 @@ $diff
             $rawQuery
         }
         $displaySummary = $query
-        $prompt = $query
+        $resolvedPrompt = $query
         $sessionLabel = "Codex: Ask"
     }
 
@@ -254,7 +252,7 @@ $diff
         $exitCode = $LASTEXITCODE
 
         $displaySummary = "Validate Command: $cmd (Exit code: $exitCode)"
-        $prompt = @"
+        $resolvedPrompt = @"
 Analyze this test/build command run.
 Command: $cmd
 Exit Code: $exitCode
@@ -278,14 +276,14 @@ If there are failures or errors, explain the root cause and propose the exact fi
             $rawTask
         }
         $displaySummary = $task
-        $prompt = $task
+        $resolvedPrompt = $task
         $sessionLabel = "Codex: Exec"
     }
 
     "interactive" {
         $task = if ($Prompt) { $Prompt } elseif ($Arguments) { $Arguments -join " " } else { "" }
         $displaySummary = if ($task) { $task } else { "(Interactive Session)" }
-        $prompt = $task
+        $resolvedPrompt = $task
         $Interactive = $true
         $sessionLabel = "Codex: Interactive"
     }
@@ -295,10 +293,9 @@ If there are failures or errors, explain the root cause and propose the exact fi
 
 if ($targetMode -eq "headless") {
     $tmp = Join-Path $env:TEMP "codex-request-$([guid]::NewGuid().ToString('N')).txt"
-    Set-Content -Path $tmp -Value $prompt -Encoding utf8
+    Set-Content -Path $tmp -Value $resolvedPrompt -Encoding utf8
     try {
-        $headlessCmd = "type `"$tmp`" | codex exec $codexExecFlagsStr"
-        cmd.exe /c $headlessCmd
+        Get-Content -Raw $tmp | codex exec $codexExecFlags
         $ec = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } else { 0 }
         exit $ec
     } finally {
@@ -318,10 +315,10 @@ $diffSummaryFile = "$tempBase.diffstat.txt"
 $doneFile = "$tempBase.done"
 $projectRoot = (Get-Location).Path
 
-Set-Content -Path $promptFile -Value $prompt -Encoding utf8
+Set-Content -Path $promptFile -Value $resolvedPrompt -Encoding utf8
 
 # Prepare environment export block for child shell
-$envKeys = @("CUSTOM_API_KEY", "GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
+$envKeys = @("GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
 $envBlock = ""
 foreach ($k in $envKeys) {
     $v = (Get-Item -Path "env:$k" -ErrorAction SilentlyContinue).Value
@@ -404,7 +401,7 @@ Write-Host "--------------------------------------------------------------------
     $innerScript += @"
 `$sw = [System.Diagnostics.Stopwatch]::StartNew()
 try {
-    cmd.exe /c "type `"$promptFile`" | codex exec $codexExecFlagsStr -o `"$lastMsgFile`"" | Tee-Object -FilePath '$outputFile'
+    Get-Content -Raw '$promptFile' | codex exec $codexExecFlagsStr -o '$lastMsgFile' | Tee-Object -FilePath '$outputFile'
     `$ec = if (`$LASTEXITCODE -ne `$null) { `$LASTEXITCODE } else { 0 }
 } catch {
     `$ec = 1

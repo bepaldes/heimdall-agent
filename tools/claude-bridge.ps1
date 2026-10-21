@@ -110,8 +110,8 @@ if ($Model) {
 }
 
 if ($Effort -and $canonicalModel) {
-    $customProxyModels = @("claude-opus-5-5", "claude-sonnet-5", "claude-fable-5.1", "gpt-6-astra", "z-ai/glm-5.3")
-    if ($customProxyModels -contains $canonicalModel) {
+    $ghostCliModels = @("claude-opus-5-5", "claude-sonnet-5", "claude-fable-5.1", "gpt-6-astra", "z-ai/glm-5.3")
+    if ($ghostCliModels -contains $canonicalModel) {
         if ($Effort -notin @("low", "medium", "high", "xhigh")) {
             Write-Warning "[Model Registry] $canonicalModel allowed effort is low, medium, high, or xhigh (requested: $Effort)."
         }
@@ -149,7 +149,7 @@ if ($Headless -or ($env:CI -eq "true") -or ($env:PODIUM_BRIDGE_HEADLESS -eq "1")
 }
 
 # Resolve action, prompt, and display information
-$prompt = ""
+$resolvedPrompt = ""
 $displaySummary = ""
 $diffSummary = ""
 $sessionLabel = "Claude: $($Action.ToUpper())"
@@ -169,7 +169,7 @@ switch ($Action) {
         if ($fileToReview) {
             $fileContent = Get-Content -Raw $fileToReview
             $displaySummary = "Review file: $fileToReview"
-            $prompt = @"
+            $resolvedPrompt = @"
 Review this document/file for logic bugs, security risks, type errors, architectural regressions, or plan gaps. Be concise and actionable.
 File: $fileToReview
 
@@ -191,7 +191,7 @@ $fileContent
             if (-not $diff) {
                 if ($promptInput) {
                     $displaySummary = $promptInput
-                    $prompt = $promptInput
+                    $resolvedPrompt = $promptInput
                     $sessionLabel = "Claude: Review"
                 } else {
                     Write-Output "No uncommitted git changes found to review."
@@ -201,7 +201,7 @@ $fileContent
                 $instructions = if ($promptInput) { $promptInput } else { "Review this git diff for logic bugs, security risks, type errors, or architectural regressions. Be concise and actionable." }
                 $displaySummary = $instructions
                 $diffSummary = ($diffStat | Out-String).Trim()
-                $prompt = @"
+                $resolvedPrompt = @"
 $instructions
 
 === GIT DIFF ===
@@ -223,7 +223,7 @@ $diff
             $rawQuery
         }
         $displaySummary = if ($query.Length -gt 200) { $query.Substring(0, 200) + "..." } else { $query }
-        $prompt = $query
+        $resolvedPrompt = $query
         $sessionLabel = "Claude: Ask"
     }
 
@@ -237,7 +237,7 @@ $diff
         $exitCode = $LASTEXITCODE
 
         $displaySummary = "Validate Command: $cmd (Exit code: $exitCode)"
-        $prompt = @"
+        $resolvedPrompt = @"
 Analyze this test/build command run.
 Command: $cmd
 Exit Code: $exitCode
@@ -261,14 +261,14 @@ If there are failures or errors, explain the root cause and propose the exact fi
             $rawTask
         }
         $displaySummary = if ($task.Length -gt 200) { $task.Substring(0, 200) + "..." } else { $task }
-        $prompt = $task
+        $resolvedPrompt = $task
         $sessionLabel = "Claude: Exec"
     }
 
     "interactive" {
         $task = if ($Prompt) { $Prompt } elseif ($Arguments) { $Arguments -join " " } else { "" }
         $displaySummary = if ($task) { $task } else { "(Interactive Session)" }
-        $prompt = $task
+        $resolvedPrompt = $task
         $Interactive = $true
         $sessionLabel = "Claude: Interactive"
     }
@@ -278,7 +278,7 @@ If there are failures or errors, explain the root cause and propose the exact fi
 
 if ($targetMode -eq "headless") {
     $tmp = Join-Path $env:TEMP "claude-request-$([guid]::NewGuid().ToString('N')).txt"
-    Set-Content -Path $tmp -Value $prompt -Encoding utf8
+    Set-Content -Path $tmp -Value $resolvedPrompt -Encoding utf8
     try {
         $headlessCmd = if ($claudeFlagsStr) { "claude -p --dangerously-skip-permissions $claudeFlagsStr < `"$tmp`"" } else { "claude -p --dangerously-skip-permissions < `"$tmp`"" }
         cmd.exe /c $headlessCmd
@@ -300,7 +300,7 @@ $diffSummaryFile = "$tempBase.diffstat.txt"
 $doneFile = "$tempBase.done"
 $projectRoot = (Get-Location).Path
 
-Set-Content -Path $promptFile -Value $prompt -Encoding utf8
+Set-Content -Path $promptFile -Value $resolvedPrompt -Encoding utf8
 
 # Prepare environment export block for child shell
 $envKeys = @("ANTHROPIC_BASE_URL", "ANTHROPIC_API_KEY", "ANTHROPIC_MODEL", "ANTHROPIC_AUTH_TOKEN", "CLAUDE_BASE_URL")
