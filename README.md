@@ -15,7 +15,7 @@
 <a id="table-of-contents"></a>
 ## Table of Contents
 
-- [1. New to AI Coding? Start Here](#1-new-to-ai-coding-start-here)
+- [1. What is Heimdall?](#1-what-is-heimdall)
 - [2. The Old Way vs. The Heimdall Way](#2-the-old-way-vs-the-heimdall-way)
 - [3. Quickstart: 3 Steps to Better Code](#3-quickstart-3-steps-to-better-code)
 - [4. Architecture & Environment Detection](#4-architecture--environment-detection)
@@ -30,29 +30,16 @@
 
 ---
 
-## 1. New to AI Coding? Start Here
+## 1. What is Heimdall?
 
-If you have tried coding with AI assistants (ChatGPT, Claude, Cursor, or Copilot), you have likely run into the **Beginner AI Trap**:
+**Heimdall** is a modular environment bootstrapper and multi-agent toolkit designed to get your AI coding setup production-ready in seconds. Instead of manually configuring prompt rules, custom instructions, and toolkits across different AI clients, Heimdall synchronizes a shared ecosystem of **curated skills** and **specialized agents** across your terminal and IDE harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI, Hermes Agent, and OpenClaw).
 
-1. You ask the AI: *"Build me a user authentication system."*
-2. The AI immediately vomits 400 lines of complex, unverified code into your project.
-3. The code uses deprecated or hallucinated functions that do not exist in modern libraries.
-4. When you paste the error message back, the AI apologizes and writes *another* 400 lines of broken code.
-5. You find yourself trapped in an infinite loop of fixing bugs caused by the AI's guesses.
+### Core Concepts: Skills & Agents
 
-### How Senior Engineers Actually Code with AI
+* **Skills (Capabilities)**: Modular domain toolkits that automatically activate based on the task. Instead of bloated static prompts, skills inject targeted knowledge only when needed—such as database best practices (`postgres-best-practices`), design systems and token enforcement (`taste-skill`), accessibility and copy hygiene (`antislop`), or security auditing (`strix-security`).
+* **Agents (Personas)**: Predefined execution roles with isolated context windows. Rather than using one generic agent for an entire workflow, Heimdall dispatches specialized personas—such as `orchestrator` for planning gates, `tester` for TDD, `frontend-designer` for UI implementation, and `reviewer` for adversarial cross-model critiques.
 
-Senior engineers do not let AI models rush into writing code. They force the AI to follow three strict engineering rules:
-
-1. **The Planning Gate (`/grill-me`)**: Forbid the AI from writing a single line of code until it has surfaced hidden assumptions, asked 2–3 probing questions about edge cases, and agreed on architectural tradeoffs.
-2. **Karpathy Simplicity**: Keep code minimal, surgical, and clear. Reject speculative bloat, premature configurability, and over-abstracted wrappers.
-3. **Slow, Deep Verification**: Never trust an AI when it claims *"it works"*. Require automated tests (TDD failing tests first), visual UI bounds checks, and negative error coverage.
-
-### What Are "Skills"? (In Plain English)
-
-> *Think of a skill like hiring a specialized senior engineer into your AI's prompt.*
-
-Instead of relying on a generic chatbot to guess how to write secure database queries or accessible CSS, Heimdall equips your agent with 50 specialized toolkits. When your AI is asked to touch a database, it automatically activates `postgres-best-practices` (curated by Supabase). When it works on UI, it activates `taste-skill` and `antislop-ui`. When it audits an API, it activates `strix-security`.
+Together, skills provide the **domain intelligence** and agents provide the **structured division of labor** required for reliable software engineering.
 
 [↑ Back to top](#table-of-contents)
 
