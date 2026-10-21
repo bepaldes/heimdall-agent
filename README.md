@@ -190,6 +190,7 @@ Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is the global CL
 PRIMARY SUBCOMMANDS:
   sync (or --sync)           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
   audit (or --audit)         Audit installed harnesses, active API endpoints, and skill counts
+  uninstall (or --uninstall)     Safely remove Heimdall skills and agent personas from all harnesses
   sync-models (or --sync-models) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
   skills (or --skills)       List all canonical skills, categories, and upstream provenance
   update-skill <name|all>    Inspect upstream repository, updates, and bounded review protocol
@@ -197,7 +198,7 @@ PRIMARY SUBCOMMANDS:
 
 SETUP & BOOTSTRAP OPTIONS:
   --profile <name>       Skill profile tier: full (50), minimal (16), security (12), design (14) [default: full]
-  --agents <targets>     Comma-separated harnesses: claude, gemini, codex, desktop, all [default: all]
+  --agents <targets>     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, desktop, all [default: all]
   --link / --no-link     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   --clean                Wipe legacy skills from target directory before deploying
   -y, --yes              Non-interactive mode (use defaults or provided CLI arguments)
@@ -208,8 +209,10 @@ SETUP & BOOTSTRAP OPTIONS:
   --no-doctrine          Skip deploying AGENTS.md universal doctrine
 
 EXAMPLES:
+  heimdall                                  # Interactive management hub (audit, sync, uninstall)
   heimdall sync                             # Instant sync after installing a new tool
   heimdall audit                            # Environment health check
+  heimdall uninstall                        # Safely unbind Heimdall skills and agents
   heimdall skills                           # Browse canonical skills catalog
   heimdall update-skill ponytail           # Inspect upstream provenance & review protocol for single skill
   heimdall update-skill all                # Generate full bounded review audit report
@@ -230,6 +233,7 @@ All primary actions can be called either as clean subcommands (`heimdall sync`) 
 | :--- | :--- | :--- | :--- |
 | **`sync`** | `--sync` | Scans `PATH` for newly installed AI tools and links canonical skills in 1 second. | `heimdall sync` |
 | **`audit`** | `--audit` | Audits installed harnesses, active API endpoints, link types, and skill counts. | `heimdall audit` |
+| **`uninstall`** | `--uninstall` | Safely removes Heimdall skills and agent personas across all harnesses while preserving user files. | `heimdall uninstall` |
 | **`sync-models`** | `--sync-models` | Probes active proxy/endpoints (e.g. Custom Proxies / API or Custom Vendors) and refreshes `config/models.json`. | `heimdall sync-models` |
 | **`skills`** | `--skills` | Lists all 50 canonical skills, categories, and upstream repositories. | `heimdall skills` |
 | **`update-skill`** | `--update-skill` | Inspects upstream git sources, updates, and bounded review protocols. | `heimdall update-skill all` |

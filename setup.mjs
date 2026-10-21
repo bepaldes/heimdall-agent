@@ -473,6 +473,7 @@ ${colors.dim}Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is 
 ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}sync${colors.reset} (or ${colors.dim}--sync${colors.reset})           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
+  ${colors.green}uninstall${colors.reset} (or ${colors.dim}--uninstall${colors.reset})     Safely remove Heimdall skills and agent personas from all harnesses
   ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
   ${colors.green}skills${colors.reset} (or ${colors.dim}--skills${colors.reset})         List all canonical skills, categories, and upstream provenance
   ${colors.green}update-skill <name|all>${colors.reset}     Inspect upstream repository, updates, and bounded review protocol
@@ -491,8 +492,10 @@ ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
   ${colors.yellow}--no-doctrine${colors.reset}          Skip deploying AGENTS.md universal doctrine
 
 ${colors.bold}EXAMPLES:${colors.reset}
+  heimdall                                  # Interactive management hub (audit, sync, uninstall)
   heimdall sync                             # Instant sync after installing a new tool
   heimdall audit                            # Environment health check
+  heimdall uninstall                        # Safely unbind Heimdall skills and agents
   heimdall skills                           # Browse canonical skills catalog
   heimdall update-skill ponytail           # Inspect upstream provenance & review protocol for single skill
   heimdall update-skill all                # Generate full bounded review audit report
@@ -510,6 +513,7 @@ function parseArgs() {
     link: false,
     clean: false,
     sync: false,
+    uninstall: false,
     tools: true,
     doctrine: true,
     toolsDir: null,
@@ -520,7 +524,8 @@ function parseArgs() {
     listSkills: false,
     updateSkill: null,
     help: false,
-    yes: false
+    yes: false,
+    hasArgs: args.length > 0
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -530,6 +535,7 @@ function parseArgs() {
     if (arg === 'help' || arg === '--help' || arg === '-h') options.help = true;
     else if (arg === 'audit' || arg === '--audit') options.audit = true;
     else if (arg === 'sync' || arg === '--sync') options.sync = true;
+    else if (arg === 'uninstall' || arg === '--uninstall') options.uninstall = true;
     else if (arg === 'sync-models' || arg === '--sync-models' || arg === 'syncmodels') options.syncModels = true;
     else if (arg === 'skills' || arg === '--skills') options.listSkills = true;
     else if (arg === 'update-skill' || arg === '--update-skill' || arg === 'updateskill') {
@@ -980,6 +986,184 @@ function runAudit(options) {
   console.log('');
 }
 
+function isHeimdallInstalled(detected) {
+  const allAvailableSkills = fs.existsSync(skillsDir)
+    ? fs.readdirSync(skillsDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name)
+    : [];
+  const skillSet = new Set(allAvailableSkills);
+  const targets = [];
+  let totalSkills = 0;
+
+  for (const [agent, targetDir] of Object.entries(targetPaths)) {
+    if (!fs.existsSync(targetDir)) continue;
+    try {
+      const entries = fs.readdirSync(targetDir);
+      let count = 0;
+      for (const name of entries) {
+        if (name !== '.system' && skillSet.has(name)) {
+          count++;
+        }
+      }
+      if (count > 0) {
+        targets.push(agent);
+        totalSkills += count;
+      }
+    } catch (err) {
+      if (err.code === 'EACCES' || err.code === 'EPERM') {
+        console.warn(`${colors.yellow}Warning: Permission denied inspecting ${targetDir}${colors.reset}`);
+      }
+    }
+  }
+
+  return {
+    installed: totalSkills > 0,
+    targets,
+    totalSkills
+  };
+}
+
+async function runUninstall(options, detected) {
+  console.log(`${colors.bold}${colors.cyan}=== Heimdall Uninstallation ===${colors.reset}\n`);
+
+  if (!options.yes) {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    try {
+      const confirm = await rl.question(`Are you sure you want to remove Heimdall skills and agents from all harnesses? (y/N): `);
+      const answer = confirm.trim().toLowerCase();
+      if (answer !== 'y' && answer !== 'yes') {
+        console.log('Uninstallation cancelled.');
+        return;
+      }
+    } finally {
+      rl.close();
+    }
+  }
+
+  const allAvailableSkills = fs.existsSync(skillsDir)
+    ? fs.readdirSync(skillsDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name)
+    : [];
+  const skillSet = new Set(allAvailableSkills);
+
+  const allAvailableAgents = fs.existsSync(agentsDir)
+    ? fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'))
+    : [];
+  const agentSet = new Set(allAvailableAgents);
+
+  let totalRemovedSkills = 0;
+  let totalRemovedAgents = 0;
+
+  for (const [agent, targetDir] of Object.entries(targetPaths)) {
+    if (!fs.existsSync(targetDir)) continue;
+    let removed = 0;
+    try {
+      const dirStat = fs.lstatSync(targetDir);
+      if (dirStat.isSymbolicLink()) {
+        try { fs.unlinkSync(targetDir); } catch { fs.rmdirSync(targetDir); }
+        removed = skillSet.size;
+      } else {
+        const entries = fs.readdirSync(targetDir);
+        for (const name of entries) {
+          if (name === '.system') continue;
+          if (skillSet.has(name)) {
+            const itemPath = path.join(targetDir, name);
+            try {
+              const stat = fs.lstatSync(itemPath);
+              if (stat.isSymbolicLink() || stat.isFile()) {
+                try { fs.unlinkSync(itemPath); } catch { fs.rmdirSync(itemPath); }
+              } else if (stat.isDirectory()) {
+                fs.rmSync(itemPath, { recursive: true, force: true });
+              }
+              removed++;
+            } catch {}
+          }
+        }
+      }
+    } catch {}
+    if (removed > 0) {
+      console.log(`  ${colors.green}✔${colors.reset} Removed ${removed} skills from ${agent.toUpperCase()} (${targetDir})`);
+      totalRemovedSkills += removed;
+    }
+  }
+
+  for (const [agent, targetAgentDir] of Object.entries(targetAgentPaths)) {
+    if (!fs.existsSync(targetAgentDir)) continue;
+    let removed = 0;
+    try {
+      const dirStat = fs.lstatSync(targetAgentDir);
+      if (dirStat.isSymbolicLink()) {
+        try { fs.unlinkSync(targetAgentDir); } catch { fs.rmdirSync(targetAgentDir); }
+        removed = agentSet.size;
+      } else {
+        const entries = fs.readdirSync(targetAgentDir);
+        for (const file of entries) {
+          if (agentSet.has(file)) {
+            const itemPath = path.join(targetAgentDir, file);
+            try {
+              const stat = fs.lstatSync(itemPath);
+              if (stat.isSymbolicLink() || stat.isFile()) {
+                try { fs.unlinkSync(itemPath); } catch { fs.rmdirSync(itemPath); }
+              } else if (stat.isDirectory()) {
+                fs.rmSync(itemPath, { recursive: true, force: true });
+              } else {
+                fs.unlinkSync(itemPath);
+              }
+              removed++;
+            } catch {}
+          }
+        }
+      }
+    } catch {}
+    if (removed > 0) {
+      console.log(`  ${colors.green}✔${colors.reset} Removed ${removed} agent personas from ${agent.toUpperCase()} (${targetAgentDir})`);
+      totalRemovedAgents += removed;
+    }
+  }
+
+  console.log(`\n${colors.bold}${colors.green}Uninstallation Complete:${colors.reset} Removed ${totalRemovedSkills} skill bindings and ${totalRemovedAgents} agent personas across harnesses.\n`);
+}
+
+async function runPostInstallMenu(options, detected) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    console.log(`${colors.bold}${colors.cyan}=== Heimdall Management Hub ===${colors.reset}`);
+    console.log(`Heimdall is currently installed and active across your environment.\n`);
+    console.log(`What would you like to do?`);
+    console.log(`  1. Audit Environment & Health Check`);
+    console.log(`  2. Fast Sync Skills & Agents (1-sec zero-drift)`);
+    console.log(`  3. Refresh Dynamic Models (sync-models)`);
+    console.log(`  4. Uninstall Heimdall`);
+    console.log(`  5. Reinstall / Reconfigure Profile & Targets`);
+    console.log(`  6. Exit\n`);
+
+    const answer = await rl.question(`Choose an option [1-6, default: 1]: `);
+    const choice = answer.trim().toLowerCase();
+
+    if (choice === '1' || choice === '') {
+      runAudit(options);
+      process.exit(0);
+    } else if (choice === '2') {
+      await runSync(options, detected);
+      process.exit(0);
+    } else if (choice === '3') {
+      await syncModelsFromEndpoint();
+      process.exit(0);
+    } else if (choice === '4') {
+      await runUninstall(options, detected);
+      process.exit(0);
+    } else if (choice === '5') {
+      return 'reinstall';
+    } else if (choice === '6' || choice === 'q' || choice === 'exit') {
+      console.log('Goodbye!');
+      process.exit(0);
+    } else {
+      runAudit(options);
+      process.exit(0);
+    }
+  } finally {
+    rl.close();
+  }
+}
+
 async function runInteractive(options, detected) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
@@ -1245,12 +1429,27 @@ async function main() {
     process.exit(0);
   }
 
+  if (options.uninstall) {
+    await runUninstall(options, detected);
+    process.exit(0);
+  }
+
   // Set default dynamic paths if not specified
   if (!options.toolsDir) {
     options.toolsDir = detected.pathCandidates[0];
   }
   if (!options.doctrinePath) {
     options.doctrinePath = detected.doctrineCandidates.find(p => fs.existsSync(p)) || detected.doctrineCandidates[0];
+  }
+
+  if (!options.yes && !options.hasArgs) {
+    const installState = isHeimdallInstalled(detected);
+    if (installState.installed) {
+      const action = await runPostInstallMenu(options, detected);
+      if (action !== 'reinstall') {
+        process.exit(0);
+      }
+    }
   }
 
   if (!options.yes) {

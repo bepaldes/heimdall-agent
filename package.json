@@ -9,6 +9,7 @@
   "scripts": {
     "setup": "node setup.mjs",
     "audit": "node setup.mjs --audit",
+    "uninstall": "node setup.mjs --uninstall",
     "minimal": "node setup.mjs --profile minimal",
     "full": "node setup.mjs --profile full"
   },
