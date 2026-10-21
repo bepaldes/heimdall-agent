@@ -57,13 +57,13 @@ When in plan mode or handling a `/plan` request in any project:
      - Tasks executed by Gemini $\rightarrow$ Claude validates (`powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`) or Codex validates (`powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`).
      - Tasks executed by Codex $\rightarrow$ Claude validates (`powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`) or Gemini validates (`powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`).
    - **Quota Resilience & Model Registry Fallback**:
-     - When **Gemini 4 Argon** reaches quota cooldown, immediately fall back to **Gemini 3.8 Flash** (for fast scans and bridge reviews) or **Gemini 3.1 Pro** (for massive context reasoning) on the Gemini side, and leverage **Claude Sonnet 5.5 / Opus 5.5** or **GPT-6 Astra** via GhostCLI.
+     - When **Gemini 4 Argon** reaches quota cooldown, immediately fall back to **Gemini 3.8 Flash** (for fast scans and bridge reviews) or **Gemini 3.1 Pro** (for massive context reasoning) on the Gemini side, and leverage **Claude Sonnet 5.5 / Opus 5.5** or **GPT-6 Astra** via Custom Proxies / API or Custom Vendors (e.g. GhostCLI, LiteLLM, or direct provider APIs).
 
 ### 2.1 Authoritative Model Registry & Effort Matrix
 
-Models are accessed through three channels: **GhostCLI** (`https://ghostcli.cloud`) as the unified API proxy for Claude Code and OpenAI Codex CLI sessions, and **Gemini Bridge** (`gemini-bridge.ps1`) hitting Google's API directly for Gemini sessions. Cross-model reviews use bridge scripts that hit each provider's native API.
+Models are accessed through unified API proxies or provider direct channels: **Custom Proxies / API or Custom Vendors** (e.g. GhostCLI, LiteLLM, Ollama, OpenRouter, or native vendor endpoints) for Claude Code and OpenAI Codex CLI sessions, and **Gemini Bridge** (`gemini-bridge.ps1`) hitting Google's API directly for Gemini sessions. Cross-model reviews use bridge scripts that hit each provider's native API.
 
-**GhostCLI Models** (via `https://ghostcli.cloud` proxy — all support text + image input):
+**Custom Proxy & Vendor Models** (via Custom Proxies / API or Custom Vendors — all support text + image input):
 
 | Model Name | Canonical Flag | Context Window | Max Output | Parallel Tools | Search | Allowed Effort Levels | Optimal Specialization |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -73,7 +73,7 @@ Models are accessed through three channels: **GhostCLI** (`https://ghostcli.clou
 | **GLM 5.3** | `z-ai/glm-5.3` | 1M | 128K | ❌ | ❌ | `low`, `medium`, `high`, `xhigh` | Massive context analysis, long-document processing, Zhipu AI reasoning. |
 | **GPT-6 Astra** | `gpt-6-astra` | 1M | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | OpenAI reasoning, broad general-purpose tasks, alternative perspective for cross-validation. |
 
-**Gemini Bridge Models** (via `gemini-bridge.ps1` → Google API directly — not through GhostCLI):
+**Gemini Bridge Models** (via `gemini-bridge.ps1` → Google API directly):
 
 | Model Name | Canonical Flag | Allowed Effort Levels | Optimal Specialization |
 | :--- | :--- | :--- | :--- |
@@ -81,7 +81,7 @@ Models are accessed through three channels: **GhostCLI** (`https://ghostcli.clou
 | **Gemini 3.8 Flash** | `gemini-3.8-flash` | `low`, `medium`, `high` | Fast scans, workspace audits, boilerplate generation, unit test scaffolding, rapid prototyping, responsive styling. |
 | **Gemini 3.1 Pro** | `gemini-3.1-pro` | `medium`, `high`, `xhigh` | Massive context analysis, repository-wide multi-file refactoring, deep documentation synthesis, architectural audits. |
 
-**API Endpoints** (GhostCLI base URL: `https://ghostcli.cloud`):
+**API Endpoints** (Custom Proxy / Provider base URL, e.g. `https://api.your-proxy.com` or `https://ghostcli.cloud`):
 
 | Format | Endpoint | Client |
 |--------|----------|--------|
@@ -90,9 +90,9 @@ Models are accessed through three channels: **GhostCLI** (`https://ghostcli.clou
 | OpenAI Chat Completions | `/v1/chat/completions` | OpenAI SDK, Cursor, Continue, Aider, LangChain |
 | Gemini GenerateContent | `/v1beta/models/{model}:generateContent` | Google Gen AI SDK, Gemini clients |
 
-Auth: `Authorization: Bearer gcli_…` or `x-api-key: gcli_…` (server accepts both). Gemini format also accepts `x-goog-api-key` and `?key=`.
+Auth: `Authorization: Bearer <key>` or `x-api-key: <key>` (server accepts both). Gemini format also accepts `x-goog-api-key` and `?key=`.
 
-**Agent Tool Model Override**: The `/model` picker in Claude Code shows a hardcoded list that may include models not on GhostCLI (e.g. Haiku) and omit models that are (e.g. Astra, GLM). To use any GhostCLI model — including those invisible in the picker — pass its canonical flag via the Agent tool's `model` parameter when spawning subagents (e.g. `model: "gpt-6-astra"`, `model: "z-ai/glm-5.3"`). The API call routes through GhostCLI regardless of what `/model` displays. Gemini models (`gemini-4`, `gemini-3.8-flash`, `gemini-3.1-pro`) are never reachable through GhostCLI; they require `gemini-bridge.ps1` hitting Google's API directly.
+**Agent Tool Model Override**: The `/model` picker in Claude Code shows a hardcoded list that may include models not supported by your proxy (e.g. Haiku) and omit extended models that are (e.g. Astra, GLM). To use any registered model — including those invisible in the picker — pass its canonical flag via the Agent tool's `model` parameter when spawning subagents (e.g. `model: "gpt-6-astra"`, `model: "z-ai/glm-5.3"`). The API call routes through your active provider/proxy regardless of what `/model` displays. Gemini models (`gemini-4`, `gemini-3.8-flash`, `gemini-3.1-pro`) are accessed via `gemini-bridge.ps1` hitting Google's API directly.
 
 *Effort Constraint Rule*: Each task in a plan must explicitly declare one of the registered models and an allowed effort level matching the tables above.
 

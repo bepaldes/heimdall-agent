@@ -2,13 +2,13 @@
   "profiles": {
     "full": {
       "name": "Full Powerhouse",
-      "description": "Complete 49-skill suite & 8 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
+      "description": "Complete 50-skill suite & 8 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
       "skills": "*",
       "agents": "*"
     },
     "minimal": {
       "name": "Lean & Surgical",
-      "description": "Core 15-skill suite & 4 core agents for essential planning, surgical coding, anti-slop, and verification.",
+      "description": "Core 16-skill suite & 4 core agents for essential planning, surgical coding, anti-slop, and verification.",
       "skills": [
         "brainstorming",
         "writing-plans",

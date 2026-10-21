@@ -2,7 +2,7 @@
 .SYNOPSIS
     Bridge helper for bidirectional coordination between Antigravity, Claude Code, and OpenAI Codex CLI (Astra).
 .DESCRIPTION
-    Invokes Codex CLI (defaulting to the Astra model via GhostCLI) by splitting the current Herdr screen to the right,
+    Invokes Codex CLI (defaulting to the Astra model via Custom Proxies / API or Custom Vendors) by splitting the current Herdr screen to the right,
     streaming live output, and automatically closing the pane when done. Supports Herdr tabs, visible windows, or headless mode.
 #>
 param(
@@ -70,7 +70,7 @@ function Ensure-CodexEnv {
         }
     }
 
-    $keys = @("GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
+    $keys = @("CUSTOM_API_KEY", "GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
     foreach ($k in $keys) {
         $userVal = [System.Environment]::GetEnvironmentVariable($k, "User")
         if (-not $userVal) {
@@ -81,8 +81,10 @@ function Ensure-CodexEnv {
         }
     }
 
-    # If GHOSTCLI_API_KEY is not set, fallback to ANTHROPIC_API_KEY (GhostCLI token)
-    if (-not $env:GHOSTCLI_API_KEY -and $env:ANTHROPIC_API_KEY) {
+    # Support CUSTOM_API_KEY, GHOSTCLI_API_KEY, or fallback to ANTHROPIC_API_KEY
+    if (-not $env:GHOSTCLI_API_KEY -and $env:CUSTOM_API_KEY) {
+        $env:GHOSTCLI_API_KEY = $env:CUSTOM_API_KEY
+    } elseif (-not $env:GHOSTCLI_API_KEY -and $env:ANTHROPIC_API_KEY) {
         $env:GHOSTCLI_API_KEY = $env:ANTHROPIC_API_KEY
     }
 }
@@ -319,7 +321,7 @@ $projectRoot = (Get-Location).Path
 Set-Content -Path $promptFile -Value $prompt -Encoding utf8
 
 # Prepare environment export block for child shell
-$envKeys = @("GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
+$envKeys = @("CUSTOM_API_KEY", "GHOSTCLI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL", "CODEX_HOME")
 $envBlock = ""
 foreach ($k in $envKeys) {
     $v = (Get-Item -Path "env:$k" -ErrorAction SilentlyContinue).Value

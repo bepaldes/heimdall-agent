@@ -110,8 +110,8 @@ if ($Model) {
 }
 
 if ($Effort -and $canonicalModel) {
-    $ghostCliModels = @("claude-opus-5-5", "claude-sonnet-5", "claude-fable-5.1", "gpt-6-astra", "z-ai/glm-5.3")
-    if ($ghostCliModels -contains $canonicalModel) {
+    $customProxyModels = @("claude-opus-5-5", "claude-sonnet-5", "claude-fable-5.1", "gpt-6-astra", "z-ai/glm-5.3")
+    if ($customProxyModels -contains $canonicalModel) {
         if ($Effort -notin @("low", "medium", "high", "xhigh")) {
             Write-Warning "[Model Registry] $canonicalModel allowed effort is low, medium, high, or xhigh (requested: $Effort)."
         }

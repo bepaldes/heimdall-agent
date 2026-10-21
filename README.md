@@ -52,7 +52,7 @@ Senior engineers do not let AI models rush into writing code. They force the AI 
 
 > *Think of a skill like hiring a specialized senior engineer into your AI's prompt.*
 
-Instead of relying on a generic chatbot to guess how to write secure database queries or accessible CSS, Heimdall equips your agent with 49 specialized toolkits. When your AI is asked to touch a database, it automatically activates `postgres-best-practices` (curated by Supabase). When it works on UI, it activates `taste-skill` and `antislop-ui`. When it audits an API, it activates `strix-security`.
+Instead of relying on a generic chatbot to guess how to write secure database queries or accessible CSS, Heimdall equips your agent with 50 specialized toolkits. When your AI is asked to touch a database, it automatically activates `postgres-best-practices` (curated by Supabase). When it works on UI, it activates `taste-skill` and `antislop-ui`. When it audits an API, it activates `strix-security`.
 
 [↑ Back to top](#table-of-contents)
 
@@ -91,8 +91,8 @@ node setup.mjs --clean --link --yes
 > **Global terminal access**: Setup automatically places `heimdall` on your PATH (or run `npm link`). You can verify your installation and inspect all options anytime with `heimdall --help`.
 
 ### Step 2: Choose Your Profile
-* **`full` (Default, 49 skills)**: Complete engineering powerhouse (planning, security, UI, database, hygiene).
-* **`minimal` (15 skills)**: Fast and lean for quick tasks or lightweight laptops.
+* **`full` (Default, 50 skills)**: Complete engineering powerhouse (planning, security, UI, database, hygiene).
+* **`minimal` (16 skills)**: Fast and lean for quick tasks or lightweight laptops.
 *(See [Section 7: Profiles](#7-profiles) for specialized Security and Design tiers).*
 
 ### Step 3: Type Your First Prompt
@@ -117,7 +117,7 @@ Heimdall dynamically inspects the host system without assuming default locations
                │  • CLI Tools: claude, agy, codex, cursor, windsurf     │
                │  • Desktop: Windows APPDATA / macOS Library / Linux    │
                │  • PATH Discovery: Discovers candidate bin/tool dirs   │
-               │  • Endpoints: GhostCLI Proxy / Vendor Direct APIs      │
+               │  • Endpoints: Custom Proxies / API or Custom Vendors   │
                └───────────────────────────┬────────────────────────────┘
                                            │
                                            ▼
@@ -132,7 +132,7 @@ Heimdall dynamically inspects the host system without assuming default locations
                                            ▼
                ┌────────────────────────────────────────────────────────┐
                │                   Atomic Deployment                    │
-               │  • 49 Curated Skills (~/.gemini, ~/.claude, ~/.codex)  │
+               │  • 50 Curated Skills (~/.gemini, ~/.claude, ~/.codex)  │
                │  • Context7 MCP live doc resolver                      │
                │  • Subagent briefs & desktop playbooks                 │
                │  • Dynamic model sync (sync-models)                    │
@@ -147,11 +147,11 @@ When run interactively (`node setup.mjs`), Heimdall surfaces all detected tools 
         Heimdall Environment Detection
 ==================================================
 [✔] Claude Code CLI     -> Found (C:\Users\...\.local\bin\claude.exe)
-                           Endpoint: https://ghostcli.cloud
+                           Endpoint: Custom Proxy / Vendor API (e.g. https://api.your-proxy.com/v1)
 [✔] Google Antigravity  -> Found (C:\Users\...\AppData\Local\agy\bin\agy.exe)
                            Endpoint: Google GenAI Direct
 [✔] OpenAI Codex CLI    -> Found (C:\Users\...\Programs\OpenAI\Codex\bin\codex.exe)
-                           Endpoint: https://ghostcli.cloud/v1
+                           Endpoint: Custom Proxy / Vendor API (e.g. https://api.your-proxy.com/v1)
 [✔] Claude Desktop      -> Found (%APPDATA%\Claude)
 [ ] Cursor / Windsurf   -> Not detected on PATH
 
@@ -203,13 +203,13 @@ Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is the global CL
 PRIMARY SUBCOMMANDS:
   sync (or --sync)           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
   audit (or --audit)         Audit installed harnesses, active API endpoints, and skill counts
-  sync-models (or --sync-models) Probe active proxy/endpoint (e.g. GhostCLI) and refresh models.json
+  sync-models (or --sync-models) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
   skills (or --skills)       List all canonical skills, categories, and upstream provenance
   update-skill <name|all>    Inspect upstream repository, updates, and bounded review protocol
   help (or --help, -h)      Display this parameter and command reference
 
 SETUP & BOOTSTRAP OPTIONS:
-  --profile <name>       Skill profile tier: full (49), minimal (16), security (12), design (14) [default: full]
+  --profile <name>       Skill profile tier: full (50), minimal (16), security (12), design (14) [default: full]
   --agents <targets>     Comma-separated harnesses: claude, gemini, codex, desktop, all [default: all]
   --link / --no-link     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   --clean                Wipe legacy skills from target directory before deploying
@@ -243,8 +243,8 @@ All primary actions can be called either as clean subcommands (`heimdall sync`) 
 | :--- | :--- | :--- | :--- |
 | **`sync`** | `--sync` | Scans `PATH` for newly installed AI tools and links canonical skills in 1 second. | `heimdall sync` |
 | **`audit`** | `--audit` | Audits installed harnesses, active API endpoints, link types, and skill counts. | `heimdall audit` |
-| **`sync-models`** | `--sync-models` | Probes active proxy/endpoints (e.g. GhostCLI) and refreshes `config/models.json`. | `heimdall sync-models` |
-| **`skills`** | `--skills` | Lists all 49 canonical skills, categories, and upstream repositories. | `heimdall skills` |
+| **`sync-models`** | `--sync-models` | Probes active proxy/endpoints (e.g. Custom Proxies / API or Custom Vendors) and refreshes `config/models.json`. | `heimdall sync-models` |
+| **`skills`** | `--skills` | Lists all 50 canonical skills, categories, and upstream repositories. | `heimdall skills` |
 | **`update-skill`** | `--update-skill` | Inspects upstream git sources, updates, and bounded review protocols. | `heimdall update-skill all` |
 | **`help`** | `--help`, `-h` | Displays the terminal help manual with all parameters and syntax. | `heimdall help` |
 
@@ -253,7 +253,7 @@ All primary actions can be called either as clean subcommands (`heimdall sync`) 
 ### Real-World Recipes & Practical Examples
 
 #### Recipe 1: Fresh 1-Liner Installation (Recommended)
-Deploys all 49 canonical skills across all detected agent harnesses using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux), cleans up any stale legacy copies, and registers the global `heimdall` CLI:
+Deploys all 50 canonical skills across all detected agent harnesses using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux), cleans up any stale legacy copies, and registers the global `heimdall` CLI:
 ```powershell
 node setup.mjs --profile full --link --clean --yes
 ```
@@ -263,7 +263,7 @@ If you only have Claude Code installed today, and later install **Google Antigra
 ```powershell
 heimdall sync
 ```
-Heimdall detects the new binary on `PATH` and links all 49 skills in under 1 second.
+Heimdall detects the new binary on `PATH` and links all 50 skills in under 1 second.
 
 #### Recipe 3: Checking Ecosystem Health & Endpoint Verification
 Verifies which harnesses are active, which API endpoints are probed, whether skills are live junctions or static copies, and checks doctrine file status:
@@ -272,7 +272,7 @@ heimdall audit
 ```
 
 #### Recipe 4: Lightweight Laptop Setup (Minimal Profile)
-For smaller context windows or fast local tasks, deploy the lean 15-skill profile (planning, Karpathy simplicity, TDD, antislop) targeted only to Claude Code and Gemini:
+For smaller context windows or fast local tasks, deploy the lean 16-skill profile (planning, Karpathy simplicity, TDD, antislop) targeted only to Claude Code and Gemini:
 ```powershell
 node setup.mjs --profile minimal --agents claude,gemini --link --yes
 ```
@@ -284,7 +284,7 @@ node setup.mjs --dry-run --yes
 ```
 
 #### Recipe 6: Refresh Live Model Catalog from Proxy/Vendor
-Fetches dynamic models (e.g. `gemini-4`, `claude-opus-5-5`, `gpt-6-astra`) from your active endpoint (e.g. GhostCLI) and syncs `config/models.json`:
+Fetches dynamic models (e.g. `gemini-4`, `claude-opus-5-5`, `gpt-6-astra`) from your active endpoint (e.g. Custom Proxies / API or Custom Vendors) and syncs `config/models.json`:
 ```powershell
 heimdall sync-models
 ```
@@ -303,7 +303,7 @@ These flags can be passed to either `node setup.mjs` or `heimdall` for headless 
 
 | Parameter | Type | Default | Description | Example |
 | :--- | :---: | :---: | :--- | :--- |
-| **`--profile <name>`** | String | `full` | Skill profile tier: `full` (49 skills), `minimal` (15), `security` (12), or `design` (14). | `--profile minimal` |
+| **`--profile <name>`** | String | `full` | Skill profile tier: `full` (50 skills), `minimal` (16), `security` (12), or `design` (14). | `--profile minimal` |
 | **`--agents <targets>`** | String | `all` | Comma-separated list of harnesses to configure: `claude`, `gemini`, `codex`, `desktop`, or `all`. | `--agents claude,gemini` |
 | **`--link`** | Flag | `false`* | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). *(Recommended)* | `--link` |
 | **`--no-link`** | Flag | `true`* | Deploy skills as independent physical directory copies instead of live junctions. | `--no-link` |
@@ -324,7 +324,7 @@ These flags can be passed to either `node setup.mjs` or `heimdall` for headless 
 <a id="6-dynamic-model-registry-sync-models"></a>
 ## 6. Dynamic Model Registry (`sync-models`)
 
-Rather than relying on outdated static model lists, Heimdall discovers available model catalogs dynamically from active provider or proxy endpoints (e.g. GhostCLI, LiteLLM, or native vendor APIs):
+Rather than relying on outdated static model lists, Heimdall discovers available model catalogs dynamically from active provider or proxy endpoints (e.g. Custom Proxies / API or Custom Vendors, LiteLLM, or native vendor APIs):
 
 ```powershell
 heimdall sync-models
@@ -415,7 +415,7 @@ A common point of confusion is the distinction between consumer desktop chat app
 OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matrix:
 1. **Binary Detection**: Heimdall automatically discovers `codex.exe` on `PATH`, `%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe`, or `%USERPROFILE%\.codex\packages\standalone\current\bin\codex.exe`.
 2. **Windows Sandboxing Flag**: Unlike macOS (Seatbelt) or Linux (Landlock/Bubblewrap), Windows does not possess native POSIX sandbox isolation primitives. For headless cross-agent reviews and automated non-interactive tasks, [`tools/codex-bridge.ps1`](tools/codex-bridge.ps1) executes Codex with `--dangerously-bypass-approvals-and-sandbox` to allow uninterrupted execution.
-3. **Endpoint Flexibility**: Codex can route either to official OpenAI endpoints or via GhostCLI (`https://ghostcli.cloud/v1`) using the `gpt-6-astra` model catalog.
+3. **Endpoint Flexibility**: Codex can route either to official OpenAI endpoints or via Custom Proxies / API or Custom Vendors (e.g. `https://api.your-proxy.com/v1`, LiteLLM, or private endpoints) using your preferred model catalog.
 4. **NTFS Junctions**: All 50 skills are linked directly into `%USERPROFILE%\.codex\skills` as NTFS junctions, ensuring zero file duplication and instantaneous sync.
 
 ### Hermes Agent & OpenClaw Integration

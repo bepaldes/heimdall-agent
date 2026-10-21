@@ -5,7 +5,7 @@
  * Heimdall Agent — Intelligent Multi-Agent Sentinel & Environment Bootstrapper
  * ==============================================================================
  * Detects installed tools (Claude Code, Antigravity, Codex CLI, Claude Desktop),
- * inspects active API endpoints (GhostCLI, Google OAuth, or Official APIs),
+ * inspects active API endpoints (Custom Proxies / API or Custom Vendors, Google OAuth, or Official APIs),
  * dynamically discovers user PATH & doctrine directories (zero hardcoded paths),
  * provides 1-second auto-sync ('heimdall sync') for newly installed AI tools,
  * and deploys skills via native live junctions (--link) or isolated copies.
@@ -473,13 +473,13 @@ ${colors.dim}Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is 
 ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}sync${colors.reset} (or ${colors.dim}--sync${colors.reset})           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
-  ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. GhostCLI) and refresh models.json
+  ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
   ${colors.green}skills${colors.reset} (or ${colors.dim}--skills${colors.reset})         List all canonical skills, categories, and upstream provenance
   ${colors.green}update-skill <name|all>${colors.reset}     Inspect upstream repository, updates, and bounded review protocol
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
-  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (49), minimal (16), security (12), design (14) [default: full]
+  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (50), minimal (16), security (12), design (14) [default: full]
   ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, desktop, all [default: all]
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
@@ -703,27 +703,39 @@ async function syncModelsFromEndpoint() {
   const detected = detectEnvironment();
   let proxyUrl = detected.endpoints.claude || detected.endpoints.codex;
 
-  if (proxyUrl.includes('ghostcli.cloud')) {
-    const targetUrl = 'https://ghostcli.cloud/v1/models';
-    console.log(`Probing GhostCLI Models API: ${colors.yellow}${targetUrl}${colors.reset}...`);
+  let targetUrl = null;
+  if (proxyUrl && proxyUrl.startsWith('http')) {
+    if (proxyUrl.includes('ghostcli.cloud')) {
+      targetUrl = 'https://ghostcli.cloud/v1/models';
+    } else if (!proxyUrl.includes('api.anthropic.com') && !proxyUrl.includes('api.openai.com')) {
+      const base = proxyUrl.replace(/\/+$/, '');
+      targetUrl = base.endsWith('/v1') ? `${base}/models` : (base.endsWith('/models') ? base : `${base}/v1/models`);
+    }
+  }
+
+  if (targetUrl) {
+    console.log(`Probing Proxy / Vendor Models API: ${colors.yellow}${targetUrl}${colors.reset}...`);
     try {
       const res = await fetch(targetUrl);
       if (res.ok) {
         const data = await res.json();
         const modelsList = data.data || data.models || [];
-        console.log(`${colors.green}✔ Successfully discovered ${modelsList.length} live models from GhostCLI!${colors.reset}\n`);
+        console.log(`${colors.green}✔ Successfully discovered ${modelsList.length} live models from endpoint!${colors.reset}\n`);
 
         let currentModels = {};
         if (fs.existsSync(modelsPath)) {
           currentModels = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
         }
 
-        currentModels.ghostcli = modelsList.map(m => ({
+        const mapped = modelsList.map(m => ({
           id: m.id || m.slug,
           displayName: m.display_name || m.id,
           context: m.context_window ? `${Math.round(m.context_window / 1000)}K` : '1M',
           description: m.description || ''
         }));
+
+        currentModels.custom_proxies = mapped;
+        currentModels.ghostcli = mapped;
 
         fs.writeFileSync(modelsPath, JSON.stringify(currentModels, null, 2));
         console.log(`${colors.green}✔ Synchronized models catalog to config/models.json${colors.reset}\n`);
@@ -1012,7 +1024,7 @@ async function runInteractive(options, detected) {
 
     console.log(`\n${colors.yellow}Select Installation Profile Tier:${colors.reset}`);
     console.log(`  1. full     - All 50 curated skills (Complete Powerhouse)`);
-    console.log(`  2. minimal  - 15 core skills (Planning, TDD, Anti-Slop, Taste, Hygiene)`);
+    console.log(`  2. minimal  - 16 core skills (Planning, TDD, Anti-Slop, Taste, Hygiene)`);
     console.log(`  3. security - 12 security skills (Differential HTTP probing, OWASP, Trail of Bits)`);
     console.log(`  4. design   - 14 frontend skills (Taste, GSAP motion, Brandkit, Tokens)`);
 
