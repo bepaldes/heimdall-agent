@@ -151,6 +151,10 @@ of step carries what makes it unambiguous and nothing more:
   tests do not determine, or for exact copy the spec fixes.
 - **A verification step:** the command to run and the output that means it
   passed.
+  - **No Pseudo-Verification**: For UI or user-facing features, never specify `tsc --noEmit`, `curl`, `grep bundle`, or container status as the verification step.
+  - **Browser E2E Required**: Web/UI tasks must specify Playwright E2E browser verification (checking DOM state, `toBeVisible()`, and non-zero bounding box geometry).
+  - **Backend Tasks with UI Impact**: If a backend task (e.g. database migration, API payload change) alters data visible on user screens, include browser UI verification in the plan.
+  - **Playwright Environment Detection**: If Playwright is not yet present in the workspace, the plan must surface this during initial authoring and prompt the human for preferred setup.
 - **A reference to another task:** that task's Interfaces block says what
   to use; the plan does not repeat that task's code.
 

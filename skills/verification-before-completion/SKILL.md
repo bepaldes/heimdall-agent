@@ -46,6 +46,20 @@ Skip any step = lying, not verifying
 | Regression test works | Red-green cycle verified | Test passes once |
 | Agent completed | VCS diff shows changes | Agent reports "success" |
 | Requirements met | Line-by-line checklist | Tests passing |
+| UI works | Playwright browser E2E DOM & visual assertions pass | `curl` 200/302 (server responding ≠ UI works) |
+| Feature bundled | Browser runtime executes & renders component | `grep -c` on compiled JS (string in bundle ≠ runtime behavior) |
+| App ready | Runtime deployment & behavior verified | `tsc --noEmit` passing (types compile ≠ app works) |
+| Service healthy | Actual feature functionality verified | "Container healthy" (daemon started ≠ feature works) |
+| Code edit works | Running app verified in runtime/browser | Reading source code to confirm edit is present |
+
+## Browser & UI Verification Gate (Playwright E2E)
+
+For any task with UI impact (including backend tasks like database migrations or API payload changes that affect user screens):
+- **Mandatory Browser Execution**: Must execute Playwright E2E tests in a real browser context.
+- **Visual DOM & Layout Checks**: Assert element visibility (`expect(locator).toBeVisible()`) and non-zero bounding box geometry (`boundingBox().height > 0`).
+- **Console Trapping**: Listen for uncaught runtime exceptions via `page.on('pageerror')`.
+- **Screenshot Policy**: Do not save screenshots to disk unless explicitly requested by the user.
+- **Environment Gate**: If Playwright is not in the workspace, flag during planning to confirm installation path with user.
 
 ## Red Flags - STOP
 
