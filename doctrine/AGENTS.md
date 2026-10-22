@@ -2,6 +2,41 @@
 
 Universal directives for all coding agents (Google Antigravity, Claude Code, OpenAI Codex CLI, etc.) operating across all projects in `C:\Apps\`.
 
+<!-- cross-agent-harness-directives:start -->
+<cross_agent_harness_discipline priority="CRITICAL_OVERRIDE">
+  <planning_protocol>
+    When receiving ANY planning request (via /plan, /grill-me, plan mode, or natural language prompts to architect, design, or plan):
+    1. TURN 1 IS HARD-GATED FOR INTERACTIVE GRILLING (ZERO-TOLERANCE):
+       - You are STRICTLY FORBIDDEN from generating or writing a plan file or implementation plan on Turn 1.
+       - You MUST NOT jump to conclusions, assume unstated requirements, or write code.
+       - You MUST immediately act as the Orchestrator and output an interactive interview containing:
+         a) Explicit Scope Classification: State clearly whether the task is a 'Spike', 'Bounded', or 'Architectural' change.
+         b) Interrogate Assumptions: Ask at least 2-3 probing questions challenging edge cases, hidden constraints, and failure modes.
+         c) Present Concrete Alternatives: Suggest at least 2 distinct approaches with explicit architectural trade-offs.
+       - You MUST pause and await the user's explicit response and direction approval before writing any plan file or code.
+    2. TURN 2+ PLAN GENERATION (UPON USER APPROVAL):
+       - Once the user responds and explicitly approves a design direction, you may generate the plan.
+       - The plan MUST strictly follow the 7-Section Canonical Plan Template:
+         Section 1: Active Skills & Directives Checklist
+         Section 2: Context & Design Read (Tokens / Aesthetics)
+         Section 3: Multi-Agent Orchestration & Model Allocation Matrix (with assigned models, effort levels, cross-reviewers)
+         Section 4: Multi-Phase Implementation Plan
+         Section 5: Symmetric & Tri-Directional Cross-Model Validation Loop
+         Section 6: Orchestrator Heartbeat
+         Section 7: Verification Harness (Automated Playwright/tests + Manual verification)
+       - Do NOT use generic, simplified, or abbreviated plan templates.
+  </planning_protocol>
+
+  <subagent_execution_contract>
+    When invoked as a child subagent across ANY harness (Antigravity `invoke_subagent`, Claude Code `Agent`, or OpenAI Codex CLI subagent):
+    - You are an autonomous executor (Implementer, Tester, Reviewer, or Code-Sentinel).
+    - The Turn 1 interactive grilling gate does NOT apply to delegated child subagents.
+    - Do NOT ask conversational questions back to the caller.
+    - Immediately inspect target files, write failing tests first (TDD), write surgical code, execute verification, and return your completed diff and status report.
+  </subagent_execution_contract>
+</cross_agent_harness_discipline>
+<!-- cross-agent-harness-directives:end -->
+
 ---
 
 ## 1. Skill Precedence & Contradiction Resolution
@@ -33,9 +68,9 @@ Whenever receiving ANY request to plan, design, architect, or implement a featur
 
 1. **Turn 1 Hard Gate: Interactive Grilling Before Any Code or Plan (ZERO-TOLERANCE)**:
    - **STRICT PROHIBITION**: The agent is **strictly forbidden** from generating an implementation plan artifact, scaffolding files, or writing code on Turn 1.
-   - **Mandatory Action**: The agent MUST act as the **Orchestrator** (orchestrator), immediately activate rainstorming, and:
+   - **Mandatory Action**: The agent MUST act as the **Orchestrator** (orchestrator), immediately activate brainstorming, and:
      1. **Classify Scope Out Loud**: State the classification (**Spike**, **Bounded**, or **Architectural**) so the human can confirm or override.
-     2. **Interrogate Assumptions**: Ask **at least 2–3 probing questions** probing edge cases, failure states, scale limits, and hidden constraints.
+     2. **Interrogate Assumptions**: Ask **at least 2-3 probing questions** probing edge cases, failure states, scale limits, and hidden constraints.
      3. **Present Concrete Alternatives**: Suggest **at least 2 distinct approaches** and articulate the concrete trade-offs of each.
    - **Hard Gate**: Only AFTER the user responds and explicitly approves a design direction may the agent proceed to produce a spec or implementation plan.
 

@@ -40,6 +40,7 @@ const agentsDir = path.join(__dirname, 'agents');
 const playbooksDir = path.join(__dirname, 'playbooks');
 const toolsDir = path.join(__dirname, 'tools');
 const doctrineDir = path.join(__dirname, 'doctrine');
+const commandsDir = path.join(__dirname, 'commands');
 const profilesPath = path.join(__dirname, 'config', 'profiles.json');
 const modelsPath = path.join(__dirname, 'config', 'models.json');
 const agentsConfigPath = path.join(__dirname, 'config', 'agents.json');
@@ -112,6 +113,10 @@ const targetPlaybookPaths = {
   agents: path.join(userHome, '.agents', 'playbooks'),
   hermes: path.join(getHermesDir(), 'playbooks'),
   openclaw: path.join(getOpenClawDir(), 'playbooks')
+};
+
+const targetCommandPaths = {
+  claude: path.join(userHome, '.claude', 'commands')
 };
 
 function printBanner() {
@@ -783,6 +788,26 @@ async function runSync(options, detected) {
     else if (agent === 'openclaw' && (detected.tools.openclaw || fs.existsSync(getOpenClawDir()))) toolInstalled = true;
 
     if (toolInstalled) {
+      // Synchronize doctrine, playbooks & commands unconditionally for installed harnesses
+      const targetDocFile = targetDoctrinePaths[agent];
+      const srcDoc = path.join(doctrineDir, 'AGENTS.md');
+      if (targetDocFile && fs.existsSync(srcDoc)) {
+        const parentDir = path.dirname(targetDocFile);
+        if (fs.existsSync(parentDir)) fs.copyFileSync(srcDoc, targetDocFile);
+      }
+
+      const targetPlayDir = targetPlaybookPaths[agent];
+      if (targetPlayDir && fs.existsSync(playbooksDir)) {
+        const parentDir = path.dirname(targetPlayDir);
+        if (fs.existsSync(parentDir)) linkDirectory(playbooksDir, targetPlayDir, false);
+      }
+
+      const targetCmdDir = targetCommandPaths[agent];
+      if (targetCmdDir && fs.existsSync(commandsDir)) {
+        const parentDir = path.dirname(targetCmdDir);
+        if (fs.existsSync(parentDir)) linkDirectory(commandsDir, targetCmdDir, false);
+      }
+
       const exists = fs.existsSync(targetDir);
       const currentSkills = exists
         ? fs.readdirSync(targetDir, { withFileTypes: true }).filter(d => d.name !== '.system')
@@ -809,20 +834,6 @@ async function runSync(options, detected) {
         let agentCount = 0;
         if (targetAgentDir) {
           agentCount = deployAgentContracts(targetAgentDir, true, false, false);
-        }
-
-        // Synchronize doctrine & playbooks
-        const targetDocFile = targetDoctrinePaths[agent];
-        const srcDoc = path.join(doctrineDir, 'AGENTS.md');
-        if (targetDocFile && fs.existsSync(srcDoc)) {
-          const parentDir = path.dirname(targetDocFile);
-          if (fs.existsSync(parentDir)) fs.copyFileSync(srcDoc, targetDocFile);
-        }
-
-        const targetPlayDir = targetPlaybookPaths[agent];
-        if (targetPlayDir && fs.existsSync(playbooksDir)) {
-          const parentDir = path.dirname(targetPlayDir);
-          if (fs.existsSync(parentDir)) linkDirectory(playbooksDir, targetPlayDir, false);
         }
 
         console.log(`   ${colors.green}✔ Linked ${count} skills and ${agentCount} predefined agents via Live Junctions${colors.reset}\n`);
@@ -1636,6 +1647,21 @@ async function main() {
               copyDirectory(playbooksDir, targetPlayDir, options.dryRun);
             }
             console.log(`   ${colors.green}✔ Synchronized playbooks to ${targetPlayDir}${colors.reset}`);
+          }
+        }
+      }
+
+      // Synchronize custom commands (Claude Code CLI)
+      if (fs.existsSync(commandsDir)) {
+        for (const [agent, targetCmdDir] of Object.entries(targetCommandPaths)) {
+          const parentDir = path.dirname(targetCmdDir);
+          if (fs.existsSync(parentDir)) {
+            if (options.link) {
+              linkDirectory(commandsDir, targetCmdDir, options.dryRun);
+            } else {
+              copyDirectory(commandsDir, targetCmdDir, options.dryRun);
+            }
+            console.log(`   ${colors.green}✔ Synchronized commands to ${targetCmdDir}${colors.reset}`);
           }
         }
       }
