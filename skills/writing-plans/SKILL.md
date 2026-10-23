@@ -51,6 +51,9 @@ independently testable deliverable.
 
 ## Plan Document Header
 
+> [!IMPORTANT]
+> **Canonical Plan Schema**: In cross-agent environments governed by Heimdall doctrine, plans must strictly adhere to the 7-Section Canonical Plan Template in [`playbooks/05-canonical-plan-template.md`](file:///C:/Apps/heimdall-agent/playbooks/05-canonical-plan-template.md). Generic or abbreviated templates are strictly prohibited.
+
 **Every plan MUST start with this header:**
 
 ```markdown
