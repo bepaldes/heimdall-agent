@@ -12,7 +12,8 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
          a) Explicit Scope: Classify as 'Spike', 'Bounded', or 'Architectural'.
          b) Interrogate Assumptions: Ask 2-3 probing questions on edge cases, limits, failure modes.
          c) Concrete Alternatives: Suggest 2 distinct approaches with explicit architectural trade-offs.
-       - Pause and await user response and direction approval before writing plans or code.
+       - MANDATORY VISIBLE OUTPUT: You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown. NEVER keep them in internal thinking/scratchpads or output a bare "awaiting answers" blocker message.
+       - Pause and await user response and direction approval ONLY AFTER printing the questions and alternatives in full.
     2. TURN 2+ PLAN GENERATION:
        - Generate plan strictly following [`playbooks/05-canonical-plan-template.md`](file:///C:/Apps/heimdall-agent/playbooks/05-canonical-plan-template.md). Abbreviated templates forbidden.
   </planning_protocol>

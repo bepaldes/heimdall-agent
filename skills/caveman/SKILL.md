@@ -43,6 +43,7 @@ Caveman applies **strictly to conversational English prose**. It must **never** 
 - **Commands & Arguments**: Preserve exact CLI commands, flags, and shell syntax verbatim.
 - **Diffs & File Paths**: Preserve complete file links (`[file](file:///...)`), line numbers, and symbol identifiers.
 - **Structured Outputs & Cross-Model Reviews**: Never strip JSON keys, schema fields, or verification checklist criteria needed by cross-model review bridges (`claude-bridge`, `gemini-bridge`, `codex-bridge`).
+- **Turn 1 Grilling Questions & Alternatives**: Never omit, swallow, or truncate the probing questions, scope classification, or architectural alternatives required by interactive grilling gates (`/plan`, `/grill-me`). These are mandatory technical payloads.
 
 ---
 

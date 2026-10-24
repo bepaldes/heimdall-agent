@@ -25,6 +25,7 @@ Before generating any code, creating plans, or taking action on any user request
    - Declare your professional recommendation with clear reasoning.
 
 4. **Hard Gate**:
-   - STOP and wait for the user to answer and select an approach.
+   - MANDATORY VISIBLE OUTPUT: Output the Scope, Probing Questions, and Alternatives explicitly in user-visible chat markdown. Never swallow them in internal thinking/scratchpads or output a bare "awaiting answers" message.
+   - STOP and wait for the user to answer and select an approach ONLY AFTER rendering the questions in full.
    - Only after receiving explicit alignment may you proceed to planning or implementation.
 ```
