@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+# Heimdall Universal Git Pre-Push Hook
+# Blocks force-pushes to protected branches across all AI harnesses and terminal environments.
+
+remote="$1"
+url="$2"
+zero_hash="0000000000000000000000000000000000000000"
+
+while read -r local_ref local_oid remote_ref remote_oid
+do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master|refs/heads/release|refs/heads/production)
+      if [ "$local_oid" != "$zero_hash" ] && [ "$remote_oid" != "$zero_hash" ]; then
+        if ! git merge-base --is-ancestor "$remote_oid" "$local_oid" 2>/dev/null; then
+          echo "[Heimdall Git Guardrail] BLOCKED: Force push (non-fast-forward) to protected branch '$remote_ref' is forbidden." >&2
+          exit 1
+        fi
+      fi
+      ;;
+    *)
+      # Feature branches and other refs are permitted
+      ;;
+  esac
+done
+
+exit 0

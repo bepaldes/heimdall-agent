@@ -41,28 +41,26 @@
 
 Together, skills provide the **domain intelligence** and agents provide the **structured division of labor** required for reliable software engineering.
 
-### Native Google Elephant-Goldfish Model (EGM) Integration
+### Google Elephant-Goldfish Model (EGM)
 
-Heimdall natively incorporates the official **Google Elephant-Goldfish Model (EGM)** ([`google/elephant-goldfish-model`](https://github.com/google/elephant-goldfish-model), [egm.dev](https://egm.dev)), built upon Dave Rensin's foundational architecture for Spec-Driven Development (SDD):
-* 🐘 **The Elephant (Context-Rich Coordination)**: The primary session and [`orchestrator`](#predefined-agents-8-specialized-personas) persona retain long-term memory, project narrative, and deep contextual history.
-* 🐠 **The Goldfish (Stateless Context Blinding)**: Reviewers and testers operate as isolated, stateless **Goldfish** agents. They are intentionally starved of conversational banter, internal debates, and speculative hypotheses:
-  - **Artifact-First Delivery**: Design proposals, specs, and reviews are written directly to disk (`docs/designs/<feature>.md` or brain artifacts) rather than dumped in chat.
-  - **"No Glazing" & Plain-English**: Zero performative sycophancy (*"great"*, *"brilliant"*, *"smart"*) or apologetic filler (*"I apologize"*). Direct, plain technical explanations without buzzwords.
-  - **Blind Bug Diagnosis**: When diagnosing bugs, the [`tester`](#predefined-agents-8-specialized-personas) receives only the observed symptom and repro steps—deliberately withholding the author's guessed cause—guaranteeing that failures are authentically codified in a test before any code change.
-  - **5-Round Convergence Ledger**: Architectural reviews follow a structured ledger protocol (`| ID | File:Line | Severity | Finding | Verbatim Action / Rebuttal | Status |`) with mandatory fixes or technical rebuttals, terminating only on zero findings or a hard 5-round escalation gate.
-* ⚖️ **The 3-Tier Smart Boundary Policy (Preventing Ceremony Overkill)**:
-  - **Tier 1 (Spike / Bugfix < 50 LOC)**: **Zero EGM ceremony**. Pure Karpathy simplicity, TDD with `tester`, surgical edits with `code-sentinel`, verify existing test suites.
-  - **Tier 2 (Bounded Feature)**: **Lightweight EGM gate**. Concise in-chat design outline, skips Zoom-Out and Comprehension, runs fast Critic & Readiness checks only.
-  - **Tier 3 (Architectural / High-Stakes)**: **Full Google EGM Pipeline**. Artifact-First design spec in `docs/designs/`, orchestrating EGM's 4-stage Goldfish review pipeline (Zoom Out -> Comprehension -> Critic -> Implementation Readiness) + spec-to-code drift monitoring.
-* 🔄 **Adaptive Goldfish Execution**: If multi-model bridge scripts (`gemini-bridge.ps1`, `claude-bridge.ps1`, `codex-bridge.ps1`) and active credentials exist in the user's environment, Heimdall dispatches cross-model Goldfish validators (e.g. Gemini Elephant validated by Claude/Codex); if external bridges or keys are absent, it automatically falls back to spawning fresh, stateless subagents on the **same native harness and model** with zero conversation history.
+Heimdall incorporates the core architecture from [`google/elephant-goldfish-model`](https://github.com/google/elephant-goldfish-model):
+
+- **The Elephant (Coordinator)**: The primary session and [`orchestrator`](#predefined-agents-8-specialized-personas) retain deep project context, architectural decisions, and task history.
+- **The Goldfish (Reviewers & Testers)**: Reviewers and testers run as isolated, stateless subagents blinded to author rationalizations, preventing sycophancy and rubber-stamping.
+- **3-Tier Boundary Ladder**:
+  - **Tier 1 (Spike / Bugfix < 50 LOC)**: Zero ceremony. Minimal surgical code with failing test first.
+  - **Tier 2 (Bounded Feature)**: Fast in-chat design check with critic and readiness reviews.
+  - **Tier 3 (Architectural)**: Spec saved to disk (`docs/designs/<feature>.md`) followed by a 4-stage review (Zoom Out, Comprehension, Critique, Readiness) and 5-round convergence ledger.
+- **Adaptive Multi-Model Execution**: Automatically dispatches cross-model reviews via bridge scripts (`gemini-bridge`, `claude-bridge`, `codex-bridge`) when configured; falls back gracefully to isolated subagents on the same model when bridges are absent.
 
 ### Distilled Everything-Claude-Code (ECC) Architectural Gems
 
 Heimdall selectively absorbs the 5 most valuable architectural patterns from [`affaan-m/everything-claude-code`](https://github.com/affaan-m/everything-claude-code) into its existing core personas, playbooks, and setup engine, completely avoiding agent bloat, token waste, or fragmented sub-specializations:
 
 1. ⚡ **Event-Driven Lifecycle Hooks (`hooks/`)**:
-   - Zero-dependency, native Node.js lifecycle hook dispatcher (`hooks/heimdall-hook.js`) automatically linked to `~/.claude/hooks` and registered in `~/.claude/settings.json`.
-   - Surgical `PreToolUse` safety checks: blocks destructive root operations (`rm -rf /`, `rmdir /s /q`), blocks force pushes to protected branches (`main`/`master`), and blocks accidental commits of sensitive credentials (`.env`, `id_rsa`, `*.pem`).
+   - Zero-dependency, native Node.js lifecycle hook dispatcher (`hooks/heimdall-hook.cjs`) automatically linked to `~/.claude/hooks` and registered in `~/.claude/settings.json`.
+   - Branch-aware safety checks: blocks destructive root commands (`rm -rf /`, `rmdir /s /q`), blocks force pushes to protected branches (`main`/`master`/`release` while permitting feature-branch force pushes), and blocks staging sensitive credentials (`.env`, `id_rsa`, `*.pem`).
+   - Universal Git protection: provides a native `hooks/git/pre-push` hook protecting all runtimes (Antigravity, Codex CLI, Hermes, Claude, and terminal users) right at the Git level.
    - Non-blocking quality advisories: Karpathy 800-line warning on `PreToolUse(Write)`, automated test reminder on `PostToolUse(Edit|Write)`, and disk persistence reminder on `PreCompact`.
 2. 🕵️ **Silent Failure Hunter Checklist**:
    - Codified in [`reviewer`](#predefined-agents-8-specialized-personas) and [Playbook 03](playbooks/03-adversarial-code-review.md) to detect the 5 silent defect patterns common in AI-generated code: empty catch blocks, dangerous default fallbacks returning `[]`/`null`, lost stack trace causes, unbounded async operations without abort timeouts, and `as unknown as T` nullish suppression.
@@ -72,6 +70,37 @@ Heimdall selectively absorbs the 5 most valuable architectural patterns from [`a
    - Integrated into [`systematic-debugging`](skills/systematic-debugging/SKILL.md): systematic isolation of cache corruption, lockfile desyncs, peer dependency collisions, module resolution mismatches (ESM/CJS), and engine runtime skew before attempting code modifications.
 5. ⏳ **Strategic Context Compaction Cadence**:
    - Universal doctrine rule in [`doctrine/AGENTS.md`](doctrine/AGENTS.md): recommends proactive `/compact` after major milestones or ~40–50 tool invocations, mandating that active tasks, unresolved ledgers, and architectural rulings are persisted to disk first.
+
+
+### Using the Orchestrator (`/orchestrator`)
+
+The **Orchestrator** is Heimdall's chief engineering coordinator. It manages the entire development lifecycle: grilling assumptions, decomposing tasks into a 7-section canonical plan, dispatching specialized subagents, and enforcing verification gates.
+
+#### 1. Triggering the Orchestrator
+- **In Claude Code CLI**:
+  - `/orchestrator <task>` or `/orchestrate <task>`: Launch full orchestration for a task or feature.
+  - `/plan <feature>`: Decompose a request into a canonical 7-section plan.
+  - `/grill-me`: Interrogate assumptions and explore trade-offs before locking architecture.
+- **In Google Antigravity & OpenAI Codex CLI**:
+  - Antigravity: Switch to or mention the `@orchestrator` persona, or run `/plan`.
+  - Codex CLI: The universal doctrine in `AGENTS.md` automatically activates the Orchestrator role for any planning or architectural prompt.
+
+#### 2. Orchestration Workflow
+
+```mermaid
+flowchart TD
+    A["User Request"] --> B["1. Grilling Gate (/grill-me)"]
+    B -->|Classify Scope & Probing Questions| C["User Alignment"]
+    C --> D["2. Canonical Plan (/plan)"]
+    D --> E["3. Subagent Dispatch"]
+    E --> F["tester (TDD failing test first)"]
+    E --> G["designer (UI & viewport boundaries)"]
+    E --> H["code-sentinel (minimal surgical code)"]
+    F & G & H --> I["4. Verification & Review"]
+    I --> J["Playwright E2E Browser Testing"]
+    I --> K["Adversarial Goldfish Code Review"]
+    J & K --> L["Complete"]
+```
 
 [↑ Back to top](#table-of-contents)
 

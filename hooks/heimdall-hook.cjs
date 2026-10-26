@@ -6,9 +6,11 @@
  * Surgical, event-driven guardrails for Claude Code & AI harnesses.
  */
 
+const { execSync } = require('child_process');
+
 const MAX_STDIN = 1024 * 1024; // 1 MiB
 
-function readStdin(timeoutMs = 150) {
+function readStdin(timeoutMs = 800) {
   return new Promise((resolve) => {
     let raw = '';
     let settled = false;
@@ -16,7 +18,6 @@ function readStdin(timeoutMs = 150) {
     const timer = setTimeout(() => {
       if (!settled) {
         settled = true;
-        try { process.stdin.pause(); } catch {}
         resolve(raw);
       }
     }, timeoutMs);
@@ -46,6 +47,14 @@ function readStdin(timeoutMs = 150) {
   });
 }
 
+function getActiveGitBranch() {
+  try {
+    return execSync('git branch --show-current', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return '';
+  }
+}
+
 async function main() {
   const event = process.argv[2] || '';
   const raw = await readStdin();
@@ -69,11 +78,38 @@ async function main() {
         process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Destructive root/system command detected.\n');
         process.exit(2);
       }
-      // Block forced git push to main / master
-      if (/git\s+push\s+.*(-f|--force).*(main|master)/i.test(command)) {
-        process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Force push to protected branch (main/master) is strictly forbidden.\n');
-        process.exit(2);
+
+      // Branch-aware force push check
+      if (/git\s+push\s+.*(-f\b|--force\b|--force-with-lease\b)/i.test(command)) {
+        // Explicit protected branch in command target
+        if (/\b(origin\s+)?(main|master|release|production)\b/i.test(command)) {
+          process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Force push to protected branch (main/master/release) is strictly forbidden.\n');
+          process.exit(2);
+        }
+
+        const tokens = command.trim().split(/\s+/);
+        const lastToken = tokens[tokens.length - 1];
+        const isExplicitProtected = /^(main|master|release|production)$/i.test(lastToken);
+
+        const currentBranch = getActiveGitBranch();
+        const isCurrentProtected = /^(main|master|release|production)$/i.test(currentBranch);
+
+        const hasExplicitFeature = tokens.some(t =>
+          /^(feature|bugfix|hotfix|chore|test|experiment)\//i.test(t) ||
+          (!/^(-|main|master|release|production|origin|git|push)$/i.test(t) && !t.startsWith('-'))
+        );
+
+        if (isExplicitProtected || (!hasExplicitFeature && isCurrentProtected)) {
+          process.stderr.write(`[Heimdall Sentinel Guardrail] BLOCKED: Force push to protected branch '${currentBranch || 'main'}' is strictly forbidden.\n`);
+          process.exit(2);
+        }
+
+        // On feature/working branches, allow force push with an advisory
+        if (currentBranch && !isCurrentProtected) {
+          process.stderr.write(`[Heimdall Sentinel] Advisory: Force push permitted on feature branch '${currentBranch}'. Verify remote commits before rewriting history.\n`);
+        }
       }
+
       // Warn on accidental secret commits
       if (/git\s+add\s+.*(\.env($|\.local)|id_rsa|.*\.pem)/i.test(command)) {
         process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Attempting to stage sensitive credential or secret files.\n');

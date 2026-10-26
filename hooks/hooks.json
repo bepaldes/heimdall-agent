@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.js\" pre-bash"
+            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.cjs\" pre-bash"
           }
         ]
       },
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.js\" pre-write"
+            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.cjs\" pre-write"
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.js\" post-write"
+            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.cjs\" post-write"
           }
         ]
       }
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.js\" pre-compact"
+            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.cjs\" pre-compact"
           }
         ]
       }
