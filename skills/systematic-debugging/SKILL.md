@@ -49,7 +49,12 @@ You MUST complete each phase before proceeding to the next.
 
 **BEFORE attempting ANY fix:**
 
-1. **Read Error Messages Carefully**
+1. **Google EGM Blind Hypothesis Invariant**
+   - **Withhold speculative guesses**: If dispatching an agent or subagent to isolate the bug, do NOT pass conversational guesses ("I suspect function X is broken").
+   - Provide ONLY: the symptom, verbatim logs, reproduction steps, and relevant stack traces.
+   - Force the diagnosing agent (the Goldfish) to observe and codify the failure independently. This prevents anchoring bias and rabbit-hole confirmation bias.
+
+2. **Read Error Messages Carefully**
    - Don't skip past errors or warnings
    - They often contain the exact solution
    - Read stack traces completely

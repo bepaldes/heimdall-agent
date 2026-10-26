@@ -44,6 +44,13 @@ Write code before the test? Delete it. Start over.
 
 Implement fresh from tests. Period.
 
+### The Google EGM Blind Bug Reproduction Principle
+When reproducing a bug reported by an external actor or an ongoing session:
+- **Blind the Diagnoser**: Isolate the test author from speculative narrative or guessed solutions.
+- Provide only symptoms, repro steps, and boundary data.
+- The test author must independently codify a test that fails with the identical symptom.
+- If the test passes or fails for an unrelated reason, the bug is not isolated; do not write code until the failure is authentically codified.
+
 ## Red-Green-Refactor
 
 ```dot

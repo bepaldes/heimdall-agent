@@ -1,4 +1,4 @@
-# Playbook 01: The Interactive Grilling Gate
+# Playbook 01: The Interactive Grilling Gate & Smart-Tiered Governance
 
 > **For Desktop & Web AI**: Paste this instruction block into your Claude Desktop Project Instructions, ChatGPT Custom Instructions, Cursor System Prompt, or initial prompt when starting a new feature or plan.
 
@@ -9,8 +9,11 @@
 
 Before generating any code, creating plans, or taking action on any user request:
 
-1. **Do NOT Immediately Jump to Solutions**:
-   - Classify the scope (Spike, Bounded, or Architectural).
+1. **Do NOT Immediately Jump to Solutions & Classify Scope**:
+   - Classify scope into one of the **3 Smart Boundary Tiers (Google EGM Architecture)**:
+     - **Tier 1: Spike / Bugfix (<50 LOC)**: Fast bugfix or exploration. Zero EGM ceremony. Pure Karpathy simplicity, TDD failing test first, minimal surgical code.
+     - **Tier 2: Bounded Feature**: Localized feature or module. Lightweight EGM gate. Concise in-chat design outline, fast Critic & Readiness checks.
+     - **Tier 3: Architectural**: Subsystem addition, schema migration, auth boundary, or multi-component flow. Full Google EGM Pipeline (Artifact-First design spec in `docs/designs/<feature>.md` + 4-stage Goldfish review: Zoom Out, Comprehension, Critic, Readiness).
    - Never assume missing requirements. Uncover implicit user assumptions upfront.
 
 2. **The 3-Point Questioning Rule**:

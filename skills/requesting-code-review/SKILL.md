@@ -7,7 +7,7 @@ description: Use when completing tasks, implementing major features, or before m
 
 Dispatch a code reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history.
 
-**Core principle:** Review early, review often.
+**Core principle:** Review early, review often. Enforce the **Google Elephant-Goldfish Model (EGM)**: the reviewer operates as an isolated, stateless **Goldfish** that evaluates raw code artifacts without being polluted by author debates or conversational rationalizations.
 
 ## When to Request Review
 
@@ -21,17 +21,46 @@ Dispatch a code reviewer subagent to catch issues before they cascade. The revie
 - Before refactoring (baseline check)
 - After fixing complex bug
 
-## How to Request
+## Two-Tier Review Trigger
 
-**1. Get git SHAs:**
+- **Tier 1 (Bounded & Routine Tasks)**: Single-pass adversarial critique targeting edge cases, type safety, missing tests, and anti-slop hygiene.
+- **Tier 2 (Architectural & High-Stakes Tasks)**: Mandatory **5-round convergence loop** with a structured findings ledger.
+
+## Adaptive Execution Ladder (Cross-Model Bridge vs. Same-Model Fallback)
+
+When dispatching the Goldfish reviewer:
+1. **Check for Multi-Model Bridges**:
+   Inspect if shared bridges exist in `C:\Apps\tools\` or PATH:
+   - For Claude sessions: check for `gemini-bridge.ps1` or `codex-bridge.ps1`.
+   - For Gemini sessions: check for `claude-bridge.ps1` or `codex-bridge.ps1`.
+   - For Codex sessions: check for `claude-bridge.ps1` or `gemini-bridge.ps1`.
+2. **If Bridge & API Credentials Present**:
+   Execute the cross-model validator:
+   ```powershell
+   powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"
+   ```
+3. **If Bridges Absent (Graceful Fallback)**:
+   Spawn a fresh child subagent on the **same model / native harness** (e.g., `invoke_subagent` in Antigravity, Agent tool in Claude Code) with zero parent conversation context. The stateless Goldfish discipline is strictly preserved.
+
+## How to Request (The Blinded Packet Builder)
+
+**1. Get git SHAs and Diff:**
 ```bash
 BASE_SHA=$(git rev-parse HEAD~1)  # or: git merge-base origin/main HEAD
 HEAD_SHA=$(git rev-parse HEAD)
+git diff $BASE_SHA..$HEAD_SHA
 ```
 
-**2. Dispatch code reviewer subagent:**
+**2. Assemble the Blinded Packet:**
+- Strip conversational history, justifications, and author debates.
+- Hand the reviewer ONLY:
+  - `{DESCRIPTION}`: Brief, objective summary of the change.
+  - `{PLAN_OR_REQUIREMENTS}`: Explicit acceptance criteria.
+  - `{DIFF}`: Raw git diff and touched source files.
 
-Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md)
+**3. Dispatch code reviewer subagent:**
+
+Dispatch a `general-purpose` or `reviewer` subagent, filling the template at [code-reviewer.md](code-reviewer.md).
 
 **Placeholders:**
 - `{DESCRIPTION}` - Brief summary of what you built
@@ -39,7 +68,7 @@ Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md
 - `{BASE_SHA}` - Starting commit
 - `{HEAD_SHA}` - Ending commit
 
-**3. Act on feedback:**
+**4. Act on feedback:**
 - Fix Critical issues immediately
 - Fix Important issues before proceeding
 - Note Minor issues for later

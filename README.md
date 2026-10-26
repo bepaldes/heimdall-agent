@@ -41,6 +41,21 @@
 
 Together, skills provide the **domain intelligence** and agents provide the **structured division of labor** required for reliable software engineering.
 
+### Native Google Elephant-Goldfish Model (EGM) Integration
+
+Heimdall natively incorporates the official **Google Elephant-Goldfish Model (EGM)** ([`google/elephant-goldfish-model`](https://github.com/google/elephant-goldfish-model), [egm.dev](https://egm.dev)), built upon Dave Rensin's foundational architecture for Spec-Driven Development (SDD):
+* 🐘 **The Elephant (Context-Rich Coordination)**: The primary session and [`orchestrator`](#predefined-agents-8-specialized-personas) persona retain long-term memory, project narrative, and deep contextual history.
+* 🐠 **The Goldfish (Stateless Context Blinding)**: Reviewers and testers operate as isolated, stateless **Goldfish** agents. They are intentionally starved of conversational banter, internal debates, and speculative hypotheses:
+  - **Artifact-First Delivery**: Design proposals, specs, and reviews are written directly to disk (`docs/designs/<feature>.md` or brain artifacts) rather than dumped in chat.
+  - **"No Glazing" & Plain-English**: Zero performative sycophancy (*"great"*, *"brilliant"*, *"smart"*) or apologetic filler (*"I apologize"*). Direct, plain technical explanations without buzzwords.
+  - **Blind Bug Diagnosis**: When diagnosing bugs, the [`tester`](#predefined-agents-8-specialized-personas) receives only the observed symptom and repro steps—deliberately withholding the author's guessed cause—guaranteeing that failures are authentically codified in a test before any code change.
+  - **5-Round Convergence Ledger**: Architectural reviews follow a structured ledger protocol (`| ID | File:Line | Severity | Finding | Verbatim Action / Rebuttal | Status |`) with mandatory fixes or technical rebuttals, terminating only on zero findings or a hard 5-round escalation gate.
+* ⚖️ **The 3-Tier Smart Boundary Policy (Preventing Ceremony Overkill)**:
+  - **Tier 1 (Spike / Bugfix < 50 LOC)**: **Zero EGM ceremony**. Pure Karpathy simplicity, TDD with `tester`, surgical edits with `code-sentinel`, verify existing test suites.
+  - **Tier 2 (Bounded Feature)**: **Lightweight EGM gate**. Concise in-chat design outline, skips Zoom-Out and Comprehension, runs fast Critic & Readiness checks only.
+  - **Tier 3 (Architectural / High-Stakes)**: **Full Google EGM Pipeline**. Artifact-First design spec in `docs/designs/`, orchestrating EGM's 4-stage Goldfish review pipeline (Zoom Out -> Comprehension -> Critic -> Implementation Readiness) + spec-to-code drift monitoring.
+* 🔄 **Adaptive Goldfish Execution**: If multi-model bridge scripts (`gemini-bridge.ps1`, `claude-bridge.ps1`, `codex-bridge.ps1`) and active credentials exist in the user's environment, Heimdall dispatches cross-model Goldfish validators (e.g. Gemini Elephant validated by Claude/Codex); if external bridges or keys are absent, it automatically falls back to spawning fresh, stateless subagents on the **same native harness and model** with zero conversation history.
+
 [↑ Back to top](#table-of-contents)
 
 ---
@@ -50,6 +65,7 @@ Together, skills provide the **domain intelligence** and agents provide the **st
 | Area | Vanilla AI Coding (The Trap) | With Heimdall (The Engineering Standard) |
 | :--- | :--- | :--- |
 | **Prompt Gate** | AI rushes to generate 300 lines of code immediately. | **Interactive Gate**: AI pauses, asks probing questions, and creates a verified plan. |
+| **Review & Bias** | AI rubber-stamps own code with conversational sycophancy. | **Google EGM Protocol**: Stateless context blinding, 3-tier smart boundaries, 5-round convergence ledger, and adaptive cross-model validation. |
 | **API Accuracy** | Hallucinates outdated methods from 4-year-old training data. | **Live Context**: Context7 MCP queries real source documentation before writing imports. |
 | **Code Style** | AI-slop: redundant comments, excessive abstractions, purple gradients. | **Antislop Guardrails**: Clean, minimal, readable code adhering to your design system. |
 | **Verification** | AI claims "done!" blindly; breaks existing features. | **Mandatory Testing**: Writes failing tests first, verifies edge cases, checks error paths. |

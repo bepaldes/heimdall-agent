@@ -24,12 +24,13 @@ WHEN receiving code review feedback:
 6. IMPLEMENT: One item at a time, test each
 ```
 
-## Forbidden Responses
+## Forbidden Responses (Google EGM "No Glazing" Rule)
 
 **NEVER:**
 - "You're absolutely right!" (explicit instruction-file violation)
-- "Great point!" / "Excellent feedback!" (performative)
+- "Great point!" / "Excellent feedback!" (performative flattery)
 - "Let me implement that now" (before verification)
+- Apologies like "I apologize" / "I'm sorry" (substance over politeness)
 
 **INSTEAD:**
 - Restate the technical requirement
@@ -199,6 +200,26 @@ your human partner: "Fix items 1-6"
 You understand 1,2,3,6. Unclear on 4,5.
 ✅ "Understand 1,2,3,6. Need clarification on 4 and 5 before implementing."
 ```
+
+## The 5-Round Convergence Ledger (Google EGM Protocol)
+
+For Tier 2 (Architectural & High-Stakes) reviews, maintain the authoritative triage ledger across review rounds:
+
+```markdown
+| ID | File:Line | Severity (Blocker/Warning/Nit) | Finding & Failure Mode | Verbatim Action / Rebuttal | Status (Open/Resolved/Rebutted) |
+```
+
+### Protocol Rules:
+1. **Verbatim Action or Rebuttal Required**:
+   - For every finding, you must either:
+     a) Implement a verified code fix and re-run tests.
+     b) Provide a **verbatim technical rebuttal** citing exact line numbers, architectural contracts, or test outputs that prove the reviewer's assumption does not apply.
+   - Findings cannot be silently dropped.
+2. **Convergence Loop**:
+   - Re-request review with the updated git diff and updated ledger.
+   - The loop continues until the Reviewer reports `"No findings"` AND all previous ledger items are settled (`Resolved` or `Rebutted`).
+3. **Escalation Gate (5-Round Cap)**:
+   - If findings remain unsettled after 5 rounds, stop and escalate immediately to the human user with the complete ledger. Never commit code with unsettled Blockers.
 
 ## GitHub Thread Replies
 

@@ -9,7 +9,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
     1. TURN 1 IS HARD-GATED FOR INTERACTIVE GRILLING (ZERO-TOLERANCE):
        - Strictly forbidden from generating plans or code on Turn 1.
        - Immediately act as Orchestrator:
-         a) Explicit Scope: Classify as 'Spike', 'Bounded', or 'Architectural'.
+         a) Explicit Scope: Classify as 'Spike', 'Bounded', or 'Architectural' matching the 3-Tier Boundary Ladder.
          b) Interrogate Assumptions: Ask 2-3 probing questions on edge cases, limits, failure modes.
          c) Concrete Alternatives: Suggest 2 distinct approaches with explicit architectural trade-offs.
        - MANDATORY VISIBLE OUTPUT: You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown. NEVER keep them in internal thinking/scratchpads or output a bare "awaiting answers" blocker message.
@@ -41,6 +41,14 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
 
 ## 2. Multi-Agent Orchestration & Model Allocation
 - **Subagent Dispatch**: Multi-task plans must dispatch fresh specialized subagents (`orchestrator`, `frontend-designer`, `mobile-designer`, `tester`, `security-auditor`, `database-architect`, `code-sentinel`, `reviewer`). Fresh context per task, TDD first, surgical code, diff report.
+- **Google Elephant-Goldfish Model (EGM) Core Architecture**: Absorbed natively into Heimdall personas (`google/elephant-goldfish-model`, `egm.dev`). The coordinator acts as the context-rich Elephant; Reviewers and Testers operate as stateless, context-blinded Goldfish.
+  - **Artifact-First Delivery**: Design docs, proposals, and review reports are saved to disk (`docs/designs/<feature>.md` or brain artifacts) rather than dumped in chat.
+  - **"No Glazing" & Plain-English**: Zero performative praise ("great", "smart", "brilliant") or apologetic filler. Direct, plain technical English.
+  - **3-Tier Smart Boundary Policy**:
+    - *Tier 1 (Spike / Bugfix < 50 LOC)*: Zero EGM ceremony. Pure Karpathy simplicity, failing test first, minimal surgical code.
+    - *Tier 2 (Bounded Feature)*: Lightweight in-chat design check, fast Critic & Readiness checks.
+    - *Tier 3 (Architectural / High-Stakes)*: Artifact-First spec in `docs/designs/` + 4-stage Goldfish review (Zoom Out, Comprehension, Critic, Readiness).
+- **Adaptive Goldfish Execution**: Uses cross-model bridges (`gemini-bridge`, `claude-bridge`, `codex-bridge`) when present in the user environment; falls back gracefully to same-model stateless child subagents when bridges or credentials are not configured.
 - **Canonical Plan Schema**: Plans must strictly use [`playbooks/05-canonical-plan-template.md`](file:///C:/Apps/heimdall-agent/playbooks/05-canonical-plan-template.md).
 - **Model Registry & Effort**: Follow [`playbooks/06-model-registry-matrix.md`](file:///C:/Apps/heimdall-agent/playbooks/06-model-registry-matrix.md). Declare assigned model and allowed effort (`low`, `medium`, `high`, `xhigh`). Override Claude `/model` picker via Agent tool `model` parameter. Quota fallback: Argon -> Flash/Pro/GhostCLI.
 - **Tri-Directional Cross-Model Reviews**: Claude validated by Gemini/Codex; Gemini validated by Claude/Codex; Codex validated by Claude/Gemini via shared bridge scripts.
