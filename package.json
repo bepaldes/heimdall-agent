@@ -1,6 +1,6 @@
 {
   "name": "heimdall-agent",
-  "version": "1.3.0",
+  "version": "1.0.0",
   "description": "Autonomous multi-agent engineering sentinel & bootstrapper. Synchronizes specialized agent personas, curated skills, and universal doctrine across Google Antigravity, Claude Code, OpenAI Codex CLI, Hermes Agent, OpenClaw, and Claude Desktop.",
   "type": "module",
   "bin": {
