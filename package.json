@@ -4,8 +4,23 @@
   "description": "Autonomous multi-agent engineering sentinel & bootstrapper. Synchronizes specialized agent personas, curated skills, and universal doctrine across Google Antigravity, Claude Code, OpenAI Codex CLI, Hermes Agent, OpenClaw, and Claude Desktop.",
   "type": "module",
   "bin": {
-    "heimdall": "./setup.mjs"
+    "heimdall": "./setup.mjs",
+    "heimdall-agent": "./setup.mjs"
   },
+  "files": [
+    "setup.mjs",
+    "skills",
+    "agents",
+    "doctrine",
+    "playbooks",
+    "commands",
+    "hooks",
+    "tools",
+    "config",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "setup": "node setup.mjs",
     "audit": "node setup.mjs --audit",
@@ -13,9 +28,16 @@
     "minimal": "node setup.mjs --profile minimal",
     "full": "node setup.mjs --profile full"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bepaldes/heimdall-agent.git"
+  },
+  "homepage": "https://github.com/bepaldes/heimdall-agent#readme",
+  "bugs": {
+    "url": "https://github.com/bepaldes/heimdall-agent/issues"
   },
   "keywords": [
     "ai-agents",
