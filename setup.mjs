@@ -41,6 +41,7 @@ const playbooksDir = path.join(__dirname, 'playbooks');
 const toolsDir = path.join(__dirname, 'tools');
 const doctrineDir = path.join(__dirname, 'doctrine');
 const commandsDir = path.join(__dirname, 'commands');
+const hooksDir = path.join(__dirname, 'hooks');
 const profilesPath = path.join(__dirname, 'config', 'profiles.json');
 const modelsPath = path.join(__dirname, 'config', 'models.json');
 const agentsConfigPath = path.join(__dirname, 'config', 'agents.json');
@@ -117,6 +118,10 @@ const targetPlaybookPaths = {
 
 const targetCommandPaths = {
   claude: path.join(userHome, '.claude', 'commands')
+};
+
+const targetHookPaths = {
+  claude: path.join(userHome, '.claude', 'hooks')
 };
 
 function printBanner() {
@@ -592,6 +597,36 @@ function cleanTargetDirectory(targetDir, dryRun = false, preserveList = ['.syste
   return cleanedCount;
 }
 
+
+function registerClaudeHooks(targetHookDir, dryRun = false) {
+  if (dryRun) return;
+  const claudeSettingsPath = path.join(userHome, '.claude', 'settings.json');
+  const hooksJsonSrc = path.join(hooksDir, 'hooks.json');
+  if (!fs.existsSync(hooksJsonSrc)) return;
+
+  try {
+    let rawTemplate = fs.readFileSync(hooksJsonSrc, 'utf8');
+    const normalizedHookDir = targetHookDir.replace(/\\/g, '/');
+    rawTemplate = rawTemplate.replace(/\{\{HOOKS_DIR\}\}/g, normalizedHookDir);
+    const parsedConfig = JSON.parse(rawTemplate);
+
+    let settings = {};
+    if (fs.existsSync(claudeSettingsPath)) {
+      try {
+        settings = JSON.parse(fs.readFileSync(claudeSettingsPath, 'utf8'));
+      } catch {
+        settings = {};
+      }
+    }
+
+    settings.hooks = parsedConfig.hooks;
+    fs.writeFileSync(claudeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
+    console.log(`   ${colors.green}✔ Registered Heimdall lifecycle hooks in ${claudeSettingsPath}${colors.reset}`);
+  } catch (err) {
+    console.log(`   ${colors.yellow}⚠ Failed to register hooks in settings.json: ${err.message}${colors.reset}`);
+  }
+}
+
 function linkDirectory(src, dest, dryRun = false) {
   if (dryRun) return;
   if (fs.existsSync(dest)) {
@@ -806,6 +841,15 @@ async function runSync(options, detected) {
       if (targetCmdDir && fs.existsSync(commandsDir)) {
         const parentDir = path.dirname(targetCmdDir);
         if (fs.existsSync(parentDir)) linkDirectory(commandsDir, targetCmdDir, false);
+      }
+
+      const targetHookDir = targetHookPaths[agent];
+      if (targetHookDir && fs.existsSync(hooksDir)) {
+        const parentDir = path.dirname(targetHookDir);
+        if (fs.existsSync(parentDir)) {
+          linkDirectory(hooksDir, targetHookDir, false);
+          if (agent === 'claude') registerClaudeHooks(targetHookDir, false);
+        }
       }
 
       const exists = fs.existsSync(targetDir);
@@ -1128,6 +1172,31 @@ async function runUninstall(options, detected) {
       console.log(`  ${colors.green}✔${colors.reset} Removed ${removed} agent personas from ${agent.toUpperCase()} (${targetAgentDir})`);
       totalRemovedAgents += removed;
     }
+  }
+
+  for (const [agent, targetHookDir] of Object.entries(targetHookPaths)) {
+    if (!fs.existsSync(targetHookDir)) continue;
+    try {
+      const dirStat = fs.lstatSync(targetHookDir);
+      if (dirStat.isSymbolicLink()) {
+        try { fs.unlinkSync(targetHookDir); } catch { fs.rmdirSync(targetHookDir); }
+      } else {
+        fs.rmSync(targetHookDir, { recursive: true, force: true });
+      }
+      console.log(`  ${colors.green}✔${colors.reset} Removed hooks from ${agent.toUpperCase()} (${targetHookDir})`);
+    } catch {}
+  }
+
+  const claudeSettingsPath = path.join(userHome, '.claude', 'settings.json');
+  if (fs.existsSync(claudeSettingsPath)) {
+    try {
+      const settings = JSON.parse(fs.readFileSync(claudeSettingsPath, 'utf8'));
+      if (settings.hooks) {
+        delete settings.hooks;
+        fs.writeFileSync(claudeSettingsPath, JSON.stringify(settings, null, 2), 'utf8');
+        console.log(`  ${colors.green}✔${colors.reset} Unregistered hooks from ${claudeSettingsPath}`);
+      }
+    } catch {}
   }
 
   console.log(`\n${colors.bold}${colors.green}Uninstallation Complete:${colors.reset} Removed ${totalRemovedSkills} skill bindings and ${totalRemovedAgents} agent personas across harnesses.\n`);
@@ -1662,6 +1731,24 @@ async function main() {
               copyDirectory(commandsDir, targetCmdDir, options.dryRun);
             }
             console.log(`   ${colors.green}✔ Synchronized commands to ${targetCmdDir}${colors.reset}`);
+          }
+        }
+      }
+
+      // Synchronize lifecycle hooks (Claude Code CLI)
+      if (fs.existsSync(hooksDir)) {
+        for (const [agent, targetHookDir] of Object.entries(targetHookPaths)) {
+          const parentDir = path.dirname(targetHookDir);
+          if (fs.existsSync(parentDir)) {
+            if (options.link) {
+              linkDirectory(hooksDir, targetHookDir, options.dryRun);
+            } else {
+              copyDirectory(hooksDir, targetHookDir, options.dryRun);
+            }
+            console.log(`   ${colors.green}✔ Synchronized lifecycle hooks to ${targetHookDir}${colors.reset}`);
+            if (agent === 'claude') {
+              registerClaudeHooks(targetHookDir, options.dryRun);
+            }
           }
         }
       }

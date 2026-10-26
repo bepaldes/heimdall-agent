@@ -268,6 +268,24 @@ If you catch yourself thinking:
 | **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
 | **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
 
+## Build & Toolchain Triage Heuristics
+
+When debugging build, compilation, bundling, or toolchain failures, distinguish between application bugs and environment/dependency desync before attempting code fixes:
+
+1. **Clean Slate Triage (Cache vs Reality)**:
+   - Never debug build errors against stale caches.
+   - Verify whether clearing build caches (`rm -rf dist .next .turbo node_modules/.cache`) reproduces or clears the failure.
+2. **Lockfile & Peer Dependency Desync**:
+   - Check if `package.json` was modified without updating lockfiles (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`).
+   - Identify conflicting duplicate versions of peer dependencies (e.g. conflicting `react`, `typescript`, or `@types/*` versions across workspaces).
+3. **Module Resolution & Target Mismatch**:
+   - Verify `tsconfig.json` settings: `moduleResolution` (`NodeNext` vs `Bundler`), `target` (`ES2022`, `ESNext`), and `.mjs`/`.cjs` boundaries.
+   - Watch for ESM/CJS interop traps (e.g. `require()` of pure ESM packages, missing `.js` extensions in ESM relative imports).
+4. **Runtime & Toolchain Version Skew**:
+   - Verify active Node/Bun/Python version matches engine constraints (`.node-version`, `.nvmrc`, `package.json` `engines`).
+5. **Build-Time vs. Runtime Environment Variables**:
+   - Distinguish variables required at bundling time (e.g. `NEXT_PUBLIC_*`, `VITE_*`) from secrets required only at server runtime.
+
 ## When Process Reveals "No Root Cause"
 
 If systematic investigation reveals issue is truly environmental, timing-dependent, or external:

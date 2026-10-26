@@ -23,9 +23,10 @@ Before writing a single line of new implementation code, climb down this sequent
 1. **Does this need to exist at all? (YAGNI)**
    - Reject unrequested features, premature config toggles, speculative plugin architectures, and "just-in-case" parameter options.
    - If the requirement does not explicitly ask for it, do not build it.
-2. **Does it already exist in this codebase? (Reuse)**
+2. **Does it already exist in this codebase? (Research & Reuse First)**
    - Search the repository before creating a new utility, helper, type, or component.
-   - Reuse existing functions and established patterns. Do not create parallel abstractions.
+   - Check standard library primitives (`crypto`, `fs`, `path`, `fetch`, `URL`, `Intl`) and installed dependencies before writing custom code.
+   - Reuse existing functions and established patterns. Do not create parallel abstractions or reinvent the wheel.
 3. **Can the standard library do it? (Built-in first)**
    - Prioritize Node.js/browser built-in modules (`crypto`, `fs`, `path`, `fetch`, `URL`, `Intl`) before installing third-party libraries.
 4. **Is there a native platform feature for it? (Platform primitives)**

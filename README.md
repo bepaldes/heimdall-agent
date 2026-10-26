@@ -56,6 +56,23 @@ Heimdall natively incorporates the official **Google Elephant-Goldfish Model (EG
   - **Tier 3 (Architectural / High-Stakes)**: **Full Google EGM Pipeline**. Artifact-First design spec in `docs/designs/`, orchestrating EGM's 4-stage Goldfish review pipeline (Zoom Out -> Comprehension -> Critic -> Implementation Readiness) + spec-to-code drift monitoring.
 * 🔄 **Adaptive Goldfish Execution**: If multi-model bridge scripts (`gemini-bridge.ps1`, `claude-bridge.ps1`, `codex-bridge.ps1`) and active credentials exist in the user's environment, Heimdall dispatches cross-model Goldfish validators (e.g. Gemini Elephant validated by Claude/Codex); if external bridges or keys are absent, it automatically falls back to spawning fresh, stateless subagents on the **same native harness and model** with zero conversation history.
 
+### Distilled Everything-Claude-Code (ECC) Architectural Gems
+
+Heimdall selectively absorbs the 5 most valuable architectural patterns from [`affaan-m/everything-claude-code`](https://github.com/affaan-m/everything-claude-code) into its existing core personas, playbooks, and setup engine, completely avoiding agent bloat, token waste, or fragmented sub-specializations:
+
+1. ⚡ **Event-Driven Lifecycle Hooks (`hooks/`)**:
+   - Zero-dependency, native Node.js lifecycle hook dispatcher (`hooks/heimdall-hook.js`) automatically linked to `~/.claude/hooks` and registered in `~/.claude/settings.json`.
+   - Surgical `PreToolUse` safety checks: blocks destructive root operations (`rm -rf /`, `rmdir /s /q`), blocks force pushes to protected branches (`main`/`master`), and blocks accidental commits of sensitive credentials (`.env`, `id_rsa`, `*.pem`).
+   - Non-blocking quality advisories: Karpathy 800-line warning on `PreToolUse(Write)`, automated test reminder on `PostToolUse(Edit|Write)`, and disk persistence reminder on `PreCompact`.
+2. 🕵️ **Silent Failure Hunter Checklist**:
+   - Codified in [`reviewer`](#predefined-agents-8-specialized-personas) and [Playbook 03](playbooks/03-adversarial-code-review.md) to detect the 5 silent defect patterns common in AI-generated code: empty catch blocks, dangerous default fallbacks returning `[]`/`null`, lost stack trace causes, unbounded async operations without abort timeouts, and `as unknown as T` nullish suppression.
+3. 🔍 **Research & Reuse First Invariant**:
+   - Hardcoded in [Playbook 01](playbooks/01-interactive-grilling-gate.md) (Step 0), [`orchestrator`](#predefined-agents-8-specialized-personas), and [`ponytail`](skills/ponytail/SKILL.md) Decision Ladder: mandatory codebase search, standard library inspection, and dependency audit before writing custom utility code.
+4. 🛠️ **Build & Toolchain Triage Heuristics**:
+   - Integrated into [`systematic-debugging`](skills/systematic-debugging/SKILL.md): systematic isolation of cache corruption, lockfile desyncs, peer dependency collisions, module resolution mismatches (ESM/CJS), and engine runtime skew before attempting code modifications.
+5. ⏳ **Strategic Context Compaction Cadence**:
+   - Universal doctrine rule in [`doctrine/AGENTS.md`](doctrine/AGENTS.md): recommends proactive `/compact` after major milestones or ~40–50 tool invocations, mandating that active tasks, unresolved ledgers, and architectural rulings are persisted to disk first.
+
 [↑ Back to top](#table-of-contents)
 
 ---
@@ -69,6 +86,7 @@ Heimdall natively incorporates the official **Google Elephant-Goldfish Model (EG
 | **API Accuracy** | Hallucinates outdated methods from 4-year-old training data. | **Live Context**: Context7 MCP queries real source documentation before writing imports. |
 | **Code Style** | AI-slop: redundant comments, excessive abstractions, purple gradients. | **Antislop Guardrails**: Clean, minimal, readable code adhering to your design system. |
 | **Verification** | AI claims "done!" blindly; breaks existing features. | **Mandatory Testing**: Writes failing tests first, verifies edge cases, checks error paths. |
+| **Lifecycle Guardrails** | AI executes arbitrary commands and large files blindly. | **Heimdall Hooks**: Destructive command blocking, Karpathy 800-line limit warnings, and test reminders. |
 | **Architecture** | Scattered duplicate configs drifting across tools. | **Single Source of Truth**: Linked via native junctions; one central repository. |
 
 [↑ Back to top](#table-of-contents)

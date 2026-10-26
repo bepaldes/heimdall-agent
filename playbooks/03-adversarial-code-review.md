@@ -38,9 +38,13 @@ For Tier 2 reviews, all findings must be tracked in an authoritative ledger:
 - **Primary Route (Cross-Model Bridge)**: If multi-model bridge scripts (`claude-bridge.ps1`, `gemini-bridge.ps1`, `codex-bridge.ps1`) and active credentials exist in the user's environment, dispatch an independent model as the Goldfish reviewer.
 - **Graceful Fallback (Same-Model Stateless Goldfish)**: If bridge tools or credentials are absent, fire a fresh, isolated child subagent on the current harness and model with zero conversational context. The stateless Goldfish discipline is strictly preserved.
 
-## 5. Adversarial Scrutiny Checklist
+## 5. Adversarial Scrutiny & Silent Failure Hunter Checklist
+- [ ] **Empty Catch Blocks**: Does any `catch (e) {}` or `.catch(() => [])` swallow exceptions without logging, tracing, or propagation?
+- [ ] **Dangerous Default Fallbacks**: Does an error branch return `[]`, `{}`, or `null`, masking catastrophic infrastructure or DB failures as empty results?
+- [ ] **Stack Trace & Cause Erasure**: Are caught errors re-thrown without chaining the original cause (`{ cause: error }`)?
+- [ ] **Unbounded Async & Missing Rollbacks**: Do network and DB requests enforce explicit timeouts (`AbortController`)? Do transactional failure paths roll back cleanly?
 - [ ] **Unhandled Promise / Error Boundaries**: Can an uncaught rejection crash the Node process or unmount the React component tree?
-- [ ] **Type Narrowing & Falsy Assumptions**: Are optional fields safely guarded? Can `null` or `undefined` slip past TypeScript typecasts?
+- [ ] **Type Narrowing & Falsy Assumptions**: Are optional fields safely guarded? Are `as unknown as T` or `!.` suppressing real type hazards?
 - [ ] **Concurrency & Race Conditions**: Are state updates idempotent? Can rapid user clicks trigger double-submits or race conditions?
 - [ ] **Authorization & Tenant Isolation**: Is authentication verified on every route? Does the handler verify that the resource belongs to the calling tenant?
 - [ ] **Security Sanitization**: Are database queries parameterized? Are user inputs sanitized to prevent XSS and SQL injection?

@@ -70,6 +70,17 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
 
 ---
 
+## 5. Strategic Context Compaction Cadence
+- **The 40–50 Tool Invocations Threshold**: LLM reasoning quality, instruction adherence, and code restraint degrade as trajectories grow beyond 40–50 tool invocations.
+- **Proactive Compaction Boundary**: Trigger strategic `/compact` (or manual state consolidation) after major milestones or upon approaching ~40 tool turns.
+- **Pre-Compaction Preservation Invariant**: Before compacting or clearing context, you MUST persist all active state to disk:
+  - Record architectural rulings and decisions (`docs/designs/<feature>.md` or task scratchpads).
+  - Save pending items in the findings ledger.
+  - Note exact reproduction commands and verified file diffs.
+  *Never compact without leaving a clean disk breadcrumb.*
+
+---
+
 <!-- antislop:start -->
 ## antislop
 For UI, copy, accessibility, mobile layout, or code comments, read `antislop` core and the task skill:

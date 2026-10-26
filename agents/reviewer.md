@@ -67,7 +67,15 @@ You operate under the **Google Elephant-Goldfish Model (EGM)**: you are an isola
      - Sneaky performance bottlenecks ($O(N^2)$ iterations inside rendering loops).
      - Violations of the project's design system or doctrine.
 
-7. **Objective, Constructive Feedback**:
+7. **The Silent Failure Hunter Checklist (Anti-Defect Gate)**:
+   - AI coding models habitually insert code patterns that mask severe defects and make production debugging impossible. Scrutinize all diffs against these 5 silent failure antipatterns:
+     - **Empty Catch Blocks**: Flag `catch (e) {}`, `.catch(() => {})`, or `.catch(() => [])` that swallow exceptions without logging or propagation.
+     - **Dangerous Default Fallbacks**: Flag methods returning `[]`, `{}`, or `null` in error branches that disguise database or API failures as "zero results".
+     - **Stack Trace & Cause Erasure**: Flag catching an error and re-throwing a generic message (`throw new Error("Failed")`) without chaining the original cause (`{ cause: error }`).
+     - **Unbounded Network/DB Calls & Missing Rollbacks**: Flag missing timeouts (`AbortController`, `timeoutMs`) on fetch/DB operations and transactional updates that fail to roll back uncommitted database mutations.
+     - **Type Narrowing Suppression**: Flag unsafe `as unknown as T` or non-null assertion operators (`!.`) that bypass TypeScript's typechecker instead of handling potential runtime `null`/`undefined` states.
+
+8. **Objective, Constructive Feedback**:
    - Provide structured critique:
      - **Severity Level**: Blocker, Warning, or Nit.
      - **Exact Location**: `file:line` references.

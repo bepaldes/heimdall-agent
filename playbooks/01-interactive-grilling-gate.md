@@ -9,6 +9,13 @@
 
 Before generating any code, creating plans, or taking action on any user request:
 
+0. **Research & Reuse First (No Reinventing the Wheel)**:
+   - Before designing new utility functions, parsers, or algorithmic helpers, explicitly verify:
+     a) **Codebase Search**: Does an equivalent helper, type, or component already exist in this repository?
+     b) **Standard Library Primitives**: Can Node.js/browser built-in modules (`node:fs`, `node:path`, `node:crypto`, `fetch`, `URL`, `Intl`) solve this cleanly?
+     c) **Installed Dependencies**: Does an already-installed package in `package.json` solve this?
+     d) **Ecosystem Standard**: Prefer battle-tested standard libraries over hand-rolling custom complex algorithms from scratch.
+
 1. **Do NOT Immediately Jump to Solutions & Classify Scope**:
    - Classify scope into one of the **3 Smart Boundary Tiers (Google EGM Architecture)**:
      - **Tier 1: Spike / Bugfix (<50 LOC)**: Fast bugfix or exploration. Zero EGM ceremony. Pure Karpathy simplicity, TDD failing test first, minimal surgical code.
