@@ -124,6 +124,70 @@ const targetHookPaths = {
   claude: path.join(userHome, '.claude', 'hooks')
 };
 
+
+const pkgJsonPath = path.join(__dirname, 'package.json');
+let currentVersion = '1.0.0';
+try {
+  currentVersion = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8')).version || '1.0.0';
+} catch {}
+
+function isNewerVersion(current, latest) {
+  if (!latest || !current) return false;
+  const c = current.replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  const l = latest.replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    const cv = c[i] || 0;
+    const lv = l[i] || 0;
+    if (lv > cv) return true;
+    if (lv < cv) return false;
+  }
+  return false;
+}
+
+async function checkForUpdates() {
+  const cacheFile = path.join(userHome, '.heimdall-update.json');
+  let cache = { lastChecked: 0, latestVersion: null };
+
+  if (fs.existsSync(cacheFile)) {
+    try {
+      cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
+    } catch {}
+  }
+
+  const now = Date.now();
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  let latestVersion = cache.latestVersion;
+
+  if (now - (cache.lastChecked || 0) > ONE_DAY) {
+    try {
+      const res = await fetch('https://registry.npmjs.org/heimdall-agent/latest', {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(1200)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.version) {
+          latestVersion = data.version;
+          cache = { lastChecked: now, latestVersion };
+          try {
+            fs.writeFileSync(cacheFile, JSON.stringify(cache), 'utf8');
+          } catch {}
+        }
+      }
+    } catch {
+      // Offline, timeout, or registry unreachable - fail silently
+    }
+  }
+
+  if (latestVersion && isNewerVersion(currentVersion, latestVersion)) {
+    console.log(`${colors.yellow}╭────────────────────────────────────────────────────────────╮
+│  ${colors.bold}Update available:${colors.reset}${colors.yellow} ${currentVersion} → ${colors.green}${colors.bold}${latestVersion}${colors.reset}${colors.yellow}                              │
+│  Run: ${colors.cyan}npm install -g heimdall-agent${colors.reset}${colors.yellow}                         │
+│  Or:  ${colors.cyan}npx heimdall-agent@latest${colors.reset}${colors.yellow}                             │
+╰────────────────────────────────────────────────────────────╯${colors.reset}`);
+  }
+}
+
 function printBanner() {
   console.log(`
 ${colors.cyan}${colors.bold}   ██╗  ██╗███████╗██╗███╗   ███╗██████╗  █████╗ ██╗     ██╗     
@@ -1476,6 +1540,7 @@ function runUpdateSkill(targetSkill = 'all') {
 
 async function main() {
   printBanner();
+  await checkForUpdates();
   const options = parseArgs();
   const detected = detectEnvironment();
 
