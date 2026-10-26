@@ -3,12 +3,12 @@
 <p align="left">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
-  <a href="#predefined-agents-8-specialized-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
-  <a href="#skill-inventory-16-curated-toolkits--suites--50-modules"><img src="https://img.shields.io/badge/skills-16%20toolkits%20%26%20suites%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 16 Toolkits & Suites (50 Modules)" /></a>
-  <a href="#supported-runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
+  <a href="#8-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
+  <a href="#skill-inventory-50-modules-across-16-toolkits"><img src="https://img.shields.io/badge/skills-16%20toolkits%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 16 Toolkits (50 Modules)" /></a>
+  <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
-**Heimdall** is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents hallucinated AI slop, isolates module boundaries, and synchronizes **8 predefined specialized agent personas** and **16 curated skill toolkits & suites (50 modular capabilities)** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, and **Claude Desktop**.
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **8 specialized agent personas** and **50 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, and **Claude Desktop**.
 
 ---
 
@@ -16,76 +16,222 @@
 ## Table of Contents
 
 - [1. What is Heimdall?](#1-what-is-heimdall)
-- [2. The Old Way vs. The Heimdall Way](#2-the-old-way-vs-the-heimdall-way)
-- [3. Quickstart: 3 Steps to Better Code](#3-quickstart-3-steps-to-better-code)
-- [4. Architecture & Environment Detection](#4-architecture--environment-detection)
-- [5. Daily CLI Usage & Complete Parameter Reference](#5-daily-cli-usage--complete-parameter-reference)
-- [6. Dynamic Model Registry (`sync-models`)](#6-dynamic-model-registry-sync-models)
-- [7. Profiles](#7-profiles)
-- [8. Predefined Agent Roster (8 Specialized Personas)](#predefined-agents-8-specialized-personas)
-- [9. Supported Runtimes & Cross-Platform Matrix](#supported-runtimes)
-- [10. Skill Inventory (16 Curated Toolkits & Suites / 50 Modules)](#skill-inventory-16-curated-toolkits--suites--50-modules)
-- [11. Companion Remote Orchestrators & Architectural Memory](#11-companion-remote-orchestrators)
+- [2. What it Does](#2-what-it-does)
+- [3. How it Works (Architecture, Files & Hooks)](#3-how-it-works)
+- [4. How to Install](#4-how-to-install)
+- [5. How to Use (CLI & Slash Commands)](#5-how-to-use)
+- [6. Full List of Skills & Agents](#6-full-list-of-skills--agents)
+- [7. Additional Companion Tools](#7-additional-companion-tools)
 - [License](#license)
 
 ---
 
+<a id="1-what-is-heimdall"></a>
 ## 1. What is Heimdall?
 
-**Heimdall** is a modular environment bootstrapper and multi-agent toolkit designed to get your AI coding setup production-ready in seconds. Instead of manually configuring prompt rules, custom instructions, and toolkits across different AI clients, Heimdall synchronizes a shared ecosystem of **curated skills** and **specialized agents** across your terminal and IDE harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI, Hermes Agent, and OpenClaw).
+**Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. 
 
-### Core Concepts: Skills & Agents
+Instead of manually maintaining scattered custom instructions, system prompts, and configuration files across different AI clients, Heimdall provides a single source of truth:
+* **Modular Skills**: 50 task-activated capabilities (such as database design, security audits, design token enforcement, and debugging) that load on demand instead of wasting prompt tokens.
+* **Specialized Agent Personas**: 8 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`).
+* **Universal Doctrine**: Central rules (`AGENTS.md`) synchronized across all harnesses, enforcing planning gates, test-driven development (TDD), and minimal surgical code edits.
 
-* **Skills (Capabilities)**: Modular domain toolkits that automatically activate based on the task. Instead of bloated static prompts, skills inject targeted knowledge only when needed—such as database best practices (`postgres-best-practices`), design systems and token enforcement (`taste-skill`), accessibility and copy hygiene (`antislop`), or security auditing (`strix-security`).
-* **Agents (Personas)**: Predefined execution roles with isolated context windows. Rather than using one generic agent for an entire workflow, Heimdall dispatches specialized personas—such as `orchestrator` for planning gates, `tester` for TDD, `frontend-designer` for UI implementation, and `reviewer` for adversarial cross-model critiques.
+Heimdall runs on **Windows, macOS, and Linux**, using native filesystem junctions and symlinks to keep all AI harnesses synchronized with zero file duplication.
 
-Together, skills provide the **domain intelligence** and agents provide the **structured division of labor** required for reliable software engineering.
+[↑ Back to top](#table-of-contents)
 
-### Google Elephant-Goldfish Model (EGM)
+---
 
-Heimdall incorporates the core architecture from [`google/elephant-goldfish-model`](https://github.com/google/elephant-goldfish-model):
+<a id="2-what-it-does"></a>
+## 2. What it Does
 
-- **The Elephant (Coordinator)**: The primary session and [`orchestrator`](#predefined-agents-8-specialized-personas) retain deep project context, architectural decisions, and task history.
-- **The Goldfish (Reviewers & Testers)**: Reviewers and testers run as isolated, stateless subagents blinded to author rationalizations, preventing sycophancy and rubber-stamping.
-- **3-Tier Boundary Ladder**:
-  - **Tier 1 (Spike / Bugfix < 50 LOC)**: Zero ceremony. Minimal surgical code with failing test first.
+Heimdall transforms unconstrained AI coding assistants into disciplined, multi-agent engineering teams:
+
+1. **Enforces Interactive Planning Gates**: Halts immediate code generation on complex tasks. Interrogates requirements, asks probing questions on failure modes, and presents architectural alternatives before locking the plan.
+2. **Eliminates AI Slop & Restrains Code**: Enforces Karpathy simplicity guidelines (50 lines over 200, surgical edits only) and purges AI conversational fluff, boilerplate comments, and decorative CSS defaults.
+3. **Implements Test-Driven Development (TDD)**: Requires failing automated tests before writing implementation code. Prohibits pseudo-verification (`curl 200`, `grep`, container status).
+4. **Mandates Playwright E2E Browser Testing**: Requires active Playwright browser verification for any interactive UI or user-facing changes.
+5. **Adversarial Peer Review**: Dispatches context-blinded reviewers to inspect git diffs for edge cases, silent regressions, and unhandled failure branches.
+6. **Intercepts Dangerous Operations**: Evaluates shell commands and file mutations via lifecycle hooks to block destructive root wiping and force-pushes to protected branches.
+
+### Comparison: Vanilla AI Coding vs. Heimdall
+
+| Area | Vanilla AI Coding | With Heimdall |
+| :--- | :--- | :--- |
+| **Initial Prompt** | AI immediately generates 300 lines of unverified code. | **Interactive Gate**: AI pauses, interrogates edge cases, and presents 2 architectural options. |
+| **Code Review** | AI rubber-stamps its own code with conversational praise. | **Context-Blinded Review**: Stateless reviewer inspects diffs without conversational bias. |
+| **Code Restraint** | Bloated wrappers, defensive boilerplate, speculative options. | **Karpathy Simplicity**: Minimum code, surgical edits, zero unprompted refactoring. |
+| **Verification** | AI claims "done!" without testing or relies on shallow checks. | **TDD & Playwright**: Failing test first; active browser DOM assertions for UI. |
+| **Safety** | AI can execute destructive commands or force push to main. | **Lifecycle Hooks**: Blocks `rm -rf /` and force pushes to `main`/`master` at runtime and Git level. |
+| **Configuration** | Scattered, drifting prompt files across multiple tools. | **Single Source of Truth**: Linked via native junctions/symlinks in 1 second. |
+
+[↑ Back to top](#table-of-contents)
+
+---
+
+<a id="3-how-it-works"></a>
+## 3. How it Works (Architecture, Files & Hooks)
+
+Heimdall sits between your AI coding clients and your codebase, deploying standardized files, hooks, and doctrine across your system.
+
+### 1. Files & Directories Touched
+
+When Heimdall bootstraps, it establishes live junctions (Windows) or symlinks (POSIX) from this repository to your target tool configuration directories:
+
+| Source in Heimdall | Deployed Location | Purpose |
+| :--- | :--- | :--- |
+| `skills/` | `~/.<tool>/skills/` | 50 domain toolkits loaded progressively on demand. |
+| `agents/` | `~/.<tool>/agents/` | 8 specialized agent persona definitions. |
+| `hooks/` | `~/.claude/hooks/` | Event-driven lifecycle hooks for Claude Code CLI. |
+| `hooks/git/` | `.git/hooks/` (optional) | Universal native Git pre-push hook for all tools. |
+| `doctrine/AGENTS.md` | `~/.claude/CLAUDE.md`<br>`~/.gemini/GEMINI.md`<br>`~/.codex/AGENTS.md`<br>`~/.hermes/AGENTS.md` | Universal cross-agent doctrine and operational constraints. |
+| `playbooks/` | `~/.<tool>/playbooks/` | Operational playbooks (grilling gate, TDD, reviews, plans). |
+| `commands/` | `~/.claude/commands/` | Slash commands (`/orchestrator`, `/orchestrate`, `/plan`, `/grill-me`). |
+| `tools/` | `PATH` candidate directory | Cross-model bridge scripts (`claude-bridge`, `gemini-bridge`, `codex-bridge`) and `heimdall` CLI. |
+
+### 2. The Google Elephant-Goldfish Model (EGM)
+
+Heimdall adopts the core division of labor from [`google/elephant-goldfish-model`](https://github.com/google/elephant-goldfish-model):
+
+* **The Elephant (Coordinator)**: The primary session and [`orchestrator`](#8-predefined-agent-personas) persona retain long-term memory, project narrative, and deep contextual history.
+* **The Goldfish (Reviewers & Testers)**: Subagents dispatched for code review (`reviewer`) and bug diagnosis (`tester`) are intentionally blinded to conversational backstory and author debates. They evaluate raw git diffs and acceptance criteria directly, preventing confirmation bias and rubber-stamping.
+* **The 3-Tier Boundary Ladder**:
+  - **Tier 1 (Spike / Bugfix < 50 LOC)**: Zero ceremony. Minimal surgical code with a failing test first.
   - **Tier 2 (Bounded Feature)**: Fast in-chat design check with critic and readiness reviews.
-  - **Tier 3 (Architectural)**: Spec saved to disk (`docs/designs/<feature>.md`) followed by a 4-stage review (Zoom Out, Comprehension, Critique, Readiness) and 5-round convergence ledger.
-- **Adaptive Multi-Model Execution**: Automatically dispatches cross-model reviews via bridge scripts (`gemini-bridge`, `claude-bridge`, `codex-bridge`) when configured; falls back gracefully to isolated subagents on the same model when bridges are absent.
+  - **Tier 3 (Architectural)**: Spec written to disk (`docs/designs/<feature>.md`), 4-stage review (Zoom Out, Comprehension, Critique, Readiness), and a 5-round convergence ledger.
+* **Adaptive Multi-Model Execution**: If cross-model bridges (`gemini-bridge.ps1`, `claude-bridge.ps1`, `codex-bridge.ps1`) and credentials exist, Heimdall routes reviews across different models (e.g. Gemini Elephant validated by Claude/Codex); otherwise, it falls back to stateless child subagents on the same model.
 
-### Distilled Everything-Claude-Code (ECC) Architectural Gems
+### 3. Event-Driven Lifecycle Hooks
 
-Heimdall selectively absorbs the 5 most valuable architectural patterns from [`affaan-m/everything-claude-code`](https://github.com/affaan-m/everything-claude-code) into its existing core personas, playbooks, and setup engine, completely avoiding agent bloat, token waste, or fragmented sub-specializations:
+Heimdall includes zero-dependency runtime hooks ([`hooks/heimdall-hook.cjs`](hooks/heimdall-hook.cjs)) registered in `~/.claude/settings.json`:
 
-1. ⚡ **Event-Driven Lifecycle Hooks (`hooks/`)**:
-   - Zero-dependency, native Node.js lifecycle hook dispatcher (`hooks/heimdall-hook.cjs`) automatically linked to `~/.claude/hooks` and registered in `~/.claude/settings.json`.
-   - Branch-aware safety checks: blocks destructive root commands (`rm -rf /`, `rmdir /s /q`), blocks force pushes to protected branches (`main`/`master`/`release` while permitting feature-branch force pushes), and blocks staging sensitive credentials (`.env`, `id_rsa`, `*.pem`).
-   - Universal Git protection: provides a native `hooks/git/pre-push` hook protecting all runtimes (Antigravity, Codex CLI, Hermes, Claude, and terminal users) right at the Git level.
-   - Non-blocking quality advisories: Karpathy 800-line warning on `PreToolUse(Write)`, automated test reminder on `PostToolUse(Edit|Write)`, and disk persistence reminder on `PreCompact`.
-2. 🕵️ **Silent Failure Hunter Checklist**:
-   - Codified in [`reviewer`](#predefined-agents-8-specialized-personas) and [Playbook 03](playbooks/03-adversarial-code-review.md) to detect the 5 silent defect patterns common in AI-generated code: empty catch blocks, dangerous default fallbacks returning `[]`/`null`, lost stack trace causes, unbounded async operations without abort timeouts, and `as unknown as T` nullish suppression.
-3. 🔍 **Research & Reuse First Invariant**:
-   - Hardcoded in [Playbook 01](playbooks/01-interactive-grilling-gate.md) (Step 0), [`orchestrator`](#predefined-agents-8-specialized-personas), and [`ponytail`](skills/ponytail/SKILL.md) Decision Ladder: mandatory codebase search, standard library inspection, and dependency audit before writing custom utility code.
-4. 🛠️ **Build & Toolchain Triage Heuristics**:
-   - Integrated into [`systematic-debugging`](skills/systematic-debugging/SKILL.md): systematic isolation of cache corruption, lockfile desyncs, peer dependency collisions, module resolution mismatches (ESM/CJS), and engine runtime skew before attempting code modifications.
-5. ⏳ **Strategic Context Compaction Cadence**:
-   - Universal doctrine rule in [`doctrine/AGENTS.md`](doctrine/AGENTS.md): recommends proactive `/compact` after major milestones or ~40–50 tool invocations, mandating that active tasks, unresolved ledgers, and architectural rulings are persisted to disk first.
+* **`PreToolUse` (Bash/PowerShell)**:
+  - **Blocks Destructive Commands**: Halts operations like `rm -rf /` or `rmdir /s /q C:\` (exit code 2).
+  - **Branch-Aware Force Push Protection**: Blocks `git push --force` targeting `main`, `master`, `release`, or `production` (explicitly or while checked out on those branches). Force pushes to feature branches (`feature/*`, `bugfix/*`) are permitted with an advisory.
+  - **Blocks Secret Commits**: Halts staging unencrypted `.env`, `id_rsa`, or `*.pem` files.
+* **`PreToolUse` (Write)**:
+  - **Karpathy Restraint Warning**: Emits an advisory if an AI attempts to generate a single file exceeding 800 lines.
+* **`PostToolUse` (Edit/Write)**:
+  - **Verification Reminder**: Emits a reminder to run automated tests or browser verification before concluding.
+* **`PreCompact`**:
+  - **Compaction State Reminder**: Reminds the agent to persist unresolved decisions and active task ledgers to disk before context compression.
+* **Universal Native Git Pre-Push Hook** ([`hooks/git/pre-push`](hooks/git/pre-push)):
+  - Shell hook installable into any repository (`.git/hooks/pre-push`) that blocks non-fast-forward pushes to `main`/`master` universally across all AI harnesses and terminal users.
 
+*(See [Section 6: Full List of Skills & Agents](#6-full-list-of-skills--agents) for detailed skill and persona inventories).*
 
-### Using the Orchestrator (`/orchestrator`)
+[↑ Back to top](#table-of-contents)
 
-The **Orchestrator** is Heimdall's chief engineering coordinator. It manages the entire development lifecycle: grilling assumptions, decomposing tasks into a 7-section canonical plan, dispatching specialized subagents, and enforcing verification gates.
+---
 
-#### 1. Triggering the Orchestrator
-- **In Claude Code CLI**:
+<a id="4-how-to-install"></a>
+## 4. How to Install
+
+### Quick Automated Installation (Recommended)
+
+Clone the repository and run the setup script with live junctions:
+
+```powershell
+# 1. Clone repository
+git clone https://github.com/bepaldes/heimdall-agent.git
+cd heimdall-agent
+
+# 2. Bootstrap full ecosystem with live junctions
+node setup.mjs --clean --link --yes
+```
+
+> **Interactive Wizard**: Run `node setup.mjs` without flags to interactively select specific AI tools, destination paths, and profiles.
+
+### Installation Profiles
+
+Select a profile tier based on your machine and workflow needs:
+
+| Profile | Skills | Predefined Agents | Description | Best For |
+| :--- | :---: | :---: | :--- | :--- |
+| **`full`** *(Default)* | 50 | 8 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
+| **`minimal`** | 16 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Lightweight laptops, smaller context windows |
+| **`security`** | 12 | 4 | AppSec suite: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Penetration testing & pre-deployment audits |
+| **`design`** | 14 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
+
+To deploy a specific profile:
+```powershell
+node setup.mjs --profile minimal --link --clean --yes
+```
+
+<a id="supported-tools--runtimes"></a>
+### Supported Tools & Runtimes
+
+Heimdall automatically discovers and configures installed AI tools:
+
+| Tool | Detection Target | Integration Method |
+| :--- | :--- | :--- |
+| **Claude Code CLI** | `claude` on PATH | Junctions to `~/.claude/skills`, `agents`, `commands`, `hooks` + settings injection |
+| **Google Antigravity** | `agy` on PATH | Junctions to `~/.gemini/skills`, `agents`, and universal `.agents/` |
+| **OpenAI Codex CLI** | `codex` on PATH | Junctions to `~/.codex/skills`, `agents`, and `AGENTS.md` |
+| **Hermes Agent** | `hermes` on PATH / LocalAppData | Junctions to `%LOCALAPPDATA%\hermes\skills` + `external_dirs` in `config.yaml` |
+| **OpenClaw** | `openclaw` on PATH | Junctions to `~/.openclaw/skills` + `AGENTS.md` / `SOUL.md` injection |
+| **Claude Desktop** | `%APPDATA%\Claude` | Auto-configures Context7 MCP and playbooks in `claude_desktop_config.json` |
+
+[↑ Back to top](#table-of-contents)
+
+---
+
+<a id="5-how-to-use"></a>
+## 5. How to Use (CLI & Slash Commands)
+
+### 1. Daily CLI Commands (`heimdall` / `node setup.mjs`)
+
+Setup creates a global `heimdall` executable on your PATH (or run `npm link`). `heimdall` and `node setup.mjs` are identical.
+
+```powershell
+# 1-second auto-sync after installing a new AI tool (zero file duplication)
+heimdall sync
+
+# Audit installed tools, active API endpoints, and skill counts
+heimdall audit
+
+# Refresh dynamic model catalog from your active provider/proxy
+heimdall sync-models
+
+# Browse canonical skills catalog and upstream repositories
+heimdall skills
+
+# Inspect upstream updates and bounded review protocol for skills
+heimdall update-skill ponytail
+heimdall update-skill all
+
+# Safely remove Heimdall skills and agent personas across all harnesses
+heimdall uninstall
+```
+
+#### CLI Parameter Reference
+
+| Flag | Default | Description | Example |
+| :--- | :---: | :--- | :--- |
+| `--profile <name>` | `full` | Skill profile tier: `full`, `minimal`, `security`, or `design`. | `heimdall --profile minimal` |
+| `--agents <targets>` | `all` | Comma-separated list of harnesses: `claude`, `gemini`, `codex`, `desktop`, `all`. | `heimdall --agents claude,gemini` |
+| `--link` | `true` (rec.) | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). | `heimdall --link` |
+| `--clean` | `false` | Wipe legacy skills from target directory before deploying. | `heimdall --clean` |
+| `--dry-run` | `false` | Simulate execution and display actions without modifying the filesystem. | `heimdall --dry-run` |
+| `-y`, `--yes` | `false` | Non-interactive mode (skips wizard prompts). | `heimdall --yes` |
+
+---
+
+### 2. Using the Orchestrator & Slash Commands
+
+The **Orchestrator** is Heimdall's chief engineering coordinator. It interrogates requirements, creates structured plans, dispatches specialized subagents, and enforces verification gates.
+
+#### How to Trigger the Orchestrator
+* **In Claude Code CLI**:
   - `/orchestrator <task>` or `/orchestrate <task>`: Launch full orchestration for a task or feature.
   - `/plan <feature>`: Decompose a request into a canonical 7-section plan.
   - `/grill-me`: Interrogate assumptions and explore trade-offs before locking architecture.
-- **In Google Antigravity & OpenAI Codex CLI**:
-  - Antigravity: Switch to or mention the `@orchestrator` persona, or run `/plan`.
-  - Codex CLI: The universal doctrine in `AGENTS.md` automatically activates the Orchestrator role for any planning or architectural prompt.
+* **In Google Antigravity**:
+  - Switch to or mention the `@orchestrator` persona, or type `/plan` / `/grill-me`.
+* **In OpenAI Codex CLI & Hermes**:
+  - The universal doctrine in `AGENTS.md` automatically activates Orchestrator discipline for any planning or architectural prompt.
 
-#### 2. Orchestration Workflow
+#### Orchestration Workflow
 
 ```mermaid
 flowchart TD
@@ -102,404 +248,42 @@ flowchart TD
     J & K --> L["Complete"]
 ```
 
-[↑ Back to top](#table-of-contents)
-
----
-
-## 2. The Old Way vs. The Heimdall Way
-
-| Area | Vanilla AI Coding (The Trap) | With Heimdall (The Engineering Standard) |
-| :--- | :--- | :--- |
-| **Prompt Gate** | AI rushes to generate 300 lines of code immediately. | **Interactive Gate**: AI pauses, asks probing questions, and creates a verified plan. |
-| **Review & Bias** | AI rubber-stamps own code with conversational sycophancy. | **Google EGM Protocol**: Stateless context blinding, 3-tier smart boundaries, 5-round convergence ledger, and adaptive cross-model validation. |
-| **API Accuracy** | Hallucinates outdated methods from 4-year-old training data. | **Live Context**: Context7 MCP queries real source documentation before writing imports. |
-| **Code Style** | AI-slop: redundant comments, excessive abstractions, purple gradients. | **Antislop Guardrails**: Clean, minimal, readable code adhering to your design system. |
-| **Verification** | AI claims "done!" blindly; breaks existing features. | **Mandatory Testing**: Writes failing tests first, verifies edge cases, checks error paths. |
-| **Lifecycle Guardrails** | AI executes arbitrary commands and large files blindly. | **Heimdall Hooks**: Destructive command blocking, Karpathy 800-line limit warnings, and test reminders. |
-| **Architecture** | Scattered duplicate configs drifting across tools. | **Single Source of Truth**: Linked via native junctions; one central repository. |
+1. **Grilling Gate (Turn 1)**: Classifies scope into the 3-Tier boundary ladder, checks existing code to prevent reinventing the wheel, asks 2–3 probing questions on failure modes, and presents 2 architectural alternatives.
+2. **Canonical Plan (Turn 2)**: Formulates a 7-section canonical plan (`playbooks/05-canonical-plan-template.md`).
+3. **Subagent Execution (Turn 3+)**: The Orchestrator delegates tasks to isolated subagents with specialized briefs.
+4. **Verification & Review**: Mandates automated test execution, Playwright browser E2E verification, and adversarial Goldfish peer review before merge.
 
 [↑ Back to top](#table-of-contents)
 
 ---
 
-## 3. Quickstart: 3 Steps to Better Code
+<a id="6-full-list-of-skills--agents"></a>
+## 6. Full List of Skills & Agents
 
-### Step 1: Install & Bootstrap Heimdall
-Open your terminal and run:
+<a id="8-predefined-agent-personas"></a>
+### 8 Predefined Agent Personas
 
-```powershell
-# 1. Clone repository
-git clone https://github.com/bepaldes/heimdall-agent.git
-cd heimdall-agent
+All personas declare `model: inherit` to run on whichever active model or vendor is configured on your machine without vendor lock-in.
 
-# 2. Run automated setup with live junctions/symlinks & global CLI shortcut
-node setup.mjs --clean --link --yes
-```
-
-> **Prefer a guided wizard?** Simply run `node setup.mjs` without flags to interactively choose specific agent harnesses, custom directories, and profile tiers.
->
-> **Global terminal access**: Setup automatically places `heimdall` on your PATH (or run `npm link`). You can verify your installation and inspect all options anytime with `heimdall --help`.
-
-### Step 2: Choose Your Profile
-* **`full` (Default, 50 skills)**: Complete engineering powerhouse (planning, security, UI, database, hygiene).
-* **`minimal` (16 skills)**: Fast and lean for quick tasks or lightweight laptops.
-*(See [Section 7: Profiles](#7-profiles) for specialized Security and Design tiers).*
-
-### Step 3: Type Your First Prompt
-Open **Google Antigravity**, **Claude Code**, or **Codex**, and try this prompt:
-```text
-/plan Build a user registration flow. Grill me on edge cases and requirements first.
-```
-Notice the difference immediately: the AI stops, challenges your assumptions, proposes clean architecture, and writes surgical, tested code.
-
-[↑ Back to top](#table-of-contents)
-
----
-
-<a id="4-architecture--environment-detection"></a>
-## 4. Architecture & Environment Detection
-
-Heimdall dynamically inspects the host system without assuming default locations, hardcoded usernames, or preset credentials:
-
-```
-               ┌────────────────────────────────────────────────────────┐
-               │                Heimdall Detection Engine              │
-               │  • CLI Tools: claude, agy, codex, cursor, windsurf     │
-               │  • Desktop: Windows APPDATA / macOS Library / Linux    │
-               │  • PATH Discovery: Discovers candidate bin/tool dirs   │
-               │  • Endpoints: Custom Proxies / API or Custom Vendors   │
-               └───────────────────────────┬────────────────────────────┘
-                                           │
-                                           ▼
-               ┌────────────────────────────────────────────────────────┐
-               │               Interactive Selection Gate               │
-               │  [1] Target Harnesses (Claude, Gemini, Codex, Desktop) │
-               │  [2] Profile Tier (Full, Minimal, Security, Design)    │
-               │  [3] Mode: Live Junctions (Single Source) vs Copies    │
-               │  [4] Tools & Doctrine Path Auto-Detection              │
-               └───────────────────────────┬────────────────────────────┘
-                                           │
-                                           ▼
-               ┌────────────────────────────────────────────────────────┐
-               │                   Atomic Deployment                    │
-               │  • 50 Curated Skills (~/.gemini, ~/.claude, ~/.codex)  │
-               │  • Context7 MCP live doc resolver                      │
-               │  • Subagent briefs & desktop playbooks                 │
-               │  • Dynamic model sync (sync-models)                    │
-               │  • Global 'heimdall' CLI shortcut on PATH              │
-               └────────────────────────────────────────────────────────┘
-```
-
-When run interactively (`node setup.mjs`), Heimdall surfaces all detected tools and endpoints before making any changes:
-
-```text
-==================================================
-        Heimdall Environment Detection
-==================================================
-[✔] Claude Code CLI     -> Found (C:\Users\...\.local\bin\claude.exe)
-                           Endpoint: Custom Proxy / Vendor API (e.g. https://api.your-proxy.com/v1)
-[✔] Google Antigravity  -> Found (C:\Users\...\AppData\Local\agy\bin\agy.exe)
-                           Endpoint: Google GenAI Direct
-[✔] OpenAI Codex CLI    -> Found (C:\Users\...\Programs\OpenAI\Codex\bin\codex.exe)
-                           Endpoint: Custom Proxy / Vendor API (e.g. https://api.your-proxy.com/v1)
-[✔] Claude Desktop      -> Found (%APPDATA%\Claude)
-[ ] Cursor / Windsurf   -> Not detected on PATH
-
---------------------------------------------------
-Where would you like Heimdall installed?
-  1. All Detected Tools (Full Ecosystem) [Recommended]
-  2. Claude Code CLI only
-  3. Google Antigravity CLI only
-  4. OpenAI Codex CLI only
-  5. Claude Desktop only (MCP & Playbooks)
-  6. Custom Multi-Selection (e.g. Claude + Gemini)
-```
-
-Selecting an option installs skills and configs strictly to the targeted runtimes, leaving untouched tools completely isolated.
-
-[↑ Back to top](#table-of-contents)
-
----
-
-<a id="5-daily-cli-usage--complete-parameter-reference"></a>
-## 5. Daily CLI Usage & Complete Parameter Reference
-
-> **`heimdall` vs. `node setup.mjs`**: They are the **exact same tool**. `heimdall` is the globally accessible terminal shortcut created by `setup.mjs` (or via `npm link`). Any command or flag shown below can be run interchangeably as either `heimdall <command>` or `node setup.mjs <command>`.
-
-### Built-in Terminal Help (`heimdall --help`)
-
-You can view the full interactive reference anytime by running:
-
-```powershell
-heimdall --help
-# or
-heimdall help
-# or (from the repository root before global link)
-node setup.mjs --help
-```
-
-<details open>
-<summary><b>Click to preview <code>heimdall --help</code> terminal output</b></summary>
-
-```text
-Heimdall Agent CLI — Intelligent Multi-Agent Sentinel & Quality Bootstrapper
-
-USAGE:
-  heimdall [command] [options]
-  node setup.mjs [command] [options]
-
-Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is the global CLI shortcut.
-
-PRIMARY SUBCOMMANDS:
-  sync (or --sync)           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
-  audit (or --audit)         Audit installed harnesses, active API endpoints, and skill counts
-  uninstall (or --uninstall)     Safely remove Heimdall skills and agent personas from all harnesses
-  sync-models (or --sync-models) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
-  skills (or --skills)       List all canonical skills, categories, and upstream provenance
-  update-skill <name|all>    Inspect upstream repository, updates, and bounded review protocol
-  help (or --help, -h)      Display this parameter and command reference
-
-SETUP & BOOTSTRAP OPTIONS:
-  --profile <name>       Skill profile tier: full (50), minimal (16), security (12), design (14) [default: full]
-  --agents <targets>     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, desktop, all [default: all]
-  --link / --no-link     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
-  --clean                Wipe legacy skills from target directory before deploying
-  -y, --yes              Non-interactive mode (use defaults or provided CLI arguments)
-  --dry-run              Simulate execution without modifying the filesystem
-  --tools-dir <dir>      Custom directory to deploy cross-model bridge tools and 'heimdall' CLI
-  --doctrine-path <file> Custom file destination for AGENTS.md universal doctrine
-  --no-tools             Skip deploying bridge tools and CLI shims
-  --no-doctrine          Skip deploying AGENTS.md universal doctrine
-
-EXAMPLES:
-  heimdall                                  # Interactive management hub (audit, sync, uninstall)
-  heimdall sync                             # Instant sync after installing a new tool
-  heimdall audit                            # Environment health check
-  heimdall uninstall                        # Safely unbind Heimdall skills and agents
-  heimdall skills                           # Browse canonical skills catalog
-  heimdall update-skill ponytail           # Inspect upstream provenance & review protocol for single skill
-  heimdall update-skill all                # Generate full bounded review audit report
-  heimdall sync-models                      # Refresh model catalogs
-  node setup.mjs --clean --link --yes       # Recommended full automated setup with live junctions
-  node setup.mjs --profile minimal --yes    # Minimal install for lightweight laptop
-```
-
-</details>
-
----
-
-### Primary Subcommands
-
-All primary actions can be called either as clean subcommands (`heimdall sync`) or as flags (`heimdall --sync`):
-
-| Subcommand | Flag Alias | Description | Example |
+| Persona | Capability Tier | Role & Responsibilities | Bound Skills |
 | :--- | :--- | :--- | :--- |
-| **`sync`** | `--sync` | Scans `PATH` for newly installed AI tools and links canonical skills in 1 second. | `heimdall sync` |
-| **`audit`** | `--audit` | Audits installed harnesses, active API endpoints, link types, and skill counts. | `heimdall audit` |
-| **`uninstall`** | `--uninstall` | Safely removes Heimdall skills and agent personas across all harnesses while preserving user files. | `heimdall uninstall` |
-| **`sync-models`** | `--sync-models` | Probes active proxy/endpoints (e.g. Custom Proxies / API or Custom Vendors) and refreshes `config/models.json`. | `heimdall sync-models` |
-| **`skills`** | `--skills` | Lists all 50 canonical skills, categories, and upstream repositories. | `heimdall skills` |
-| **`update-skill`** | `--update-skill` | Inspects upstream git sources, updates, and bounded review protocols. | `heimdall update-skill all` |
-| **`help`** | `--help`, `-h` | Displays the terminal help manual with all parameters and syntax. | `heimdall help` |
+| **`orchestrator`** | `deep_reasoning` | Planning gatekeeper (`/grill-me`), requirements interrogation, modular task decomposition, Playwright E2E verification enforcement, and subagent coordination. | `brainstorming`, `writing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills`, `executing-plans` |
+| **`frontend-designer`** | `high_polish_vision` | Enforces design read, typography hierarchy, token mappings, and anti-slop UI aesthetics for web surfaces. | `taste-skill`, `taste-skill-v1`, `gpt-tasteskill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill` |
+| **`mobile-designer`** | `responsive_flex_safety` | Mobile viewport safety (320px–430px), 48px touch targets, zero-clipping overflow flex containers, and responsive assets. | `antislop-layoutmobile`, `antislop-human`, `antislop-ui`, `imagegen-frontend-mobile`, `taste-skill` |
+| **`tester`** | `fast_verification` | Enforces strict Test-Driven Development (TDD) and browser verification (Playwright). Rejects pseudo-verification (`curl`, `grep`, `tsc`). | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `executing-plans` |
+| **`security-auditor`** | `deep_assurance_audit` | Dynamic differential HTTP probing across auth levels, OWASP Top 10 defenses, and Trail of Bits insecure defaults detection. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
+| **`database-architect`** | `schema_migration_safety` | Governs non-destructive migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
+| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments, purges defensive dead code, and enforces anti-slop standards. | `karpathy-guidelines`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
+| **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions and swallowed errors, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
 
 ---
 
-### Real-World Recipes & Practical Examples
+<a id="skill-inventory-50-modules-across-16-toolkits"></a>
+### Skill Inventory (50 Modules Across 16 Toolkits)
 
-#### Recipe 1: Fresh 1-Liner Installation (Recommended)
-Deploys all 50 canonical skills across all detected agent harnesses using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux), cleans up any stale legacy copies, and registers the global `heimdall` CLI:
-```powershell
-node setup.mjs --profile full --link --clean --yes
-```
+Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** and **11 Standalone Toolkits (11 modules)**:
 
-#### Recipe 2: Adding a Newly Installed AI Tool Later (Zero-Drift Auto-Sync)
-If you only have Claude Code installed today, and later install **Google Antigravity** or **OpenAI Codex**, never re-install from scratch. Just run:
-```powershell
-heimdall sync
-```
-Heimdall detects the new binary on `PATH` and links all 50 skills in under 1 second.
-
-#### Recipe 3: Checking Ecosystem Health & Endpoint Verification
-Verifies which harnesses are active, which API endpoints are probed, whether skills are live junctions or static copies, and checks doctrine file status:
-```powershell
-heimdall audit
-```
-
-#### Recipe 4: Lightweight Laptop Setup (Minimal Profile)
-For smaller context windows or fast local tasks, deploy the lean 16-skill profile (planning, Karpathy simplicity, TDD, antislop) targeted only to Claude Code and Gemini:
-```powershell
-node setup.mjs --profile minimal --agents claude,gemini --link --yes
-```
-
-#### Recipe 5: Safe Non-Destructive Dry Run
-Inspect exactly which directories, junctions, and configs would be touched without modifying the filesystem:
-```powershell
-node setup.mjs --dry-run --yes
-```
-
-#### Recipe 6: Refresh Live Model Catalog from Proxy/Vendor
-Fetches dynamic models (e.g. `gemini-4`, `claude-opus-5-5`, `gpt-6-astra`) from your active endpoint (e.g. Custom Proxies / API or Custom Vendors) and syncs `config/models.json`:
-```powershell
-heimdall sync-models
-```
-
-#### Recipe 7: Headless Docker & CI Container Bootstrapping
-Automate deployment in container builds or CI runners with custom directories:
-```bash
-node setup.mjs --profile full --tools-dir /usr/local/bin --doctrine-path /workspace/AGENTS.md --clean --yes
-```
-
----
-
-### Complete Parameter Reference Table (`node setup.mjs` / `heimdall`)
-
-These flags can be passed to either `node setup.mjs` or `heimdall` for headless automation, CI/CD pipelines, or custom configurations:
-
-| Parameter | Type | Default | Description | Example |
-| :--- | :---: | :---: | :--- | :--- |
-| **`--profile <name>`** | String | `full` | Skill profile tier: `full` (50 skills), `minimal` (16), `security` (12), or `design` (14). | `--profile minimal` |
-| **`--agents <targets>`** | String | `all` | Comma-separated list of harnesses to configure: `claude`, `gemini`, `codex`, `desktop`, or `all`. | `--agents claude,gemini` |
-| **`--link`** | Flag | `false`* | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). *(Recommended)* | `--link` |
-| **`--no-link`** | Flag | `true`* | Deploy skills as independent physical directory copies instead of live junctions. | `--no-link` |
-| **`--clean`** | Flag | `false` | Wipes existing legacy skills in target directories before installing (preserves vendor files). | `--clean` |
-| **`-y`, `--yes`** | Flag | `false` | Non-interactive mode (skips interactive wizard prompts and applies defaults or passed flags). | `--yes` |
-| **`--dry-run`** | Flag | `false` | Simulates the full installation and prints planned actions without touching the filesystem. | `--dry-run` |
-| **`--tools-dir <dir>`** | Path | Auto (`PATH`) | Custom destination directory to deploy cross-model bridge tools and global `heimdall` CLI shim. | `--tools-dir ~/.local/bin` |
-| **`--doctrine-path <file>`** | Path | Auto (`AGENTS.md`) | Custom destination path for `AGENTS.md` universal doctrine. | `--doctrine-path ~/.agents/AGENTS.md` |
-| **`--no-tools`** | Flag | `false` | Skips installing cross-model bridge tools and CLI shims. | `--no-tools` |
-| **`--no-doctrine`** | Flag | `false` | Skips deploying `AGENTS.md` universal doctrine. | `--no-doctrine` |
-
-*Note: In the interactive wizard (`node setup.mjs`), Live Junctions (`--link`) is the recommended prompt default. In non-interactive mode without flags, specify `--link` to enable symlinks.
-
-[↑ Back to top](#table-of-contents)
-
----
-
-<a id="6-dynamic-model-registry-sync-models"></a>
-## 6. Dynamic Model Registry (`sync-models`)
-
-Rather than relying on outdated static model lists, Heimdall discovers available model catalogs dynamically from active provider or proxy endpoints (e.g. Custom Proxies / API or Custom Vendors, LiteLLM, or native vendor APIs):
-
-```powershell
-heimdall sync-models
-```
-
-This queries live catalog endpoints, registers new models (e.g. `gemini-4`, `claude-opus-5-5`, `gpt-6-astra`), and updates `config/models.json` automatically.
-
-[↑ Back to top](#table-of-contents)
-
----
-
-<a id="7-profiles"></a>
-## 7. Profiles
-
-| Profile | Skills | Predefined Agents | Primary Focus | Best For |
-| :--- | :---: | :---: | :--- | :--- |
-| **`full`** | 15 Suites (50 modules) | 8 (All) | Complete engineering suite: planning, antislop, design, security, hygiene, database | Everyday development across all runtimes |
-| **`minimal`** | 16 modules | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer` | Fast workflows, lightweight laptops, beginners |
-| **`security`** | 12 modules | 4 | Security posture: `orchestrator`, `security-auditor`, `tester`, `reviewer` | Penetration testing & pre-deployment audits |
-| **`design`** | 14 modules | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel` | Frontend development & design system work |
-
-[↑ Back to top](#table-of-contents)
-
----
-
-<a id="predefined-agents-8-specialized-personas"></a>
-## 8. Predefined Agent Roster (8 Specialized Personas)
-
-Heimdall equips your engineering harnesses with **8 specialized, model-agnostic agent personas**. Each agent is pre-configured with explicit behavioral contracts and bound to a curated subset of Heimdall's 50 skills.
-
-### Model-Agnostic Execution (`model: inherit`)
-To prevent vendor lock-in and support single-vendor setups, all agent contracts declare `model: inherit` (or omit `model:`):
-* **Single-Vendor Autonomy**: If your machine only runs **Google Antigravity (`agy`)**, all agents execute on your active Gemini model. If you only run **OpenAI Codex CLI**, they run on your active Codex model. They will **never** fail by attempting to reach an unconfigured external vendor.
-* **Per-Harness Capability Mapping**: [`config/agents.json`](config/agents.json) defines runtime-specific preferences so multi-model setups automatically dispatch the optimal model per task.
-
-| Persona | Capability Tier | Key Role & Contract | Associated Skill Bundle |
-| :--- | :--- | :--- | :--- |
-| **`orchestrator`** | `deep_reasoning` | Planning gatekeeper (`/grill-me`), requirements interrogation, modular task decomposition, Playwright E2E verification gate enforcement, and subagent handoffs. | `brainstorming`, `writing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills` |
-| **`frontend-designer`** | `high_polish_vision` | Enforces Section 0.B "Design Read", design token mappings, typographic hierarchy, and anti-slop UI aesthetics for web surfaces. | `taste-skill`, `taste-skill-v1`, `gpt-tasteskill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill` |
-| **`mobile-designer`** | `responsive_flex_safety` | Dedicated to mobile viewports (320px–430px), minimum 48px touch targets, zero-clipping overflow flex containers, and responsive assets. | `antislop-layoutmobile`, `antislop-human`, `antislop-ui`, `imagegen-frontend-mobile`, `taste-skill` |
-| **`tester`** | `fast_verification` | Enforces strict Test-Driven Development (TDD) and Browser E2E verification (Playwright). Rejects pseudo-verification (`curl`, `grep`, `tsc`, container status). Mandates visual DOM verification. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `executing-plans` |
-| **`security-auditor`** | `deep_assurance_audit` | Dynamic differential HTTP probing (anonymous vs unprivileged vs admin), OWASP Top 10 defenses, and Trail of Bits insecure defaults detection. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
-| **`database-architect`** | `schema_migration_safety` | Governs non-destructive schema migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL, NoSQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
-| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments and defensive dead-code, and purges AI slop. | `karpathy-guidelines`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
-| **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions, verifies test assertions, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
-
-### How Agents Are Deployed
-Running `node setup.mjs --clean --link --yes` (or `heimdall sync`) links all 8 agent contracts via Live Junctions into:
-* **Claude Code**: `~/.claude/agents/` (natively invokable by name)
-* **Google Antigravity**: `~/.gemini/agents/` & universal `.agents/`
-* **OpenAI Codex CLI**: `~/.codex/agents/`
-* **Hermes Agent**: `%LOCALAPPDATA%\hermes\agents\` or `~/.hermes/agents/`
-* **OpenClaw**: `~/.openclaw/agents/`
-* **Shared Multi-Agent**: `~/.agents/agents/`
-
-[↑ Back to top](#table-of-contents)
-
----
-
-<a id="supported-runtimes"></a>
-## 9. Supported Runtimes & Cross-Platform Matrix
-
-Heimdall operates across **Windows**, **macOS**, and **Linux**. It automatically selects native directory junctions (`junction`) on Windows or standard directory symlinks (`ln -s`) on POSIX systems.
-
-| Harness | Deployment Target (Windows / macOS / Linux) | Integration Mechanism |
-| :--- | :--- | :--- |
-| **Google Antigravity** | `~/.gemini/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) • Google OAuth Native |
-| **Claude Code** | `~/.claude/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) |
-| **OpenAI Codex CLI** | `~/.codex/skills/` | Dynamic Progressive Disclosure (Junction / Symlink) |
-| **Hermes Agent** | Windows: `%LOCALAPPDATA%\hermes\skills\` (or `~/.hermes/skills/`)<br>macOS/Linux: `~/.hermes/skills/` | Dynamic Progressive Disclosure • `external_dirs` in `config.yaml` |
-| **OpenClaw** | `~/.openclaw/skills/` | Dynamic Progressive Disclosure • `AGENTS.md` / `SOUL.md` auto-injection |
-| **Shared Multi-Agent** | `~/.agents/skills/` | Hierarchical Workspace Traversal |
-| **Claude Desktop** | Windows: `%APPDATA%\Claude\`<br>macOS: `~/Library/Application Support/Claude/`<br>Linux: `~/.config/Claude/` | Automated `claude_desktop_config.json` + Playbooks |
-| **IDEs / Editors** | Workspace Root | Standalone Playbooks & Cursorrules |
-
-### Consumer Desktop Chat Apps vs. Agentic Coding CLIs
-
-A common point of confusion is the distinction between consumer desktop chat apps and developer agent CLIs:
-
-* **Gemini for Desktop (`gemini.google/desktop`) & ChatGPT Desktop**:
-  * These are consumer chat GUIs. They run in sandboxed webviews/Electron environments and do **not** support automated local skill directory loading (`~/.<tool>/skills`) or arbitrary local shell tool execution loops.
-  * *To use Heimdall principles with them*: Upload [`doctrine/AGENTS.md`](doctrine/AGENTS.md) or specific playbooks from [`playbooks/`](playbooks/) into a **Gemini Custom Gem** or **ChatGPT Project / Custom GPT** system prompt.
-* **Google Antigravity (`agy`), Claude Code (`claude`), & OpenAI Codex CLI (`codex`)**:
-  * These are full autonomous agent harnesses with terminal access, progressive skill disclosure, and filesystem mutation capabilities. Heimdall is engineered natively for these runtimes.
-
-### OpenAI Codex CLI on Windows
-
-OpenAI Codex CLI operates cleanly on Windows within Heimdall's multi-agent matrix:
-1. **Binary Detection**: Heimdall automatically discovers `codex.exe` on `PATH`, `%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe`, or `%USERPROFILE%\.codex\packages\standalone\current\bin\codex.exe`.
-2. **Windows Sandboxing Flag**: Unlike macOS (Seatbelt) or Linux (Landlock/Bubblewrap), Windows does not possess native POSIX sandbox isolation primitives. For headless cross-agent reviews and automated non-interactive tasks, [`tools/codex-bridge.ps1`](tools/codex-bridge.ps1) executes Codex with `--dangerously-bypass-approvals-and-sandbox` to allow uninterrupted execution.
-3. **Endpoint Flexibility**: Codex can route either to official OpenAI endpoints or via Custom Proxies / API or Custom Vendors (e.g. `https://api.your-proxy.com/v1`, LiteLLM, or private endpoints) using your preferred model catalog.
-4. **NTFS Junctions**: All 50 skills are linked directly into `%USERPROFILE%\.codex\skills` as NTFS junctions, ensuring zero file duplication and instantaneous sync.
-
-### Hermes Agent & OpenClaw Integration
-
-Heimdall delivers first-class support for **Hermes Agent** (Nous Research) and **OpenClaw**:
-1. **Hermes Agent (`hermes`)**:
-   - **Cross-Platform Auto-Detection**: Discovers `hermes.cmd` on Windows (`%LOCALAPPDATA%\hermes\bin\hermes.cmd`) or `which hermes` / `~/.hermes/bin/hermes` on macOS/Linux.
-   - **Zero-Drift Live Junctions**: All 50 skills are linked directly into `%LOCALAPPDATA%\hermes\skills\` (or `~/.hermes/skills/`), appearing instantly in `hermes skills list` as enabled local skills.
-   - **Native External Dirs Hook**: `setup.mjs` configures `skills.external_dirs: - ~/.agents/skills` in `config.yaml`, ensuring Nous Research's built-in skills resolver loads Heimdall skills without collisions.
-   - **Universal Doctrine**: `AGENTS.md` is automatically copied into the Hermes root, where Hermes natively auto-injects it into system prompts.
-2. **OpenClaw (`openclaw`)**:
-   - **Cross-Platform Auto-Detection**: Discovers `openclaw` on `PATH` or standard install paths (`~/.openclaw`).
-   - **Modular Skills & Soul**: Links all 50 skills into `~/.openclaw/skills` and synchronizes `AGENTS.md` / `SOUL.md` to govern behavioral boundaries and anti-slop rules.
-
-### Linux & macOS Parity
-
-* **Installer**: `setup.mjs` runs on Node.js >= 18 on all OSes, dynamically selecting `which` vs `where.exe`, and creating native directory symlinks.
-* **Bridge Scripts**: `tools/` contains native Windows wrappers (`.cmd`, `.ps1`) and portable POSIX shell shims (`claude-bridge.sh`, `gemini-bridge.sh`, `codex-bridge.sh`) that invoke PowerShell Core (`pwsh`).
-* **Skills**: 100% platform-agnostic Markdown, Python, and shell scripts.
-
-[↑ Back to top](#table-of-contents)
-
----
-
-<a id="skill-inventory-16-curated-toolkits--suites--50-modules"></a>
-## 10. Skill Inventory (16 Curated Toolkits & Suites / 50 Modules)
-
-Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** and **11 Standalone Power Toolkits (11 modules)** for a total of **50 modular capabilities**. For full trigger conditions, descriptions, and upstream repository links for every skill, see the complete [Skills Directory](docs/SKILLS.md).
-
-### Core Multi-Skill Suites (5 Suites / 39 Modules)
+#### Core Multi-Skill Suites (5 Suites / 39 Modules)
 
 <details open>
 <summary><b>1. Superpowers Engineering Suite (15 modules) — Jesse Vincent / obra</b></summary>
@@ -510,7 +294,7 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 - `subagent-driven-development`: Decomposes large tasks into isolated subagents with specialized briefs.
 - `dispatching-parallel-agents`: Coordinates concurrent subagent workers on independent branches.
 - `test-driven-development`: Requires failing automated tests prior to implementation logic.
-- `systematic-debugging`: Isolates root causes using scientific hypothesis testing.
+- `systematic-debugging`: Isolates root causes using scientific hypothesis testing and build triage heuristics.
 - `verification-before-completion`: Mandates passing test suites and live verification before claiming completion.
 - `finishing-a-development-branch`: Verifies branch hygiene, tests, and documentation before merge.
 - `using-git-worktrees`: Manages parallel agent execution branches without dirtying working trees.
@@ -527,7 +311,7 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 
 - `taste-skill`: Enforces cohesive design reads, purpose-driven typography, and brand-first color logic.
 - `taste-skill-v1`: Baseline visual hierarchy and layout balance heuristics.
-- `gpt-tasteskill`: OpenAI-optimized aesthetic evaluation and UI critique prompt harness.
+- `gpt-tasteskill`: Aesthetic evaluation and UI critique prompt harness.
 - `brandkit`: Manages design tokens, invariant brand assets, and multi-palette themes.
 - `brutalist-skill`: High-contrast, bold typographic layouts with deliberate structural tension.
 - `minimalist-skill`: Ultra-clean editorial layouts emphasizing typography, space, and restraint.
@@ -557,7 +341,7 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 
 - `claude-collaborator`: Cross-model delegation bridge to Claude Opus / Sonnet for deep architectural review.
 - `gemini-collaborator`: Cross-model delegation bridge to Google Antigravity / Gemini for high-velocity scans.
-- `codex-collaborator`: Cross-model delegation bridge to OpenAI Codex CLI (Astra) for adversarial peer reviews.
+- `codex-collaborator`: Cross-model delegation bridge to OpenAI Codex CLI for adversarial peer reviews.
 
 </details>
 
@@ -570,14 +354,14 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 
 </details>
 
-### Standalone Power Toolkits (11 Curated Toolkits / 11 Modules)
+#### Standalone Toolkits (11 Curated Toolkits / 11 Modules)
 
 <details open>
-<summary><b>Browse Standalone Toolkits (including ponytail, karpathy, caveman, and security sentinels)</b></summary>
+<summary><b>Browse Standalone Toolkits</b></summary>
 
-- **`ponytail`**: Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces Dietrich Gebert's 7-step Decision Ladder: YAGNI checks, codebase reuse, built-in standard library, native platform features, and zero premature abstractions while strictly preserving security and error handling.
+- **`ponytail`**: Pragmatic senior developer discipline. Enforces Dietrich Gebert's Decision Ladder: YAGNI checks, codebase reuse, built-in standard library, native platform features, and zero premature abstractions.
 - **`karpathy-guidelines`**: Andrej Karpathy's simplicity heuristics: write minimal surgical code, reject speculative configurability, surface hidden assumptions, and never touch adjacent working code.
-- **`caveman`**: Julius Brussee's token-reduction protocol slashing conversational ceremony, pleasantries, and AI sycophancy while preserving raw code, shell commands, and structured diffs.
+- **`caveman`**: Julius Brussee's token-reduction protocol slashing conversational ceremony while preserving raw code, shell commands, and structured diffs.
 - **`strix-security`**: Autonomous dynamic HTTP differential probing across Anonymous, Unprivileged, and Privileged identity contexts.
 - **`security-audit-sweep`**: 4-phase security audit sweeping route gates, IAM entitlement least-privilege, dependency vulnerabilities, and secret leakage.
 - **`owasp-security`**: Hardens code against OWASP Top 10:2025, ASVS 5.0, LLM Top 10, and Agentic Application risks.
@@ -593,15 +377,15 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 
 ---
 
-<a id="11-companion-remote-orchestrators"></a>
-## 11. Companion Remote Orchestrators & Architectural Memory
+<a id="7-additional-companion-tools"></a>
+## 7. Additional Companion Tools
 
 For multi-device pair programming, mobile monitoring, and project memory, Heimdall integrates with:
 
-- **[Herdr (`herdr.dev`)](https://herdr.dev/)**: A terminal-native agent multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`).
-- **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: A mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
-- **[Graphify (`github.com/Graphify-Labs/graphify`)](https://github.com/Graphify-Labs/graphify)**: An open-source, local-first code knowledge graph builder. Uses Tree-sitter AST parsing across 40+ programming languages to build deterministic dependency maps with zero LLM API costs, and exports directly to Obsidian vaults (`--obsidian`).
-- **[Obsidian (`obsidian.md`)](https://obsidian.md/)**: A local-first, extensible Markdown knowledge base. Paired with Graphify-generated vaults (`[[wikilinks]]`), it serves as persistent external memory for AI coding agents (like Claude Code), loading immediate architectural context on startup without expensive token scanning.
+* **[Herdr (`herdr.dev`)](https://herdr.dev/)**: Terminal-native agent multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`).
+* **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: Mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
+* **[Graphify (`github.com/Graphify-Labs/graphify`)](https://github.com/Graphify-Labs/graphify)**: Local-first code knowledge graph builder. Uses Tree-sitter AST parsing across 40+ programming languages to build deterministic dependency maps with zero LLM API costs, exporting directly to Obsidian vaults.
+* **[Obsidian (`obsidian.md`)](https://obsidian.md/)**: Local-first Markdown knowledge base. Paired with Graphify-generated vaults (`[[wikilinks]]`), it serves as persistent external memory for AI coding agents, loading immediate architectural context on startup without token-heavy scanning.
 
 [↑ Back to top](#table-of-contents)
 
