@@ -35,7 +35,20 @@ Before generating any code, creating plans, or taking action on any user request
    - Declare your professional recommendation with clear reasoning.
 
 4. **Hard Gate**:
-   - MANDATORY VISIBLE OUTPUT: Output the Scope, Probing Questions, and Alternatives explicitly in user-visible chat markdown. Never swallow them in internal thinking/scratchpads or output a bare "awaiting answers" message.
+   - MANDATORY VISIBLE OUTPUT (ANTI-PATTERN BAN): NEVER keep the questions or alternatives inside internal thinking/scratchpads. NEVER output a bare "awaiting answers..." blocker message. You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
+     ```markdown
+     ### 1. Scope Classification
+     - **Scope**: [Spike / Bounded / Architectural]
+
+     ### 2. Probing Questions
+     1. [Question 1: edge cases / failure modes]
+     2. [Question 2: limits / boundary conditions]
+     3. [Question 3: integration / performance constraints]
+
+     ### 3. Concrete Alternatives
+     - **Alternative 1**: [Description + architectural trade-offs]
+     - **Alternative 2**: [Description + architectural trade-offs]
+     ```
    - STOP and wait for the user to answer and select an approach ONLY AFTER rendering the questions in full.
    - Only after receiving explicit alignment may you proceed to planning or implementation.
 ```

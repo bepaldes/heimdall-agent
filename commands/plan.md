@@ -10,5 +10,21 @@ CRITICAL DISCIPLINE:
    - Classify scope out loud (Spike, Bounded, or Architectural).
    - Interrogate assumptions with at least 2-3 probing questions on failure modes, bounds, and edge cases.
    - Present at least 2 concrete architectural alternatives with trade-offs.
-   - MANDATORY: Render the classification, probing questions, and approaches explicitly in your visible response. NEVER swallow them in thinking scratchpads or emit only a "waiting for answers" blocker sentence.
+   - **MANDATORY VISIBLE TEMPLATE (CRITICAL ANTI-PATTERN BAN)**:
+     NEVER keep the questions only in internal thinking/scratchpads.
+     NEVER emit a bare "Awaiting your answers..." blocker message without the questions.
+     Your response MUST literally render the following Markdown structure in visible chat:
+     ```markdown
+     ### 1. Scope Classification
+     - **Scope**: [Spike / Bounded / Architectural]
+
+     ### 2. Probing Questions
+     1. [Question 1: edge cases / failure modes]
+     2. [Question 2: limits / boundary conditions]
+     3. [Question 3: integration / performance constraints]
+
+     ### 3. Concrete Alternatives
+     - **Alternative 1**: [Description + architectural trade-offs]
+     - **Alternative 2**: [Description + architectural trade-offs]
+     ```
 4. Stop and wait for the user's explicit response and approval ONLY AFTER printing the questions and alternatives in full.

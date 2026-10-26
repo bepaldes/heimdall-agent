@@ -12,7 +12,20 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
          a) Explicit Scope: Classify as 'Spike', 'Bounded', or 'Architectural' matching the 3-Tier Boundary Ladder.
          b) Interrogate Assumptions: Ask 2-3 probing questions on edge cases, limits, failure modes.
          c) Concrete Alternatives: Suggest 2 distinct approaches with explicit architectural trade-offs.
-       - MANDATORY VISIBLE OUTPUT: You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown. NEVER keep them in internal thinking/scratchpads or output a bare "awaiting answers" blocker message.
+       - MANDATORY VISIBLE OUTPUT (ANTI-PATTERN BAN): NEVER keep the questions or alternatives inside internal thinking/scratchpads. NEVER emit a bare "awaiting answers..." blocker message. You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
+         ```markdown
+         ### 1. Scope Classification
+         - **Scope**: [Spike / Bounded / Architectural]
+
+         ### 2. Probing Questions
+         1. [Question 1: edge cases / failure modes]
+         2. [Question 2: limits / boundary conditions]
+         3. [Question 3: integration / performance constraints]
+
+         ### 3. Concrete Alternatives
+         - **Alternative 1**: [Description + architectural trade-offs]
+         - **Alternative 2**: [Description + architectural trade-offs]
+         ```
        - Pause and await user response and direction approval ONLY AFTER printing the questions and alternatives in full.
     2. TURN 2+ PLAN GENERATION:
        - Generate plan strictly following [`playbooks/05-canonical-plan-template.md`](file:///C:/Apps/heimdall-agent/playbooks/05-canonical-plan-template.md). Abbreviated templates forbidden.
