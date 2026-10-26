@@ -231,6 +231,42 @@ function getClaudeDesktopDir() {
 }
 
 /**
+ * Detects Claude Desktop by checking for an existing configuration file
+ * or the presence of the native desktop executable on OS-specific paths.
+ */
+function detectClaudeDesktop() {
+  const configDir = getClaudeDesktopDir();
+  const configFile = path.join(configDir, 'claude_desktop_config.json');
+
+  if (fs.existsSync(configFile)) {
+    return { dir: configDir, file: configFile, detected: true, configExists: true };
+  }
+
+  const platform = os.platform();
+  let appInstalled = false;
+
+  if (platform === 'win32') {
+    const winCandidates = [
+      path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Claude', 'Claude.exe'),
+      path.join(process.env.LOCALAPPDATA || '', 'Claude', 'Claude.exe'),
+      path.join(process.env.PROGRAMFILES || '', 'Claude', 'Claude.exe'),
+      path.join(process.env['ProgramFiles(x86)'] || '', 'Claude', 'Claude.exe')
+    ];
+    appInstalled = winCandidates.some(p => p && fs.existsSync(p));
+  } else if (platform === 'darwin') {
+    const macCandidates = [
+      '/Applications/Claude.app',
+      path.join(userHome, 'Applications', 'Claude.app')
+    ];
+    appInstalled = macCandidates.some(p => fs.existsSync(p));
+  } else {
+    appInstalled = !!checkCommand('claude-desktop') || fs.existsSync('/opt/Claude/claude');
+  }
+
+  return { dir: configDir, file: configFile, detected: appInstalled, configExists: false };
+}
+
+/**
  * Resiliently discovers the OpenAI Codex CLI binary on PATH and standard Windows/POSIX install paths.
  */
 function detectCodexBinary() {
@@ -445,9 +481,9 @@ function detectEnvironment() {
   detected.tools.cursor = checkCommand('cursor');
   detected.tools.windsurf = checkCommand('windsurf');
 
-  // 2. Check Claude Desktop directory (Windows, macOS, Linux)
-  const claudeDesktopDir = getClaudeDesktopDir();
-  detected.tools.claudeDesktop = fs.existsSync(claudeDesktopDir) ? claudeDesktopDir : null;
+  // 2. Check Claude Desktop (executable or existing config file)
+  const desktopStatus = detectClaudeDesktop();
+  detected.tools.claudeDesktop = desktopStatus.detected ? desktopStatus.dir : null;
 
   // 3. Check Claude Code endpoint
   const claudeSettingsPath = path.join(userHome, '.claude', 'settings.json');
@@ -952,22 +988,22 @@ async function runSync(options, detected) {
     }
   }
 
-  // Check Claude Desktop
+  // Check Claude Desktop (only touch if config file already exists)
   if (detected.tools.claudeDesktop) {
     const claudeDesktopFile = path.join(detected.tools.claudeDesktop, 'claude_desktop_config.json');
-    let deskConfig = { mcpServers: {} };
     if (fs.existsSync(claudeDesktopFile)) {
+      let deskConfig = { mcpServers: {} };
       try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
-    }
-    if (!deskConfig.mcpServers?.context7) {
-      if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
-      deskConfig.mcpServers.context7 = {
-        command: "npx",
-        args: ["-y", "@upstash/context7-mcp"]
-      };
-      fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
-      console.log(`  ${colors.green}✔${colors.reset} Configured Context7 MCP for Claude Desktop`);
-      syncedAny = true;
+      if (!deskConfig.mcpServers?.context7) {
+        if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
+        deskConfig.mcpServers.context7 = {
+          command: "npx",
+          args: ["-y", "@upstash/context7-mcp"]
+        };
+        fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
+        console.log(`  ${colors.green}✔${colors.reset} Configured Context7 MCP for Claude Desktop`);
+        syncedAny = true;
+      }
     }
   }
 
@@ -1705,26 +1741,28 @@ async function main() {
     }
   }
 
-  // 4. Configure Claude Desktop if selected or in 'all'
-  if (options.agents.includes('desktop') || options.agents.includes('all')) {
-    const claudeDesktopDir = getClaudeDesktopDir();
-    const claudeDesktopFile = path.join(claudeDesktopDir, 'claude_desktop_config.json');
+  // 4. Configure Claude Desktop only if detected/explicit and config file already exists
+  const desktopStatus = detectClaudeDesktop();
+  const shouldTargetDesktop = options.agents.includes('desktop') || (options.agents.includes('all') && desktopStatus.detected);
 
-    console.log(`\n-> Configuring Claude Desktop (${claudeDesktopFile})...`);
-    if (!options.dryRun) {
-      if (!fs.existsSync(claudeDesktopDir)) fs.mkdirSync(claudeDesktopDir, { recursive: true });
-      let deskConfig = { mcpServers: {} };
-      if (fs.existsSync(claudeDesktopFile)) {
+  if (shouldTargetDesktop) {
+    const claudeDesktopFile = desktopStatus.file;
+    if (fs.existsSync(claudeDesktopFile)) {
+      console.log(`\n-> Configuring Claude Desktop (${claudeDesktopFile})...`);
+      if (!options.dryRun) {
+        let deskConfig = { mcpServers: {} };
         try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
+        if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
+        deskConfig.mcpServers.context7 = {
+          command: "npx",
+          args: ["-y", "@upstash/context7-mcp"]
+        };
+        fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
       }
-      if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
-      deskConfig.mcpServers.context7 = {
-        command: "npx",
-        args: ["-y", "@upstash/context7-mcp"]
-      };
-      fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
+      console.log(`   ${colors.green}✔ Configured Context7 MCP for Claude Desktop${colors.reset}`);
+    } else if (options.agents.includes('desktop')) {
+      console.log(`\n-> Claude Desktop config not found at ${claudeDesktopFile} (skipped; only touched if exists)`);
     }
-    console.log(`   ${colors.green}✔ Configured Context7 MCP for Claude Desktop${colors.reset}`);
   }
 
   // 5. Deploy tools & global heimdall CLI shims if requested
