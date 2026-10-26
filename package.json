@@ -16,14 +16,18 @@
     "commands",
     "hooks",
     "tools",
+    "lib",
     "config",
     "docs",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
+    "test": "node --test test/*.test.mjs",
     "setup": "node setup.mjs",
     "audit": "node setup.mjs --audit",
+    "sync": "node setup.mjs sync",
+    "sync-models": "node setup.mjs sync-models",
     "uninstall": "node setup.mjs --uninstall",
     "minimal": "node setup.mjs --profile minimal",
     "full": "node setup.mjs --profile full"

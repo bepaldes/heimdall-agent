@@ -7,8 +7,70 @@
  */
 
 const { execSync } = require('child_process');
+const os = require('os');
+const fs = require('fs');
+const path = require('path');
 
 const MAX_STDIN = 1024 * 1024; // 1 MiB
+
+function getSessionFilePath() {
+  const ppid = process.ppid || 'global';
+  return path.join(os.tmpdir(), `heimdall-session-${ppid}.json`);
+}
+
+function loadSessionState() {
+  try {
+    const p = getSessionFilePath();
+    if (fs.existsSync(p)) {
+      return JSON.parse(fs.readFileSync(p, 'utf8'));
+    }
+  } catch {}
+  return { turns: 0, estimatedTokens: 0, updatedAt: Date.now() };
+}
+
+function saveSessionState(state) {
+  try {
+    const p = getSessionFilePath();
+    fs.writeFileSync(p, JSON.stringify(state), 'utf8');
+  } catch {}
+}
+
+function clearSessionState() {
+  try {
+    const p = getSessionFilePath();
+    if (fs.existsSync(p)) fs.unlinkSync(p);
+  } catch {}
+}
+
+function getActiveContextLimit() {
+  if (process.env.HEIMDALL_ACTIVE_CONTEXT_LIMIT) {
+    const parsed = parseInt(process.env.HEIMDALL_ACTIVE_CONTEXT_LIMIT, 10);
+    if (parsed > 0) return parsed;
+  }
+  return 1000000; // 1M default maximum
+}
+
+function trackContextUsage(payloadRaw) {
+  const session = loadSessionState();
+  session.turns = (session.turns || 0) + 1;
+  const turnTokens = Math.round((payloadRaw ? payloadRaw.length : 0) / 3.8);
+  session.estimatedTokens = (session.estimatedTokens || 0) + turnTokens;
+  session.updatedAt = Date.now();
+  saveSessionState(session);
+
+  const limit = getActiveContextLimit();
+  const warningTokens = Math.round(limit * 0.75);
+
+  if (session.estimatedTokens >= warningTokens || session.turns >= 40) {
+    const tokenDisplay = session.estimatedTokens >= 1000
+      ? `${Math.round(session.estimatedTokens / 1000)}K`
+      : `${session.estimatedTokens}`;
+    const limitDisplay = limit >= 1000000
+      ? `${Math.round(limit / 1000000)}M`
+      : `${Math.round(limit / 1000)}K`;
+    process.stderr.write(`[Heimdall Context Sentinel] WARNING: Session approaching context threshold (~${tokenDisplay} / ${limitDisplay} max tokens, turn ${session.turns} of 40-turn cadence). Trigger /compact or persist active state to disk.\n`);
+  }
+}
 
 function readStdin(timeoutMs = 800) {
   return new Promise((resolve) => {
@@ -72,6 +134,7 @@ async function main() {
 
   switch (event) {
     case 'pre-bash': {
+      trackContextUsage(raw);
       const command = (toolInput.command || '').trim();
       // Block destructive system commands
       if (/(^|[;&|]\s*)(rm\s+-rf\s+(\/|~|\$HOME|\.\/|\*)|rmdir\s+\/s\s+\/q\s+[a-zA-Z]:\\)/i.test(command)) {
@@ -119,6 +182,7 @@ async function main() {
     }
 
     case 'pre-write': {
+      trackContextUsage(raw);
       const filePath = toolInput.file_path || toolInput.path || '';
       const content = toolInput.content || '';
       const lineCount = content ? content.split('\n').length : 0;
@@ -134,6 +198,7 @@ async function main() {
     }
 
     case 'pre-compact': {
+      clearSessionState();
       process.stderr.write('[Heimdall Lifecycle Sentinel] Context compaction occurring. Ensure active tasks, rulings, and pending ledger items are preserved on disk.\n');
       break;
     }

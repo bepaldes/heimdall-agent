@@ -18,6 +18,8 @@ import os from 'node:os';
 import readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import { resolveModelMaxContext } from './lib/model-context.cjs';
+import { updateHermesConfigContext } from './lib/hermes-context.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -408,6 +410,40 @@ function configureHermesExternalDirs(hermesDir, dryRun = false) {
     }
   } catch {}
   return false;
+}
+
+/**
+ * Ensures Hermes Agent config.yaml has maximum context_length set for active models.
+ */
+function configureHermesContextLimit(hermesDir, modelsList = null, dryRun = false) {
+  if (!fs.existsSync(path.join(hermesDir, 'config.yaml'))) return false;
+
+  let contextMap = {};
+  if (Array.isArray(modelsList) && modelsList.length > 0) {
+    for (const m of modelsList) {
+      if (m.id && m.context_window_tokens) {
+        contextMap[m.id] = m.context_window_tokens;
+      }
+    }
+  } else if (fs.existsSync(modelsPath)) {
+    try {
+      const catalog = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
+      const allModels = [...(catalog.ghostcli || []), ...(catalog.custom_proxies || []), ...(catalog.google || [])];
+      for (const m of allModels) {
+        const resolved = resolveModelMaxContext(m, { prioritizeMax: true });
+        contextMap[m.id] = resolved.tokens;
+      }
+    } catch {}
+  }
+
+  // Ensure default fallbacks for common models
+  if (!contextMap['claude-opus-5-5']) contextMap['claude-opus-5-5'] = 1000000;
+  if (!contextMap['claude-sonnet-5']) contextMap['claude-sonnet-5'] = 1000000;
+  if (!contextMap['claude-fable-5.1']) contextMap['claude-fable-5.1'] = 1000000;
+  if (!contextMap['gpt-6-astra']) contextMap['gpt-6-astra'] = 1000000;
+  if (!contextMap['z-ai/glm-5.3']) contextMap['z-ai/glm-5.3'] = 1000000;
+
+  return updateHermesConfigContext(hermesDir, contextMap, dryRun);
 }
 
 /**
@@ -907,18 +943,30 @@ async function syncModelsFromEndpoint() {
           currentModels = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
         }
 
-        const mapped = modelsList.map(m => ({
-          id: m.id || m.slug,
-          displayName: m.display_name || m.id,
-          context: m.context_window ? `${Math.round(m.context_window / 1000)}K` : '1M',
-          description: m.description || ''
-        }));
+        const mapped = modelsList.map(m => {
+          const resolved = resolveModelMaxContext(m, { prioritizeMax: true });
+          return {
+            id: m.id || m.slug,
+            displayName: m.display_name || m.id,
+            context: resolved.label,
+            context_window_tokens: resolved.tokens,
+            description: m.description || ''
+          };
+        });
 
         currentModels.custom_proxies = mapped;
         currentModels.ghostcli = mapped;
 
         fs.writeFileSync(modelsPath, JSON.stringify(currentModels, null, 2));
         console.log(`${colors.green}✔ Synchronized models catalog to config/models.json${colors.reset}\n`);
+
+        const hermesDir = getHermesDir();
+        if (fs.existsSync(hermesDir)) {
+          const hermesContextUpdated = configureHermesContextLimit(hermesDir, mapped);
+          if (hermesContextUpdated) {
+            console.log(`${colors.green}✔ Enforced maximum context limits in Hermes config.yaml${colors.reset}\n`);
+          }
+        }
       } else {
         console.log(`${colors.yellow}Notice: Endpoint returned HTTP ${res.status}. Preserving cached models.json.${colors.reset}\n`);
       }
@@ -949,6 +997,10 @@ async function runSync(options, detected) {
 
     if (agent === 'hermes') {
       configureHermesExternalDirs(getHermesDir(), false);
+      const hermesContextUpdated = configureHermesContextLimit(getHermesDir(), null, false);
+      if (hermesContextUpdated) {
+        console.log(`   ${colors.green}✔ Enforced maximum context limits in Hermes config.yaml${colors.reset}`);
+      }
     }
 
     const toolInstalled = true;
@@ -1739,6 +1791,10 @@ async function main() {
       const hermesConfigured = configureHermesExternalDirs(getHermesDir(), options.dryRun);
       if (hermesConfigured) {
         console.log(`   ${colors.green}✔ Registered ~/.agents/skills in Hermes config.yaml external_dirs${colors.reset}`);
+      }
+      const hermesContextUpdated = configureHermesContextLimit(getHermesDir(), null, options.dryRun);
+      if (hermesContextUpdated) {
+        console.log(`   ${colors.green}✔ Enforced maximum context limits in Hermes config.yaml${colors.reset}`);
       }
     }
   }
