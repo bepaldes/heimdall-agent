@@ -124,6 +124,34 @@ const targetHookPaths = {
   claude: path.join(userHome, '.claude', 'hooks')
 };
 
+/**
+ * Resolves the root directory of a target agent harness.
+ */
+function getAgentRootDir(agent) {
+  if (agent === 'claude') return path.join(userHome, '.claude');
+  if (agent === 'gemini') return path.join(userHome, '.gemini');
+  if (agent === 'codex') return path.join(userHome, '.codex');
+  if (agent === 'agents') return path.join(userHome, '.agents');
+  if (agent === 'hermes') return getHermesDir();
+  if (agent === 'openclaw') return getOpenClawDir();
+  if (agent === 'desktop') return getClaudeDesktopDir();
+  return null;
+}
+
+/**
+ * Checks whether an agent harness exists and has an existing root directory/configuration.
+ * Heimdall will only configure an agent harness if its root directory already exists.
+ */
+function isAgentConfigurable(agent) {
+  if (agent === 'desktop') {
+    const status = detectClaudeDesktop();
+    return Boolean(status.configExists);
+  }
+  const rootDir = getAgentRootDir(agent);
+  return Boolean(rootDir && fs.existsSync(rootDir));
+}
+
+
 
 const pkgJsonPath = path.join(__dirname, 'package.json');
 let currentVersion = '1.0.0';
@@ -700,7 +728,9 @@ function cleanTargetDirectory(targetDir, dryRun = false, preserveList = ['.syste
 
 function registerClaudeHooks(targetHookDir, dryRun = false) {
   if (dryRun) return;
-  const claudeSettingsPath = path.join(userHome, '.claude', 'settings.json');
+  const claudeDir = path.join(userHome, '.claude');
+  if (!fs.existsSync(claudeDir)) return;
+  const claudeSettingsPath = path.join(claudeDir, 'settings.json');
   const hooksJsonSrc = path.join(hooksDir, 'hooks.json');
   if (!fs.existsSync(hooksJsonSrc)) return;
 
@@ -729,6 +759,8 @@ function registerClaudeHooks(targetHookDir, dryRun = false) {
 
 function linkDirectory(src, dest, dryRun = false) {
   if (dryRun) return;
+  const parentDir = path.dirname(dest);
+  if (!fs.existsSync(parentDir)) return;
   if (fs.existsSync(dest)) {
     try {
       const stat = fs.lstatSync(dest);
@@ -773,6 +805,8 @@ function copyDirectory(src, dest, dryRun = false) {
 
 function deployAgentContracts(targetDir, link = false, clean = false, dryRun = false, agentsList = null) {
   if (!fs.existsSync(agentsDir)) return 0;
+  const parentDir = path.dirname(targetDir);
+  if (!fs.existsSync(parentDir)) return 0;
   const allFiles = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'));
   const agentFiles = agentsList ? allFiles.filter(f => agentsList.includes(f)) : allFiles;
 
@@ -911,17 +945,13 @@ async function runSync(options, detected) {
   let syncedAny = false;
 
   for (const [agent, targetDir] of Object.entries(targetPaths)) {
-    let toolInstalled = false;
-    if (agent === 'claude' && detected.tools.claude) toolInstalled = true;
-    else if (agent === 'gemini' && (detected.tools.agy || fs.existsSync(path.join(userHome, '.gemini', 'antigravity-cli')))) toolInstalled = true;
-    else if (agent === 'codex' && detected.tools.codex) toolInstalled = true;
-    else if (agent === 'agents') toolInstalled = true;
-    else if (agent === 'hermes' && (detected.tools.hermes || fs.existsSync(getHermesDir()))) {
-      toolInstalled = true;
+    if (!isAgentConfigurable(agent)) continue;
+
+    if (agent === 'hermes') {
       configureHermesExternalDirs(getHermesDir(), false);
     }
-    else if (agent === 'openclaw' && (detected.tools.openclaw || fs.existsSync(getOpenClawDir()))) toolInstalled = true;
 
+    const toolInstalled = true;
     if (toolInstalled) {
       // Synchronize doctrine, playbooks & commands unconditionally for installed harnesses
       const targetDocFile = targetDoctrinePaths[agent];
@@ -1069,50 +1099,44 @@ function runAudit(options) {
   const unlinkedTools = [];
 
   for (const [agent, targetDir] of Object.entries(targetPaths)) {
+    const rootDir = getAgentRootDir(agent);
     const targetAgentDir = targetAgentPaths[agent];
-    if (fs.existsSync(targetDir)) {
-      const entries = fs.readdirSync(targetDir, { withFileTypes: true })
-        .filter(d => (d.isDirectory() || d.isSymbolicLink()) && d.name !== '.system');
+    if (isAgentConfigurable(agent)) {
+      if (fs.existsSync(targetDir)) {
+        const entries = fs.readdirSync(targetDir, { withFileTypes: true })
+          .filter(d => (d.isDirectory() || d.isSymbolicLink()) && d.name !== '.system');
 
-      let linkedCount = 0;
-      for (const entry of entries) {
-        try {
-          if (fs.lstatSync(path.join(targetDir, entry.name)).isSymbolicLink()) {
-            linkedCount++;
-          }
-        } catch {}
-      }
+        let linkedCount = 0;
+        for (const entry of entries) {
+          try {
+            if (fs.lstatSync(path.join(targetDir, entry.name)).isSymbolicLink()) {
+              linkedCount++;
+            }
+          } catch {}
+        }
 
-      const installed = entries.map(d => d.name);
-      const missing = availableSkills.filter(s => !installed.includes(s));
-      const statusColor = missing.length === 0 ? colors.green : colors.yellow;
-      const linkLabel = linkedCount === installed.length && installed.length > 0
-        ? ` (${colors.cyan}Live Junctions / Single Source of Truth${colors.reset})`
-        : linkedCount > 0 ? ` (${linkedCount} linked, ${installed.length - linkedCount} copies)` : ' (Static copies)';
+        const installed = entries.map(d => d.name);
+        const missing = availableSkills.filter(s => !installed.includes(s));
+        const statusColor = missing.length === 0 ? colors.green : colors.yellow;
+        const linkLabel = linkedCount === installed.length && installed.length > 0
+          ? ` (${colors.cyan}Live Junctions / Single Source of Truth${colors.reset})`
+          : linkedCount > 0 ? ` (${linkedCount} linked, ${installed.length - linkedCount} copies)` : ' (Static copies)';
 
-      const agentCount = fs.existsSync(targetAgentDir)
-        ? fs.readdirSync(targetAgentDir).filter(f => f.endsWith('.md')).length
-        : 0;
+        const agentCount = fs.existsSync(targetAgentDir)
+          ? fs.readdirSync(targetAgentDir).filter(f => f.endsWith('.md')).length
+          : 0;
 
-      console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${statusColor}${installed.length} skills, ${agentCount} agents${colors.reset} in ${path.dirname(targetDir)}${linkLabel}`);
+        console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${statusColor}${installed.length} skills, ${agentCount} agents${colors.reset} in ${rootDir}${linkLabel}`);
 
-      if (installed.length === 0) {
+        if (installed.length === 0) {
+          unlinkedTools.push(agent);
+        }
+      } else {
+        console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${colors.yellow}INSTALLED BUT NOT LINKED (${targetDir})${colors.reset}`);
         unlinkedTools.push(agent);
       }
     } else {
-      const isHermesOrOpenClaw = agent === 'hermes' || agent === 'openclaw';
-      const isToolDetected = (agent === 'hermes' && (detected.tools.hermes || fs.existsSync(getHermesDir()))) ||
-                             (agent === 'openclaw' && (detected.tools.openclaw || fs.existsSync(getOpenClawDir())));
-      if (!isHermesOrOpenClaw || isToolDetected) {
-        console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${colors.dim}NOT LINKED (${targetDir})${colors.reset}`);
-      }
-      if ((agent === 'claude' && detected.tools.claude) ||
-          (agent === 'gemini' && detected.tools.agy) ||
-          (agent === 'codex' && detected.tools.codex) ||
-          (agent === 'hermes' && (detected.tools.hermes || fs.existsSync(getHermesDir()))) ||
-          (agent === 'openclaw' && (detected.tools.openclaw || fs.existsSync(getOpenClawDir())))) {
-        unlinkedTools.push(agent);
-      }
+      console.log(`  ${colors.bold}${agent.toUpperCase().padEnd(8)}${colors.reset} -> ${colors.dim}Not found (${rootDir || 'unconfigured'})${colors.reset}`);
     }
   }
 
@@ -1665,21 +1689,25 @@ async function main() {
   // 2. Resolve destination agent directories
   let activeDestinations = [];
   if (options.agents.includes('all')) {
-    activeDestinations = Object.entries(targetPaths).filter(([agent]) => {
-      if (agent === 'openclaw') return Boolean(detected.tools.openclaw || fs.existsSync(getOpenClawDir()));
-      if (agent === 'hermes') return Boolean(detected.tools.hermes || fs.existsSync(getHermesDir()));
-      return true;
-    });
+    activeDestinations = Object.entries(targetPaths).filter(([agent]) => isAgentConfigurable(agent));
   } else {
     for (const agent of options.agents) {
       if (targetPaths[agent]) {
-        activeDestinations.push([agent, targetPaths[agent]]);
+        if (isAgentConfigurable(agent)) {
+          activeDestinations.push([agent, targetPaths[agent]]);
+        } else {
+          const rootDir = getAgentRootDir(agent);
+          console.log(`\n-> ${colors.bold}${agent.toUpperCase()}${colors.reset} directory not found at ${rootDir} (skipped; only configured if exists)`);
+        }
       }
     }
   }
 
   // 3. Clean and deploy skills
   for (const [agent, targetDir] of activeDestinations) {
+    const rootDir = getAgentRootDir(agent);
+    if (!rootDir || !fs.existsSync(rootDir)) continue;
+
     console.log(`\n-> Deploying to ${colors.bold}${agent.toUpperCase()}${colors.reset} (${targetDir})...`);
     if (!options.dryRun && !fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
@@ -1743,7 +1771,7 @@ async function main() {
 
   // 4. Configure Claude Desktop only if detected/explicit and config file already exists
   const desktopStatus = detectClaudeDesktop();
-  const shouldTargetDesktop = options.agents.includes('desktop') || (options.agents.includes('all') && desktopStatus.detected);
+  const shouldTargetDesktop = options.agents.includes('desktop') || (options.agents.includes('all') && desktopStatus.configExists);
 
   if (shouldTargetDesktop) {
     const claudeDesktopFile = desktopStatus.file;
@@ -1767,10 +1795,10 @@ async function main() {
 
   // 5. Deploy tools & global heimdall CLI shims if requested
   if (options.tools && options.toolsDir) {
-    console.log(`\n-> Deploying Bridge Tools & 'heimdall' CLI to ${colors.bold}${options.toolsDir}${colors.reset}...`);
-    if (!options.dryRun && !fs.existsSync(options.toolsDir)) {
-      fs.mkdirSync(options.toolsDir, { recursive: true });
-    }
+    if (!fs.existsSync(options.toolsDir)) {
+      console.log(`\n-> Tools directory not found at ${options.toolsDir} (skipped)`);
+    } else {
+      console.log(`\n-> Deploying Bridge Tools & 'heimdall' CLI to ${colors.bold}${options.toolsDir}${colors.reset}...`);
     const tools = fs.readdirSync(toolsDir);
     for (const tool of tools) {
       const src = path.join(toolsDir, tool);
@@ -1785,6 +1813,7 @@ async function main() {
     // Deploy global heimdall shim
     deployGlobalShims(options.toolsDir, options.dryRun);
     console.log(`   ${colors.green}✔ Deployed ${tools.length} cross-model bridge tools + 'heimdall' global CLI shim${colors.reset}`);
+    }
   }
 
   // 6. Deploy universal doctrine & playbooks if requested
@@ -1801,6 +1830,7 @@ async function main() {
 
       // Synchronize doctrine across all active harnesses
       for (const [agent, targetDocFile] of Object.entries(targetDoctrinePaths)) {
+        if (!isAgentConfigurable(agent)) continue;
         const parentDir = path.dirname(targetDocFile);
         if (fs.existsSync(parentDir)) {
           fs.copyFileSync(srcDoc, targetDocFile);
@@ -1811,6 +1841,7 @@ async function main() {
       // Synchronize playbooks
       if (fs.existsSync(playbooksDir)) {
         for (const [agent, targetPlayDir] of Object.entries(targetPlaybookPaths)) {
+          if (!isAgentConfigurable(agent)) continue;
           const parentDir = path.dirname(targetPlayDir);
           if (fs.existsSync(parentDir)) {
             if (options.link) {
@@ -1826,6 +1857,7 @@ async function main() {
       // Synchronize custom commands (Claude Code CLI)
       if (fs.existsSync(commandsDir)) {
         for (const [agent, targetCmdDir] of Object.entries(targetCommandPaths)) {
+          if (!isAgentConfigurable(agent)) continue;
           const parentDir = path.dirname(targetCmdDir);
           if (fs.existsSync(parentDir)) {
             if (options.link) {
@@ -1841,6 +1873,7 @@ async function main() {
       // Synchronize lifecycle hooks (Claude Code CLI)
       if (fs.existsSync(hooksDir)) {
         for (const [agent, targetHookDir] of Object.entries(targetHookPaths)) {
+          if (!isAgentConfigurable(agent)) continue;
           const parentDir = path.dirname(targetHookDir);
           if (fs.existsSync(parentDir)) {
             if (options.link) {
