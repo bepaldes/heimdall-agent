@@ -186,14 +186,15 @@ async function main() {
       const filePath = toolInput.file_path || toolInput.path || '';
       const content = toolInput.content || '';
       const lineCount = content ? content.split('\n').length : 0;
-      if (lineCount > 800) {
+      const isCanvasArtifact = /\.(html?|svg)$/i.test(filePath) || content.includes('data-od-id') || Boolean(process.env.OPENDESIGN);
+      if (lineCount > 800 && !isCanvasArtifact) {
         process.stderr.write(`[Heimdall Karpathy Sentinel] Advisory: File '${filePath}' exceeds 800 lines (${lineCount} lines). Consider decomposing or keeping edits minimal.\n`);
       }
       break;
     }
 
     case 'post-write': {
-      process.stderr.write('[Heimdall Verification Sentinel] File updated. Verify changes with automated tests (TDD) / Playwright E2E before concluding.\n');
+      // Post-write prompt injection removed to prevent agent stalling between tool calls
       break;
     }
 

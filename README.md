@@ -8,7 +8,9 @@
   <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
-Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **8 specialized agent personas** and **50 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, and **Claude Desktop**.
+🌐 **Language / Idioma:** **English** | [Português (Brasil)](README.pt-BR.md)
+
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **8 specialized agent personas** and **50 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
 
 ---
 
@@ -170,6 +172,7 @@ Heimdall automatically discovers and configures installed AI tools:
 | **OpenAI Codex CLI** | `codex` on PATH | Junctions to `~/.codex/skills`, `agents`, and `AGENTS.md` |
 | **Hermes Agent** | `hermes` on PATH / LocalAppData | Junctions to `%LOCALAPPDATA%\hermes\skills` + `external_dirs` in `config.yaml` |
 | **OpenClaw** | `openclaw` on PATH | Junctions to `~/.openclaw/skills` + `AGENTS.md` / `SOUL.md` injection |
+| **OpenDesign** | `open-design` on PATH / `.opendesign` | Automatic visual canvas mode: bypasses Turn 1 grilling gate, preserves `data-od-*` attributes & applies `taste-skill` + `antislop-ui` |
 | **Claude Desktop** | `%APPDATA%\Claude` | Auto-configures Context7 MCP and playbooks in `claude_desktop_config.json` |
 
 [↑ Back to top](#table-of-contents)
@@ -383,6 +386,7 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 For multi-device pair programming, mobile monitoring, and project memory, Heimdall integrates with:
 
 * **[Herdr (`herdr.dev`)](https://herdr.dev/)**: Terminal-native agent multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`).
+* **[OpenDesign (`open-design.ai`)](https://open-design.ai/)**: Local-first, open-source AI visual design canvas workspace. Spawns Claude Code, Codex, and Gemini CLI as runtime adapters; Heimdall's visual canvas contract exempts canvas generation from Turn 1 grilling gates while enforcing `taste-skill`, WCAG AAA accessibility, and `data-od-*` DOM layer preservation.
 * **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: Mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
 * **[Graphify (`github.com/Graphify-Labs/graphify`)](https://github.com/Graphify-Labs/graphify)**: Local-first code knowledge graph builder. Uses Tree-sitter AST parsing across 40+ programming languages to build deterministic dependency maps with zero LLM API costs, exporting directly to Obsidian vaults.
 * **[Obsidian (`obsidian.md`)](https://obsidian.md/)**: Local-first Markdown knowledge base. Paired with Graphify-generated vaults (`[[wikilinks]]`), it serves as persistent external memory for AI coding agents, loading immediate architectural context on startup without token-heavy scanning.

@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveModelMaxContext, normalizeContextTokens } from '../lib/model-context.cjs';
+import { resolveModelMaxContext, normalizeContextTokens, resolveCustomModelsEndpoint } from '../lib/model-context.cjs';
 
 describe('Model Context Discovery & Maximum Context Resolution', () => {
   test('normalizes raw token numbers into integer tokens and human readable string', () => {
@@ -54,5 +54,31 @@ describe('Model Context Discovery & Maximum Context Resolution', () => {
     const resolved = resolveModelMaxContext(unknownModel);
     assert.equal(resolved.tokens, 131072);
     assert.equal(resolved.label, '128K');
+  });
+
+  test('resolveCustomModelsEndpoint returns null for official APIs and target URL for custom proxies', () => {
+    assert.equal(
+      resolveCustomModelsEndpoint({
+        claude: 'https://api.anthropic.com (Official)',
+        codex: 'https://api.openai.com (Official)'
+      }),
+      null
+    );
+
+    assert.equal(
+      resolveCustomModelsEndpoint({
+        claude: 'https://ghostcli.cloud',
+        codex: 'https://api.openai.com (Official)'
+      }),
+      'https://ghostcli.cloud/v1/models'
+    );
+
+    assert.equal(
+      resolveCustomModelsEndpoint({
+        claude: 'https://api.anthropic.com (Official)',
+        codex: 'https://my-proxy.internal/v1'
+      }),
+      'https://my-proxy.internal/v1/models'
+    );
   });
 });

@@ -41,4 +41,44 @@ describe('Runtime Lifecycle Sentinel Hook', () => {
     assert.equal(res.status, 0);
     assert.match(res.stderr, /\[Heimdall Lifecycle Sentinel\] Context compaction occurring/);
   });
+
+  test('pre-write exempts .html/.svg canvas prototypes and OpenDesign data-od-id from 800-line warning while warning on code files', () => {
+    const longHtml = '<div>' + '\nline'.repeat(850) + '</div>';
+    const htmlPayload = JSON.stringify({
+      tool_input: {
+        file_path: 'prototype.html',
+        content: longHtml
+      }
+    });
+
+    const resHtml = spawnSync(process.execPath, [hookScript, 'pre-write'], {
+      input: htmlPayload,
+      encoding: 'utf8'
+    });
+    assert.equal(resHtml.status, 0);
+    assert.doesNotMatch(resHtml.stderr, /\[Heimdall Karpathy Sentinel\] Advisory/);
+
+    const longTs = 'const a = 1;' + '\nconst b = 2;'.repeat(850);
+    const tsPayload = JSON.stringify({
+      tool_input: {
+        file_path: 'src/component.ts',
+        content: longTs
+      }
+    });
+
+    const resTs = spawnSync(process.execPath, [hookScript, 'pre-write'], {
+      input: tsPayload,
+      encoding: 'utf8'
+    });
+    assert.equal(resTs.status, 0);
+    assert.match(resTs.stderr, /\[Heimdall Karpathy Sentinel\] Advisory: File 'src\/component.ts' exceeds 800 lines/);
+
+    // post-write should exempt canvas prototypes from TDD reminder
+    const resPostHtml = spawnSync(process.execPath, [hookScript, 'post-write'], {
+      input: htmlPayload,
+      encoding: 'utf8'
+    });
+    assert.equal(resPostHtml.status, 0);
+    assert.doesNotMatch(resPostHtml.stderr, /\[Heimdall Verification Sentinel\]/);
+  });
 });

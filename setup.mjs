@@ -18,8 +18,9 @@ import os from 'node:os';
 import readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
-import { resolveModelMaxContext } from './lib/model-context.cjs';
+import { resolveModelMaxContext, resolveCustomModelsEndpoint } from './lib/model-context.cjs';
 import { updateHermesConfigContext } from './lib/hermes-context.cjs';
+import { detectPathCandidates } from './lib/path-discovery.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -447,56 +448,6 @@ function configureHermesContextLimit(hermesDir, modelsList = null, dryRun = fals
 }
 
 /**
- * Dynamically discovers candidate tools/bin directories registered in the user's PATH.
- * Never assumes a hardcoded system path.
- */
-function detectPathCandidates() {
-  const pathEnv = process.env.PATH || '';
-  const delimiter = path.delimiter;
-  const rawDirs = pathEnv.split(delimiter).map(d => d.trim()).filter(Boolean);
-  const candidates = [];
-  const seen = new Set();
-
-  for (const raw of rawDirs) {
-    try {
-      const resolved = path.resolve(raw);
-      const lower = resolved.toLowerCase();
-      if (seen.has(lower)) continue;
-      seen.add(lower);
-
-      if (fs.existsSync(resolved)) {
-        // Exclude system directories
-        const isSystem = lower.includes('\\windows\\system32') ||
-                         lower.includes('\\windows\\system') ||
-                         lower.includes('/usr/sbin') ||
-                         lower.includes('/sbin') ||
-                         lower.includes('\\powershell');
-        if (!isSystem) {
-          const isToolLike = lower.includes('tool') ||
-                             lower.includes('bin') ||
-                             lower.includes('.local') ||
-                             lower.includes('apps') ||
-                             lower.includes('npm') ||
-                             lower.includes('cargo') ||
-                             lower.includes('heimdall');
-          if (isToolLike) {
-            candidates.push(resolved);
-          }
-        }
-      }
-    } catch {}
-  }
-
-  // Fallback candidate if none detected
-  const defaultUserTools = path.join(userHome, '.heimdall', 'bin');
-  if (candidates.length === 0) {
-    candidates.push(defaultUserTools);
-  }
-
-  return candidates;
-}
-
-/**
  * Dynamically discovers candidate paths for universal doctrine AGENTS.md.
  */
 function detectDoctrineCandidates() {
@@ -917,17 +868,7 @@ function deployGlobalShims(targetToolsDir, dryRun = false) {
 async function syncModelsFromEndpoint() {
   console.log(`${colors.cyan}${colors.bold}=== Live Model Synchronization ===${colors.reset}\n`);
   const detected = detectEnvironment();
-  let proxyUrl = detected.endpoints.claude || detected.endpoints.codex;
-
-  let targetUrl = null;
-  if (proxyUrl && proxyUrl.startsWith('http')) {
-    if (proxyUrl.includes('ghostcli.cloud')) {
-      targetUrl = 'https://ghostcli.cloud/v1/models';
-    } else if (!proxyUrl.includes('api.anthropic.com') && !proxyUrl.includes('api.openai.com')) {
-      const base = proxyUrl.replace(/\/+$/, '');
-      targetUrl = base.endsWith('/v1') ? `${base}/models` : (base.endsWith('/models') ? base : `${base}/v1/models`);
-    }
-  }
+  const targetUrl = resolveCustomModelsEndpoint(detected.endpoints);
 
   if (targetUrl) {
     console.log(`Probing Proxy / Vendor Models API: ${colors.yellow}${targetUrl}${colors.reset}...`);
@@ -1093,6 +1034,16 @@ async function runSync(options, detected) {
   const activeToolsDir = options.toolsDir || detected.pathCandidates[0];
   if (activeToolsDir && fs.existsSync(activeToolsDir)) {
     deployGlobalShims(activeToolsDir, false);
+  }
+
+  // Refresh active workspace doctrine files
+  const srcDoc = path.join(doctrineDir, 'AGENTS.md');
+  if (fs.existsSync(srcDoc)) {
+    for (const cand of detected.doctrineCandidates) {
+      if (fs.existsSync(cand)) {
+        try { fs.copyFileSync(srcDoc, cand); } catch {}
+      }
+    }
   }
 
   if (syncedAny) {
@@ -1380,39 +1331,53 @@ async function runUninstall(options, detected) {
 
 async function runPostInstallMenu(options, detected) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const hasCustomApi = Boolean(resolveCustomModelsEndpoint(detected.endpoints));
   try {
     console.log(`${colors.bold}${colors.cyan}=== Heimdall Management Hub ===${colors.reset}`);
     console.log(`Heimdall is currently installed and active across your environment.\n`);
     console.log(`What would you like to do?`);
-    console.log(`  1. Audit Environment & Health Check`);
-    console.log(`  2. Fast Sync Skills & Agents (1-sec zero-drift)`);
-    console.log(`  3. Refresh Dynamic Models (sync-models)`);
-    console.log(`  4. Uninstall Heimdall`);
-    console.log(`  5. Reinstall / Reconfigure Profile & Targets`);
-    console.log(`  6. Exit\n`);
 
-    const answer = await rl.question(`Choose an option [1-6, default: 1]: `);
+    const menuItems = [
+      { label: 'Audit Environment & Health Check', action: 'audit' },
+      { label: 'Fast Sync Skills & Agents (1-sec zero-drift)', action: 'sync' },
+      ...(hasCustomApi ? [{ label: 'Refresh Dynamic Models (sync-models)', action: 'sync-models' }] : []),
+      { label: 'Uninstall Heimdall', action: 'uninstall' },
+      { label: 'Reinstall / Reconfigure Profile & Targets', action: 'reinstall' },
+      { label: 'Exit', action: 'exit' }
+    ];
+
+    menuItems.forEach((item, idx) => {
+      console.log(`  ${idx + 1}. ${item.label}`);
+    });
+    console.log('');
+
+    const answer = await rl.question(`Choose an option [1-${menuItems.length}, default: 1]: `);
     const choice = answer.trim().toLowerCase();
 
-    if (choice === '1' || choice === '') {
-      runAudit(options);
-      process.exit(0);
-    } else if (choice === '2') {
-      await runSync(options, detected);
-      process.exit(0);
-    } else if (choice === '3') {
-      await syncModelsFromEndpoint();
-      process.exit(0);
-    } else if (choice === '4') {
-      await runUninstall(options, detected);
-      process.exit(0);
-    } else if (choice === '5') {
-      return 'reinstall';
-    } else if (choice === '6' || choice === 'q' || choice === 'exit') {
+    if (choice === 'q' || choice === 'exit') {
       console.log('Goodbye!');
       process.exit(0);
-    } else {
+    }
+
+    const idx = choice === '' ? 0 : parseInt(choice, 10) - 1;
+    const selected = menuItems[idx] ? menuItems[idx].action : 'audit';
+
+    if (selected === 'audit') {
       runAudit(options);
+      process.exit(0);
+    } else if (selected === 'sync') {
+      await runSync(options, detected);
+      process.exit(0);
+    } else if (selected === 'sync-models') {
+      await syncModelsFromEndpoint();
+      process.exit(0);
+    } else if (selected === 'uninstall') {
+      await runUninstall(options, detected);
+      process.exit(0);
+    } else if (selected === 'reinstall') {
+      return 'reinstall';
+    } else if (selected === 'exit') {
+      console.log('Goodbye!');
       process.exit(0);
     }
   } finally {

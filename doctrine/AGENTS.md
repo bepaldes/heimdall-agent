@@ -5,30 +5,32 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
 <!-- cross-agent-harness-directives:start -->
 <cross_agent_harness_discipline priority="CRITICAL_OVERRIDE">
   <planning_protocol>
-    When receiving ANY planning request (/plan, /grill-me, plan mode, architectural/design prompt):
-    1. TURN 1 IS HARD-GATED FOR INTERACTIVE GRILLING (ZERO-TOLERANCE):
-       - Strictly forbidden from generating plans or code on Turn 1.
-       - Immediately act as Orchestrator:
-         a) Explicit Scope: Classify as 'Spike', 'Bounded', or 'Architectural' matching the 3-Tier Boundary Ladder.
-         b) Interrogate Assumptions: Ask 2-3 probing questions on edge cases, limits, failure modes.
-         c) Concrete Alternatives: Suggest 2 distinct approaches with explicit architectural trade-offs.
-       - MANDATORY VISIBLE OUTPUT (ANTI-PATTERN BAN): NEVER keep the questions or alternatives inside internal thinking/scratchpads. NEVER emit a bare "awaiting answers..." blocker message. You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
-         ```markdown
-         ### 1. Scope Classification
-         - **Scope**: [Spike / Bounded / Architectural]
+    When receiving an EXPLICIT planning or interview slash command (/plan or /grill-me):
+    - ORDINARY TASK & EXECUTION EXEMPTION: When receiving ordinary coding requests, implementation tasks, direct instructions, or prompts referencing existing plans or design docs (e.g., docs/designs/...), DO NOT trigger Turn 1 grilling. Execute the requested implementation directly, autonomously, and continuously.
+    - EXPLICIT /plan OR /grill-me ONLY:
+      1. TURN 1 IS HARD-GATED FOR INTERACTIVE GRILLING (ZERO-TOLERANCE):
+         - Strictly forbidden from generating plans or code on Turn 1.
+         - Immediately act as Orchestrator:
+           a) Explicit Scope: Classify as 'Spike', 'Bounded', or 'Architectural' matching the 3-Tier Boundary Ladder.
+           b) Interrogate Assumptions: Ask 2-3 probing questions on edge cases, limits, failure modes.
+           c) Concrete Alternatives: Suggest 2 distinct approaches with explicit architectural trade-offs.
+         - MANDATORY VISIBLE OUTPUT (ANTI-PATTERN BAN): NEVER keep the questions or alternatives inside internal thinking/scratchpads. NEVER emit a bare "awaiting answers..." blocker message. You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
+           ```markdown
+           ### 1. Scope Classification
+           - **Scope**: [Spike / Bounded / Architectural]
 
-         ### 2. Probing Questions
-         1. [Question 1: edge cases / failure modes]
-         2. [Question 2: limits / boundary conditions]
-         3. [Question 3: integration / performance constraints]
+           ### 2. Probing Questions
+           1. [Question 1: edge cases / failure modes]
+           2. [Question 2: limits / boundary conditions]
+           3. [Question 3: integration / performance constraints]
 
-         ### 3. Concrete Alternatives
-         - **Alternative 1**: [Description + architectural trade-offs]
-         - **Alternative 2**: [Description + architectural trade-offs]
-         ```
-       - Pause and await user response and direction approval ONLY AFTER printing the questions and alternatives in full.
-    2. TURN 2+ PLAN GENERATION:
-       - Generate plan strictly following [`playbooks/05-canonical-plan-template.md`](file:///C:/Apps/heimdall-agent/playbooks/05-canonical-plan-template.md). Abbreviated templates forbidden.
+           ### 3. Concrete Alternatives
+           - **Alternative 1**: [Description + architectural trade-offs]
+           - **Alternative 2**: [Description + architectural trade-offs]
+           ```
+         - Pause and await user response and direction approval ONLY AFTER printing the questions and alternatives in full.
+      2. TURN 2+ PLAN GENERATION:
+         - Generate plan strictly following [`playbooks/05-canonical-plan-template.md`](file:///C:/Apps/heimdall-agent/playbooks/05-canonical-plan-template.md). Abbreviated templates forbidden.
   </planning_protocol>
 
   <subagent_execution_contract>
@@ -38,6 +40,25 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
     - Do NOT ask conversational questions back to caller.
     - Inspect files, write failing tests first (TDD), write surgical code, verify, return diff report.
   </subagent_execution_contract>
+
+  <visual_canvas_contract>
+    When invoked inside a visual design canvas (OpenDesign, `.opendesign`, `OPENDESIGN` env, or prompts targeting `data-od-id` / standalone HTML canvas prototypes):
+    - Turn 1 interactive grilling gate and TDD unit-test prerequisite do NOT apply; generate or update the visual artifact immediately on Turn 1.
+    - Keep `taste-skill`, `antislop-ui`, `antislop-human`, and `antislop-layoutmobile` active.
+    - Preserve existing `data-od-id` and `data-od-*` DOM attributes so canvas layer selection remains intact.
+    - Honor `DESIGN.md` brand/token definitions when present in the workspace.
+  </visual_canvas_contract>
+
+  <execution_continuity>
+    - ZERO SIGNPOSTING (ANTI-PATTERN BAN): NEVER announce what tool you are about to call and yield the turn (e.g., saying "I will now create the script..." and stopping). If you state an action, you MUST immediately invoke the tool in the same turn.
+    - AUTONOMOUS PLAN EXECUTION: Once an implementation plan or task is approved by the user, execute all remaining steps continuously from start to finish. Do NOT pause between intermediate steps to ask for permission or report trivial progress. Keep executing until the final deliverable is created and verified, or an unrecoverable blocking error occurs.
+  </execution_continuity>
+
+  <local_tool_identity>
+    - LOCAL TERMINAL WORKSTATION AGENT: You are a local engineering agent running directly on the user's workstation with native filesystem and terminal tools (Edit, Write, Bash, PowerShell).
+    - FORBIDDEN DISCLAIMER BAN: NEVER state "I cannot directly edit local files on your system" or behave like a remote web chatbot.
+    - AUTOMATED BUG RESOLUTION: When runtime, syntax, or library errors occur during script execution, NEVER ask the user to manually edit files or paste code. Immediately inspect the failure, research or determine the fix, apply the correction directly using your Edit or Write tool, and re-run.
+  </local_tool_identity>
 </cross_agent_harness_discipline>
 <!-- cross-agent-harness-directives:end -->
 
