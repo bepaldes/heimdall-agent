@@ -437,12 +437,20 @@ function configureHermesContextLimit(hermesDir, modelsList = null, dryRun = fals
     } catch {}
   }
 
+  // Ensure both canonical and [1m] suffixed model names are registered
+  for (const [id, tokens] of Object.entries({ ...contextMap })) {
+    if (!id.endsWith('[1m]')) {
+      contextMap[`${id}[1m]`] = tokens;
+    }
+  }
+
   // Ensure default fallbacks for common models
   if (!contextMap['claude-opus-5-5']) contextMap['claude-opus-5-5'] = 1000000;
   if (!contextMap['claude-sonnet-5']) contextMap['claude-sonnet-5'] = 1000000;
   if (!contextMap['claude-fable-5.1']) contextMap['claude-fable-5.1'] = 1000000;
   if (!contextMap['gpt-6-astra']) contextMap['gpt-6-astra'] = 1000000;
   if (!contextMap['z-ai/glm-5.3']) contextMap['z-ai/glm-5.3'] = 1000000;
+  if (!contextMap['z-ai/glm-5.3-flash']) contextMap['z-ai/glm-5.3-flash'] = 1000000;
 
   return updateHermesConfigContext(hermesDir, contextMap, dryRun);
 }
