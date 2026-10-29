@@ -884,7 +884,50 @@ async function syncModelsFromEndpoint() {
           currentModels = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
         }
 
-        const mapped = modelsList.map(m => {
+        console.log(`Checking live health of discovered models...`);
+        const apiKey = detected.endpoints.claude_key || detected.endpoints.codex_key || process.env.ANTHROPIC_API_KEY || process.env.GHOSTCLI_API_KEY || '';
+        const baseUrl = targetUrl.replace(/\/v1\/models\/?$/, '');
+
+        const testedModels = await Promise.all(modelsList.map(async m => {
+          const modelId = m.id || m.slug;
+          let isAlive = true;
+
+          if (apiKey) {
+            try {
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), 8000);
+              const testRes = await fetch(`${baseUrl}/v1/messages`, {
+                method: 'POST',
+                headers: {
+                  'x-api-key': apiKey,
+                  'anthropic-version': '2023-06-01',
+                  'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  model: modelId,
+                  max_tokens: 5,
+                  messages: [{ role: 'user', content: 'hi' }]
+                }),
+                signal: controller.signal
+              });
+              clearTimeout(timeout);
+              isAlive = testRes.ok;
+            } catch {
+              isAlive = false;
+            }
+          }
+
+          return { raw: m, modelId, isAlive };
+        }));
+
+        const liveModels = testedModels.filter(t => t.isAlive);
+        const deadModels = testedModels.filter(t => !t.isAlive);
+
+        if (deadModels.length > 0) {
+          console.log(`${colors.yellow}⚠ Filtered out ${deadModels.length} unresponsive model(s): ${deadModels.map(d => d.modelId).join(', ')}${colors.reset}\n`);
+        }
+
+        const mapped = liveModels.map(({ raw: m }) => {
           const resolved = resolveModelMaxContext(m, { prioritizeMax: true });
           return {
             id: m.id || m.slug,
