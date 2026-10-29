@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **15 Primary Toolkits & Suites (50 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **15 Primary Toolkits & Suites (51 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -34,6 +34,7 @@ heimdall update-skill all
 - [⚡ Cloudflare Edge & WAF Security](#cloudflare-security-audit)
 - [⚡ Snyk Dependency & Vulnerability Scan](#snyk-agent-scan)
 - [⚡ Supabase Postgres Best Practices](#postgres-best-practices)
+- [⚡ Progressive Disclosure & Skill Architecture](#progressive-disclosure)
 - [⚡ Project & Workspace Hygiene Sentinel](#project-hygiene)
 - [⚡ Structured Analysis & Output Formatting](#output-skill)
 - [⚡ Caveman Chat Token Brevity Protocol](#caveman)
@@ -239,6 +240,18 @@ heimdall update-skill all
 - **Description**: "Postgres best practices maintained by Supabase, for Postgres running anywhere. Load this skill BEFORE writing or changing anything that lives in a Postgres database: creating or altering tables and columns (including choosing column types), schema design, migrations and declarative schema files, RLS policies and the tests that verify them, indexes, triggers, database functions, queues and scheduled jobs (pg_cron, pgmq), vector/semantic search (pgvector), and restoring dumps (pg_restore) or importing data. Also load it when diagnosing slow queries, high CPU, timeouts, EXPLAIN plans, connection exhaustion, locking, bloat, or rows visible to the wrong user or tenant. This is not just a performance guide — schema, migration, security, and SQL authoring tasks need these rules too, even for a one-column change or a single query."
 - **Upstream Source**: [https://github.com/supabase/postgres-best-practices](https://github.com/supabase/postgres-best-practices)
 - **Contract File**: [`skills/postgres-best-practices/SKILL.md`](../skills/postgres-best-practices/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="progressive-disclosure"></a>
+### ⚡ Progressive Disclosure & Skill Architecture
+
+- **Module Name**: `progressive-disclosure`
+- **Description**: Structuring modular agent skills and toolsets with progressive disclosure to eliminate prompt bloat and avoid multi-agent sprawl.
+- **Upstream Source**: [https://github.com/bepaldes/heimdall-agent](https://github.com/bepaldes/heimdall-agent)
+- **Contract File**: [`skills/progressive-disclosure/SKILL.md`](../skills/progressive-disclosure/SKILL.md)
 
 [↑ Back to top](#toc)
 

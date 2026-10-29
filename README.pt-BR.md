@@ -10,7 +10,7 @@
 
 🌐 **Idioma / Language:** [English](README.md) | **Português (Brasil)**
 
-O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **8 personas de agentes especializados** e **50 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
+O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **9 personas de agentes especializados** e **51 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
 
 ---
 
@@ -34,8 +34,8 @@ O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para en
 O **Heimdall** é um bootstrapper de ambiente e camada de coordenação multi-agente para ferramentas de programação com IA.
 
 Em vez de manter manualmente instruções customizadas, prompts de sistema e arquivos de configuração espalhados em diferentes clientes de IA, o Heimdall fornece uma fonte única da verdade (*Single Source of Truth*):
-* **Skills Modulares**: 50 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
-* **Personas de Agentes Especializados**: 8 papéis predefinidos com janelas de contexto isoladas (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`).
+* **Skills Modulares**: 51 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
+* **Personas de Agentes Especializados**: 9 papéis predefinidos com janelas de contexto isoladas (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`).
 * **Doutrina Universal**: Regras centrais (`AGENTS.md`) sincronizadas em todas as ferramentas, exigindo portões de planejamento, desenvolvimento orientado a testes (TDD) e edições cirúrgicas mínimas.
 
 O Heimdall roda em **Windows, macOS e Linux**, usando *junctions* e *symlinks* nativos do sistema de arquivos para manter todas as ferramentas sincronizadas sem duplicação de arquivos.
@@ -263,8 +263,8 @@ flowchart TD
 <a id="6-lista-completa-de-skills-e-agentes"></a>
 ## 6. Lista completa de Skills e Agentes
 
-<a id="8-personas-de-agentes-predefinidas"></a>
-### 8 Personas de Agentes Predefinidas
+<a id="9-personas-de-agentes-predefinidas"></a>
+### 9 Personas de Agentes Predefinidas
 
 Todas as personas declaram `model: inherit` para rodar em qualquer modelo ou provedor configurado na sua máquina, sem *vendor lock-in*.
 
@@ -278,11 +278,12 @@ Todas as personas declaram `model: inherit` para rodar em qualquer modelo ou pro
 | **`database-architect`** | `schema_migration_safety` | Governa migrações não destrutivas, normalização, auditoria de planos de query (`EXPLAIN ANALYZE`) e pool de conexões (Postgres/Supabase, SQLite, MySQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
 | **`code-sentinel`** | `surgical_restraint` | Simplicidade Karpathy: escreve código cirúrgico mínimo, remove comentários redundantes, elimina código morto defensivo e aplica padrões anti-slop. | `karpathy-guidelines`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
 | **`reviewer`** | `adversarial_diff_eval` | Realiza análise adversarial de diffs, captura regressões silenciosas e erros engolidos, e coordena revisões cruzadas entre modelos. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
+| **`modernizer`** | `legacy_migration_safety` | Executa transformações de código legado, upgrades de runtime e migrações Strangler Fig protegidas por testes de caracterização Golden Master. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `karpathy-guidelines`, `project-hygiene`, `output-skill` |
 
 ---
 
-<a id="inventario-de-skills-50-modulos-em-16-toolkits"></a>
-### Inventário de Skills (50 Módulos em 16 Toolkits)
+<a id="inventario-de-skills-51-modulos-em-16-toolkits"></a>
+### Inventário de Skills (51 Módulos em 16 Toolkits)
 
 O Heimdall organiza as capacidades em **5 Suítes Multi-Skill Principais (39 módulos)** e **11 Toolkits Independentes (11 módulos)**:
 
@@ -371,6 +372,7 @@ O Heimdall organiza as capacidades em **5 Suítes Multi-Skill Principais (39 mó
 - **`cloudflare-security-audit`**: Segurança de borda (edge), configuração de WAF e controle estrito de fronteiras CORS.
 - **`snyk-agent-scan`**: Varredura automatizada de skills de IA, configurações MCP e cadeia de suprimentos contra *prompt injection* e vazamento de credenciais.
 - **`postgres-best-practices`**: Diretrizes arquiteturais curadas pela Supabase para modelagem de schemas PostgreSQL, indexação, pool de conexões e políticas RLS.
+- **`progressive-disclosure`**: Padrão de divulgação progressiva em 3 camadas alinhado à Anthropic e Google, cortando o uso de tokens de prompt em >80% e prevenindo a proliferação desordenada de subagentes.
 - **`project-hygiene`**: Varre repositórios em busca de código morto, exports não utilizados, dependências circulares e caches de build obsoletos.
 - **`output-skill`**: Garante saídas completas do modelo sem reticências (`...`), blocos de código truncados ou omissões.
 

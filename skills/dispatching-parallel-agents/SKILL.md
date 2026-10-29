@@ -84,6 +84,23 @@ When agents return:
 - Run full test suite
 - Integrate all changes
 
+### 5. Agent-as-Tool vs. Handoff Taxonomy (OpenAI Agents SDK Standard)
+
+When dispatching, explicitly decide between two coordination patterns:
+1. **Agent-as-Tool (Bounded Capability - Default)**:
+   - The primary orchestrator retains full conversational ownership and top-level state.
+   - The subagent acts as an isolated callable tool that executes a bounded investigation, writes findings to its scratchpad, and returns a concise result back to the orchestrator.
+2. **Handoff (Delegated Ownership)**:
+   - Conversation authority and execution state are transferred entirely to the destination agent.
+   - Used when a task transitions completely into a distinct domain (e.g., triage routing to dedicated security audit).
+
+### 6. Single-Writer Memory Steward Pattern (Anthropic & Google Standard)
+
+To prevent race conditions and merge collisions during parallel execution:
+- Parallel subagents must NEVER concurrently mutate shared files in the git workspace.
+- Each subagent writes exclusively to its isolated task scratchpad (`docs/runs/<task_id>/` or subagent branch/worktree).
+- The Lead Orchestrator evaluates all returned patches, performs conflict resolution, and commits the integrated changes into the main branch.
+
 ## Agent Prompt Structure
 
 Good agent prompts are:

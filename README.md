@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#8-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
-  <a href="#skill-inventory-50-modules-across-16-toolkits"><img src="https://img.shields.io/badge/skills-16%20toolkits%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 16 Toolkits (50 Modules)" /></a>
+  <a href="#skill-inventory-51-modules-across-16-toolkits"><img src="https://img.shields.io/badge/skills-16%20toolkits%20%2851%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 16 Toolkits (51 Modules)" /></a>
   <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Language / Idioma:** **English** | [Português (Brasil)](README.pt-BR.md)
 
-Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **8 specialized agent personas** and **50 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **9 specialized agent personas** and **51 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
 
 ---
 
@@ -34,8 +34,8 @@ Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent so
 **Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. 
 
 Instead of manually maintaining scattered custom instructions, system prompts, and configuration files across different AI clients, Heimdall provides a single source of truth:
-* **Modular Skills**: 50 task-activated capabilities (such as database design, security audits, design token enforcement, and debugging) that load on demand instead of wasting prompt tokens.
-* **Specialized Agent Personas**: 8 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`).
+* **Modular Skills**: 51 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
+* **Specialized Agent Personas**: 9 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`).
 * **Universal Doctrine**: Central rules (`AGENTS.md`) synchronized across all harnesses, enforcing planning gates, test-driven development (TDD), and minimal surgical code edits.
 
 Heimdall runs on **Windows, macOS, and Linux**, using native filesystem junctions and symlinks to keep all AI harnesses synchronized with zero file duplication.
@@ -82,7 +82,7 @@ When Heimdall bootstraps, it establishes live junctions (Windows) or symlinks (P
 
 | Source in Heimdall | Deployed Location | Purpose |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<tool>/skills/` | 50 domain toolkits loaded progressively on demand. |
+| `skills/` | `~/.<tool>/skills/` | 51 domain toolkits loaded progressively on demand. |
 | `agents/` | `~/.<tool>/agents/` | 8 specialized agent persona definitions. |
 | `hooks/` | `~/.claude/hooks/` | Event-driven lifecycle hooks for Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (optional) | Universal native Git pre-push hook for all tools. |
@@ -278,11 +278,12 @@ All personas declare `model: inherit` to run on whichever active model or vendor
 | **`database-architect`** | `schema_migration_safety` | Governs non-destructive migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
 | **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments, purges defensive dead code, and enforces anti-slop standards. | `karpathy-guidelines`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
 | **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions and swallowed errors, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
+| **`modernizer`** | `legacy_migration_safety` | Executes legacy codebase transformations, runtime upgrades, and Strangler Fig migrations guarded by Golden Master characterization tests. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `karpathy-guidelines`, `project-hygiene`, `output-skill` |
 
 ---
 
-<a id="skill-inventory-50-modules-across-16-toolkits"></a>
-### Skill Inventory (50 Modules Across 16 Toolkits)
+<a id="skill-inventory-51-modules-across-16-toolkits"></a>
+### Skill Inventory (51 Modules Across 16 Toolkits)
 
 Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** and **11 Standalone Toolkits (11 modules)**:
 
@@ -371,6 +372,7 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 - **`cloudflare-security-audit`**: Edge security, WAF configuration, and CORS boundary enforcement.
 - **`snyk-agent-scan`**: Automated scanning of AI skills, MCP configurations, and supply chains for prompt injection and credential leaks.
 - **`postgres-best-practices`**: Supabase-curated architectural guidelines for PostgreSQL schema design, indexing, connection pooling, and RLS policies.
+- **`progressive-disclosure`**: Anthropic & Google-aligned 3-layer progressive disclosure standard cutting prompt overhead by >80% and preventing subagent sprawl.
 - **`project-hygiene`**: Sweeps workspaces for dead code, unused exports, circular dependencies, and stale build caches.
 - **`output-skill`**: Guarantees unabridged LLM output without ellipses (`...`), incomplete code blocks, or truncation.
 
