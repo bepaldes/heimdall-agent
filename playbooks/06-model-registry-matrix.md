@@ -4,12 +4,20 @@
 
 ---
 
-## 1. Access Channels
+## 1. Access Channels & Bridge Architecture
 
-Models are accessed through three primary channels:
-- **GhostCLI** (`https://ghostcli.cloud`): Unified API proxy for Claude Code and OpenAI Codex CLI sessions.
-- **Gemini Bridge** (`gemini-bridge.ps1`): Direct connection to Google's API for Gemini sessions and reviews (not through GhostCLI).
-- **Bridge Scripts** (`C:\Apps\tools\`): Canonical shared scripts (`claude-bridge.ps1`, `gemini-bridge.ps1`, `codex-bridge.ps1`) hitting native APIs for cross-model validation.
+Models are partitioned into two architectural access channels:
+
+- **Channel 1: GhostCLI Unified Gateway (`https://ghostcli.cloud`)**
+  - Powers **Claude Code CLI**, **OpenAI Codex CLI**, and **Hermes Agent**.
+  - Serves all Anthropic models (`claude-*`), OpenAI models (`gpt-6-astra`), and Zhipu AI models (`z-ai/glm-5.3`, `z-ai/glm-5.3-flash`).
+  - Because GhostCLI exposes multi-protocol translation (`/v1/messages`, `/v1/responses`, `/v1/chat/completions`), Claude Code can run GPT-6 Astra or GLM directly (`claude --model gpt-6-astra`), and Codex can run Claude Sonnet directly (`codex --model claude-sonnet-5`).
+  - `claude-bridge.ps1` and `codex-bridge.ps1` are **not API protocol bridges**; they are **Process & Multiplexer Bridges** used for Herdr pane splitting, background pane execution, and launching fresh, zero-context review processes.
+
+- **Channel 2: Google Gemini Direct API (`gemini.googleapis.com`)**
+  - Powers **Google Antigravity** natively (via direct Google OAuth).
+  - Accessed from outside Antigravity via **`gemini-bridge.ps1`**.
+  - **`gemini-bridge.ps1` is the true API Gateway Bridge**: it provides the only bridge link into Google's direct native Gemini 4 / 3.8 / 3.1 infrastructure (bypassing GhostCLI).
 
 ---
 
@@ -22,7 +30,8 @@ All GhostCLI models support text and image input:
 | **Claude Opus 5.5** | `claude-opus-5-5` | 256K / 1M extended | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | Deepest architectural reasoning, complex multi-system debugging, critical security audits, knotty algorithms. |
 | **Claude Sonnet 5** | `claude-sonnet-5` | 256K / 1M extended | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | Primary full-stack coding driver, type-safe API schemas, database mutation logic, Playwright E2E test authoring. |
 | **Claude Fable 5.1** | `claude-fable-5.1` | 256K / 1M extended | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | Visual storytelling, high-polish frontend design, copycrafting, UI aesthetic alignment, interaction flows. |
-| **GLM 5.3** | `z-ai/glm-5.3` | 1M | 128K | ❌ | ❌ | `low`, `medium`, `high`, `xhigh` | Massive context analysis, long-document processing, Zhipu AI reasoning. |
+| **GLM 5.3** | `z-ai/glm-5.3` | 1M | 128K | ❌ | ❌ | `low`, `medium`, `high`, `xhigh` | Massive context analysis, long-document processing, Zhipu AI reasoning (upstream may experience upstream queue delays). |
+| **GLM 5.3 Flash** | `z-ai/glm-5.3-flash` | 1M | 128K | ❌ | ❌ | `low`, `medium`, `high` | Fast responses for code tasks, rapid reasoning, lightweight context queries. |
 | **GPT-6 Astra** | `gpt-6-astra` | 1M | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | OpenAI reasoning, broad general-purpose tasks, alternative perspective for cross-validation. |
 
 ---
