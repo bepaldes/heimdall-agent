@@ -68,6 +68,13 @@
       "description": "Código agêntico com contexto de 1M"
     },
     {
+      "id": "z-ai/glm-5.3-flash",
+      "displayName": "GLM 5.3 Flash",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Respostas rápidas para código"
+    },
+    {
       "id": "gpt-6-astra",
       "displayName": "GPT-6 Astra",
       "context": "1M",
@@ -103,6 +110,13 @@
       "context": "1M",
       "context_window_tokens": 1000000,
       "description": "Código agêntico com contexto de 1M"
+    },
+    {
+      "id": "z-ai/glm-5.3-flash",
+      "displayName": "GLM 5.3 Flash",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Respostas rápidas para código"
     },
     {
       "id": "gpt-6-astra",

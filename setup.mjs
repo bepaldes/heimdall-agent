@@ -901,6 +901,15 @@ async function syncModelsFromEndpoint() {
         fs.writeFileSync(modelsPath, JSON.stringify(currentModels, null, 2));
         console.log(`${colors.green}✔ Synchronized models catalog to config/models.json${colors.reset}\n`);
 
+        console.log(`${colors.bold}Available Models Catalog (${mapped.length} models):${colors.reset}`);
+        mapped.forEach(m => {
+          const idStr = `${colors.cyan}${m.id.padEnd(24)}${colors.reset}`;
+          const ctxStr = `${colors.yellow}[${m.context}]${colors.reset}`;
+          const descStr = m.description ? `${colors.dim}— ${m.description}${colors.reset}` : '';
+          console.log(`  • ${idStr} ${ctxStr} ${descStr}`);
+        });
+        console.log('');
+
         const hermesDir = getHermesDir();
         if (fs.existsSync(hermesDir)) {
           const hermesContextUpdated = configureHermesContextLimit(hermesDir, mapped);
