@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "description": "Heimdall MCP Server Registry — Standardized Model Context Protocol servers across Google Antigravity, Claude Code, and Claude Desktop",
+  "mcpServers": {
+    "open-design": {
+      "name": "OpenDesign MCP",
+      "category": "design",
+      "description": "Direct bridge to OpenDesign canvas, styles, components, and project context for coding agents.",
+      "autoDetect": {
+        "platform": "win32",
+        "appDataSubdir": "Open Design"
+      },
+      "config": {
+        "command": "C:\\Users\\Bernardo\\AppData\\Roaming\\Open Design\\en\\27c3746c33b16995\\Open Design.exe",
+        "args": [
+          "C:\\Users\\Bernardo\\AppData\\Roaming\\Open Design\\launcher\\channels\\stable\\namespaces\\release-stable-win\\versions\\0.26.1\\payload\\resources\\app\\prebundled\\daemon\\daemon-cli.mjs",
+          "mcp"
+        ],
+        "env": {
+          "OD_DATA_DIR": "C:\\Users\\Bernardo\\AppData\\Roaming\\Open Design\\namespaces\\release-stable-win\\data",
+          "OD_SIDECAR_CLIENT_ENDPOINT": "\\\\.\\pipe\\open-design-sidecar-714ebde02da67fea98a7ed27125062c8",
+          "OD_MCP_BOOTSTRAP_COMMAND": "C:\\Users\\Bernardo\\AppData\\Local\\Programs\\Open Design\\Open Design.exe",
+          "OD_MCP_BOOTSTRAP_ARGS": "[\"--headless\"]",
+          "ELECTRON_RUN_AS_NODE": "1"
+        }
+      }
+    },
+    "context7": {
+      "name": "Context7 Documentation MCP",
+      "category": "documentation",
+      "description": "Up-to-date documentation and library query engine for AI coding assistants.",
+      "config": {
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp"]
+      }
+    },
+    "rea": {
+      "name": "Reverse Engineer Anything (REA)",
+      "category": "reverse-engineering",
+      "description": "Native, managed, Electron/JS, firmware, and WebMCP binary inspection suite.",
+      "config": {
+        "command": "C:\\Program Files\\nodejs\\node.exe",
+        "args": [
+          "C:\\Users\\Bernardo\\AppData\\Roaming\\npm\\node_modules\\rea-agents\\scripts\\rea.mjs",
+          "mcp"
+        ]
+      }
+    },
+    "chrome-devtools": {
+      "name": "Chrome DevTools MCP",
+      "category": "browser-inspection",
+      "description": "Browser automation, performance profiling, DOM snapshotting, and console monitoring.",
+      "config": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "chrome-devtools-mcp@latest",
+          "--executablePath",
+          "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+        ]
+      }
+    },
+    "mobbin": {
+      "name": "Mobbin Design UI Patterns",
+      "category": "design-reference",
+      "description": "Curated real-world mobile and web application design patterns and flows.",
+      "config": {
+        "serverUrl": "https://api.mobbin.com/mcp"
+      }
+    }
+  }
+}

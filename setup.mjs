@@ -49,6 +49,7 @@ const profilesPath = path.join(__dirname, 'config', 'profiles.json');
 const modelsPath = path.join(__dirname, 'config', 'models.json');
 const agentsConfigPath = path.join(__dirname, 'config', 'agents.json');
 const skillsConfigPath = path.join(__dirname, 'config', 'skills.json');
+const mcpConfigPath = path.join(__dirname, 'config', 'mcp.json');
 
 /**
  * Resolves the platform-specific Hermes Agent directory:
@@ -295,6 +296,213 @@ function detectClaudeDesktop() {
   }
 
   return { dir: configDir, file: configFile, detected: appInstalled, configExists: false };
+}
+
+/**
+ * Dynamically resolves the active Open Design installation and MCP configuration.
+ */
+function resolveOpenDesignMcpConfig() {
+  const platform = os.platform();
+  let fallbackConfig = null;
+  if (fs.existsSync(mcpConfigPath)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8'));
+      fallbackConfig = data.mcpServers?.['open-design']?.config || null;
+    } catch {}
+  }
+
+  if (platform !== 'win32') return fallbackConfig;
+
+  const appData = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
+  const localAppData = process.env.LOCALAPPDATA || path.join(userHome, 'AppData', 'Local');
+  const odRoaming = path.join(appData, 'Open Design');
+
+  if (!fs.existsSync(odRoaming)) return fallbackConfig;
+
+  // 1. Locate executable
+  let odExe = null;
+  const enDir = path.join(odRoaming, 'en');
+  if (fs.existsSync(enDir)) {
+    try {
+      const subdirs = fs.readdirSync(enDir);
+      for (const sub of subdirs) {
+        const cand = path.join(enDir, sub, 'Open Design.exe');
+        if (fs.existsSync(cand)) {
+          odExe = cand;
+          break;
+        }
+      }
+    } catch {}
+  }
+  if (!odExe) {
+    const defaultLocalExe = path.join(localAppData, 'Programs', 'Open Design', 'Open Design.exe');
+    if (fs.existsSync(defaultLocalExe)) odExe = defaultLocalExe;
+  }
+
+  // 2. Locate daemon-cli.mjs in version payloads
+  let daemonCli = null;
+  const versionsDir = path.join(odRoaming, 'launcher', 'channels', 'stable', 'namespaces', 'release-stable-win', 'versions');
+  if (fs.existsSync(versionsDir)) {
+    try {
+      const versions = fs.readdirSync(versionsDir);
+      for (const ver of versions) {
+        const cand = path.join(versionsDir, ver, 'payload', 'resources', 'app', 'prebundled', 'daemon', 'daemon-cli.mjs');
+        if (fs.existsSync(cand)) {
+          daemonCli = cand;
+          break;
+        }
+      }
+    } catch {}
+  }
+
+  // 3. Locate active named pipe if running
+  let activePipe = null;
+  try {
+    const pipeCandidates = fs.readdirSync('\\\\.\\pipe');
+    const odPipe = pipeCandidates.find(p => p.startsWith('open-design-sidecar-'));
+    if (odPipe) {
+      activePipe = `\\\\.\\pipe\\${odPipe}`;
+    }
+  } catch {}
+
+  if (!odExe || !daemonCli) return fallbackConfig;
+
+  const dataDir = path.join(odRoaming, 'namespaces', 'release-stable-win', 'data');
+  const bootstrapExe = path.join(localAppData, 'Programs', 'Open Design', 'Open Design.exe');
+
+  return {
+    command: odExe,
+    args: [daemonCli, "mcp"],
+    env: {
+      OD_DATA_DIR: dataDir,
+      OD_SIDECAR_CLIENT_ENDPOINT: activePipe || fallbackConfig?.env?.OD_SIDECAR_CLIENT_ENDPOINT || "\\\\.\\pipe\\open-design-sidecar-active",
+      OD_MCP_BOOTSTRAP_COMMAND: fs.existsSync(bootstrapExe) ? bootstrapExe : odExe,
+      OD_MCP_BOOTSTRAP_ARGS: "[\"--headless\"]",
+      ELECTRON_RUN_AS_NODE: "1"
+    }
+  };
+}
+
+/**
+ * Synchronizes curated and dynamic MCP servers (including OpenDesign and Context7)
+ * across Antigravity, Claude Desktop, and Claude Code.
+ */
+function syncMcpServers(detected, options = {}) {
+  let syncedAny = false;
+  let mcpRegistry = {};
+  if (fs.existsSync(mcpConfigPath)) {
+    try {
+      mcpRegistry = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8')).mcpServers || {};
+    } catch {}
+  }
+
+  const odConfig = resolveOpenDesignMcpConfig();
+
+  // 1. Antigravity (AGY)
+  const agyMcpFile = path.join(userHome, '.gemini', 'config', 'mcp_config.json');
+  if (fs.existsSync(path.dirname(agyMcpFile))) {
+    let agyConfig = { mcpServers: {} };
+    try {
+      if (fs.existsSync(agyMcpFile)) {
+        agyConfig = JSON.parse(fs.readFileSync(agyMcpFile, 'utf8'));
+      }
+    } catch {}
+    if (!agyConfig.mcpServers) agyConfig.mcpServers = {};
+
+    let agyUpdated = false;
+    if (odConfig && JSON.stringify(agyConfig.mcpServers['open-design']) !== JSON.stringify(odConfig)) {
+      agyConfig.mcpServers['open-design'] = odConfig;
+      agyUpdated = true;
+    }
+    if (mcpRegistry.context7?.config && !agyConfig.mcpServers['context7']) {
+      agyConfig.mcpServers['context7'] = mcpRegistry.context7.config;
+      agyUpdated = true;
+    }
+
+    if (agyUpdated && !options.dryRun) {
+      fs.writeFileSync(agyMcpFile, JSON.stringify(agyConfig, null, 2), 'utf8');
+      console.log(`  ${colors.green}✔${colors.reset} Synchronized OpenDesign MCP for Google Antigravity`);
+      syncedAny = true;
+    }
+  }
+
+  // 2. Claude Desktop
+  const claudeDesktopDir = getClaudeDesktopDir();
+  const claudeDesktopFile = path.join(claudeDesktopDir, 'claude_desktop_config.json');
+  if (fs.existsSync(claudeDesktopFile)) {
+    let deskConfig = { mcpServers: {} };
+    try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
+    if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
+
+    let deskUpdated = false;
+    if (odConfig && JSON.stringify(deskConfig.mcpServers['open-design']) !== JSON.stringify(odConfig)) {
+      deskConfig.mcpServers['open-design'] = odConfig;
+      deskUpdated = true;
+    }
+    if (mcpRegistry.context7?.config && !deskConfig.mcpServers['context7']) {
+      deskConfig.mcpServers['context7'] = mcpRegistry.context7.config;
+      deskUpdated = true;
+    }
+
+    if (deskUpdated && !options.dryRun) {
+      fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2), 'utf8');
+      console.log(`  ${colors.green}✔${colors.reset} Synchronized OpenDesign & Context7 MCP for Claude Desktop`);
+      syncedAny = true;
+    }
+  }
+
+  // 3. Claude Code CLI
+  const claudeConfigFile = path.join(userHome, '.claude.json');
+  if (fs.existsSync(claudeConfigFile)) {
+    let claudeConfig = {};
+    try { claudeConfig = JSON.parse(fs.readFileSync(claudeConfigFile, 'utf8')); } catch {}
+    if (!claudeConfig.mcpServers) claudeConfig.mcpServers = {};
+
+    let claudeUpdated = false;
+    if (odConfig && JSON.stringify(claudeConfig.mcpServers['open-design']) !== JSON.stringify(odConfig)) {
+      claudeConfig.mcpServers['open-design'] = odConfig;
+      claudeUpdated = true;
+    }
+
+    if (claudeUpdated && !options.dryRun) {
+      fs.writeFileSync(claudeConfigFile, JSON.stringify(claudeConfig, null, 2), 'utf8');
+      console.log(`  ${colors.green}✔${colors.reset} Synchronized OpenDesign MCP for Claude Code`);
+      syncedAny = true;
+    }
+  }
+
+  return syncedAny;
+}
+
+/**
+ * Audits registered and configured MCP servers across harnesses.
+ */
+function auditMcpServers() {
+  const results = [];
+  const agyMcpFile = path.join(userHome, '.gemini', 'config', 'mcp_config.json');
+  if (fs.existsSync(agyMcpFile)) {
+    try {
+      const cfg = JSON.parse(fs.readFileSync(agyMcpFile, 'utf8'));
+      results.push({ harness: 'Google Antigravity', server: 'open-design', configured: Boolean(cfg.mcpServers?.['open-design']) });
+      results.push({ harness: 'Google Antigravity', server: 'context7', configured: Boolean(cfg.mcpServers?.['context7']) });
+    } catch {}
+  }
+  const claudeDesktopFile = path.join(getClaudeDesktopDir(), 'claude_desktop_config.json');
+  if (fs.existsSync(claudeDesktopFile)) {
+    try {
+      const cfg = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8'));
+      results.push({ harness: 'Claude Desktop', server: 'open-design', configured: Boolean(cfg.mcpServers?.['open-design']) });
+      results.push({ harness: 'Claude Desktop', server: 'context7', configured: Boolean(cfg.mcpServers?.['context7']) });
+    } catch {}
+  }
+  const claudeConfigFile = path.join(userHome, '.claude.json');
+  if (fs.existsSync(claudeConfigFile)) {
+    try {
+      const cfg = JSON.parse(fs.readFileSync(claudeConfigFile, 'utf8'));
+      results.push({ harness: 'Claude Code', server: 'open-design', configured: Boolean(cfg.mcpServers?.['open-design']) });
+    } catch {}
+  }
+  return results;
 }
 
 /**
@@ -1071,24 +1279,9 @@ async function runSync(options, detected) {
     }
   }
 
-  // Check Claude Desktop (only touch if config file already exists)
-  if (detected.tools.claudeDesktop) {
-    const claudeDesktopFile = path.join(detected.tools.claudeDesktop, 'claude_desktop_config.json');
-    if (fs.existsSync(claudeDesktopFile)) {
-      let deskConfig = { mcpServers: {} };
-      try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
-      if (!deskConfig.mcpServers?.context7) {
-        if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
-        deskConfig.mcpServers.context7 = {
-          command: "npx",
-          args: ["-y", "@upstash/context7-mcp"]
-        };
-        fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
-        console.log(`  ${colors.green}✔${colors.reset} Configured Context7 MCP for Claude Desktop`);
-        syncedAny = true;
-      }
-    }
-  }
+  // Synchronize Model Context Protocol (MCP) servers (OpenDesign, Context7, etc.)
+  const mcpSynced = syncMcpServers(detected, options);
+  if (mcpSynced) syncedAny = true;
 
   // Refresh bridge tools & shims
   const activeToolsDir = options.toolsDir || detected.pathCandidates[0];
@@ -1223,6 +1416,17 @@ function runAudit(options) {
     console.log(`  ${colors.green}Active at ${activeDoctrine}${colors.reset}`);
   } else {
     console.log(`  ${colors.dim}Not found at ${activeDoctrine}${colors.reset}`);
+  }
+
+  console.log(`\n${colors.bold}Model Context Protocol (MCP) Servers:${colors.reset}`);
+  const mcpReport = auditMcpServers();
+  if (mcpReport.length > 0) {
+    for (const item of mcpReport) {
+      const status = item.configured ? `${colors.green}Configured${colors.reset}` : `${colors.dim}Not configured${colors.reset}`;
+      console.log(`  ${item.harness.padEnd(20)} [${item.server}] -> ${status}`);
+    }
+  } else {
+    console.log(`  ${colors.dim}No MCP server harnesses detected.${colors.reset}`);
   }
 
   console.log('');
@@ -1850,29 +2054,8 @@ async function main() {
     }
   }
 
-  // 4. Configure Claude Desktop only if detected/explicit and config file already exists
-  const desktopStatus = detectClaudeDesktop();
-  const shouldTargetDesktop = options.agents.includes('desktop') || (options.agents.includes('all') && desktopStatus.configExists);
-
-  if (shouldTargetDesktop) {
-    const claudeDesktopFile = desktopStatus.file;
-    if (fs.existsSync(claudeDesktopFile)) {
-      console.log(`\n-> Configuring Claude Desktop (${claudeDesktopFile})...`);
-      if (!options.dryRun) {
-        let deskConfig = { mcpServers: {} };
-        try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
-        if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
-        deskConfig.mcpServers.context7 = {
-          command: "npx",
-          args: ["-y", "@upstash/context7-mcp"]
-        };
-        fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2));
-      }
-      console.log(`   ${colors.green}✔ Configured Context7 MCP for Claude Desktop${colors.reset}`);
-    } else if (options.agents.includes('desktop')) {
-      console.log(`\n-> Claude Desktop config not found at ${claudeDesktopFile} (skipped; only touched if exists)`);
-    }
-  }
+  // 4. Synchronize Model Context Protocol (MCP) servers (OpenDesign, Context7, etc.)
+  syncMcpServers(detected, options);
 
   // 5. Deploy tools & global heimdall CLI shims if requested
   if (options.tools && options.toolsDir) {

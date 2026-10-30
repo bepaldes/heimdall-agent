@@ -29,10 +29,10 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
        - Propose 2 distinct concrete approaches with explicit architectural trade-offs.
        - Render Scope, Questions, and Alternatives clearly in chat markdown, then pause for user approval.
     2. TURN 2+ MULTI-MODEL PLAN GENERATION:
-       - Generate an authoritative plan strictly following `playbooks/05-canonical-plan-template.md`.
+       - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `playbooks/`, `../playbooks/`, or `../heimdall-agent/playbooks/`).
        - The plan MUST specify:
-         a) Multi-Agent Orchestration & Model Allocation Matrix (allocating tasks across Claude, Gemini, and Codex from `playbooks/06-model-registry-matrix.md`).
-         b) Implementation Execution Commands (`*-bridge.ps1 exec`) and Symmetric Cross-Model Validation Loop (`*-bridge.ps1 review` via `C:\Apps\tools\`).
+         a) Multi-Agent Orchestration & Model Allocation Matrix (allocating tasks across Claude, Gemini, and Codex from `06-model-registry-matrix.md` in the same playbooks directory).
+         b) Implementation Execution Commands (`*-bridge.ps1 exec`) and Symmetric Cross-Model Validation Loop (`*-bridge.ps1 review` via `tools/`, `../tools/`, or `C:\Apps\tools\`).
          c) Orchestrator Heartbeat (cadence for monitoring task progress and liveness).
          d) Verification Harness (Playwright E2E for interactive UI/views; rejection of pseudo-verification like curl/grep/tsc alone).
   </planning_protocol>
