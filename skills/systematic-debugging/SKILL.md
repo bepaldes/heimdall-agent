@@ -49,12 +49,7 @@ You MUST complete each phase before proceeding to the next.
 
 **BEFORE attempting ANY fix:**
 
-1. **Google EGM Blind Hypothesis Invariant**
-   - **Withhold speculative guesses**: If dispatching an agent or subagent to isolate the bug, do NOT pass conversational guesses ("I suspect function X is broken").
-   - Provide ONLY: the symptom, verbatim logs, reproduction steps, and relevant stack traces.
-   - Force the diagnosing agent (the Goldfish) to observe and codify the failure independently. This prevents anchoring bias and rabbit-hole confirmation bias.
-
-2. **Read Error Messages Carefully**
+1. **Read Error Messages Carefully**
    - Don't skip past errors or warnings
    - They often contain the exact solution
    - Read stack traces completely
@@ -93,11 +88,11 @@ You MUST complete each phase before proceeding to the next.
    ```bash
    # Layer 1: Workflow
    echo "=== Secrets available in workflow: ==="
-   echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
+   echo "IDENTITY: $([ -n "${IDENTITY:-}" ] && echo SET || echo UNSET)"
 
    # Layer 2: Build script
    echo "=== Env vars in build script: ==="
-   env | grep IDENTITY || echo "IDENTITY not in environment"
+   printenv IDENTITY >/dev/null 2>&1 && echo "IDENTITY in environment" || echo "IDENTITY not in environment"
 
    # Layer 3: Signing script
    echo "=== Keychain state: ==="
@@ -267,24 +262,6 @@ If you catch yourself thinking:
 | **2. Pattern** | Find working examples, compare | Identify differences |
 | **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
 | **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
-
-## Build & Toolchain Triage Heuristics
-
-When debugging build, compilation, bundling, or toolchain failures, distinguish between application bugs and environment/dependency desync before attempting code fixes:
-
-1. **Clean Slate Triage (Cache vs Reality)**:
-   - Never debug build errors against stale caches.
-   - Verify whether clearing build caches (`rm -rf dist .next .turbo node_modules/.cache`) reproduces or clears the failure.
-2. **Lockfile & Peer Dependency Desync**:
-   - Check if `package.json` was modified without updating lockfiles (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`).
-   - Identify conflicting duplicate versions of peer dependencies (e.g. conflicting `react`, `typescript`, or `@types/*` versions across workspaces).
-3. **Module Resolution & Target Mismatch**:
-   - Verify `tsconfig.json` settings: `moduleResolution` (`NodeNext` vs `Bundler`), `target` (`ES2022`, `ESNext`), and `.mjs`/`.cjs` boundaries.
-   - Watch for ESM/CJS interop traps (e.g. `require()` of pure ESM packages, missing `.js` extensions in ESM relative imports).
-4. **Runtime & Toolchain Version Skew**:
-   - Verify active Node/Bun/Python version matches engine constraints (`.node-version`, `.nvmrc`, `package.json` `engines`).
-5. **Build-Time vs. Runtime Environment Variables**:
-   - Distinguish variables required at bundling time (e.g. `NEXT_PUBLIC_*`, `VITE_*`) from secrets required only at server runtime.
 
 ## When Process Reveals "No Root Cause"
 

@@ -6,8 +6,6 @@ description: >
 model: inherit
 skills:
   - taste-skill
-  - taste-skill-v1
-  - gpt-tasteskill
   - brandkit
   - minimalist-skill
   - brutalist-skill

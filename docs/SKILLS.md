@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **15 Primary Toolkits & Suites (51 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **18 Primary Toolkits & Suites (50 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -20,7 +20,7 @@ heimdall update-skill all
 
 ### Core Multi-Skill Suites
 - [📦 Superpowers Software Engineering Suite (15 modules)](#superpowers)
-- [📦 Taste Design & Aesthetic Studio (12 modules)](#taste-studio)
+- [📦 Taste Design & Aesthetic Studio (10 modules)](#taste-studio)
 - [📦 Anti-Slop Quality & Token Efficiency Suite (6 modules)](#antislop)
 - [📦 Tri-Directional Cross-Model Bridges (3 modules)](#cross-model-bridges)
 - [📦 Trail of Bits High-Assurance AppSec Suite (3 modules)](#trailofbits-appsec)
@@ -38,6 +38,7 @@ heimdall update-skill all
 - [⚡ Project & Workspace Hygiene Sentinel](#project-hygiene)
 - [⚡ Structured Analysis & Output Formatting](#output-skill)
 - [⚡ Caveman Chat Token Brevity Protocol](#caveman)
+- [⚡ Clean Code & ub-mode Quality Sentinel](#clean-code)
 
 ---
 
@@ -72,16 +73,14 @@ heimdall update-skill all
 ---
 
 <a id="taste-studio"></a>
-### 📦 Taste Design & Aesthetic Studio (12 modules)
+### 📦 Taste Design & Aesthetic Studio (10 modules)
 
-- **Upstream Source**: [https://github.com/bepaldes/heimdall-agent](https://github.com/bepaldes/heimdall-agent)
+- **Upstream Source**: [https://github.com/Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)
 - **Suite Type**: Multi-Skill Suite
 
 #### Included Modules:
 
 * **`taste-skill`**: Frontend craft, anti-slop, and high-taste design skill for UI adjustments, interactive interfaces, new features, components, redesigns, landing pages, and web apps. The agent infers the right design direction, eliminates generic AI defaults, enforces design tokens and design systems, and ships polished, intentional interfaces. ([Contract File](../skills/taste-skill/SKILL.md))
-* **`taste-skill-v1`**: The original v1 taste-skill, preserved for projects depending on its exact behavior. The current default is `design-taste-frontend` (v2 experimental), which is a substantial rewrite. Use this v1 install name only if you need exact backward compatibility. ([Contract File](../skills/taste-skill-v1/SKILL.md))
-* **`gpt-tasteskill`**: Elite UX/UI & Advanced GSAP Motion Engineer. Enforces Python-driven true randomization for layout variance, strict AIDA page structure, wide editorial typography (bans 6-line wraps), gapless bento grids, strict GSAP ScrollTriggers (pinning, stacking, scrubbing), inline micro-images, and massive section spacing. ([Contract File](../skills/gpt-tasteskill/SKILL.md))
 * **`brandkit`**: Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts. ([Contract File](../skills/brandkit/SKILL.md))
 * **`minimalist-skill`**: Clean editorial-style interfaces. Warm monochrome palette, typographic contrast, flat bento grids, muted pastels. No gradients, no heavy shadows. ([Contract File](../skills/minimalist-skill/SKILL.md))
 * **`brutalist-skill`**: Raw mechanical interfaces fusing Swiss typographic print with military terminal aesthetics. Rigid grids, extreme type scale contrast, utilitarian color, analog degradation effects. For data-heavy dashboards, portfolios, or editorial sites that need to feel like declassified blueprints. ([Contract File](../skills/brutalist-skill/SKILL.md))
@@ -288,6 +287,19 @@ heimdall update-skill all
 - **Description**: Slashes chat token consumption by dropping conversational filler, pleasantries, and polite ceremony.
 - **Upstream Source**: [https://github.com/JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
 - **Contract File**: [`skills/caveman/SKILL.md`](../skills/caveman/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="clean-code"></a>
+### ⚡ Clean Code & ub-mode Quality Sentinel
+
+- **Module Name**: `clean-code`
+- **Aliases**: `/clean-code`, `/ub-mode`
+- **Description**: Enforces Uncle Bob's Clean Code discipline, TDD cycles, laziness protocol, and mathematical quality gates (CRAP < 10, DRY similarity < 0.8, mutant-killing test design).
+- **Upstream Source**: [https://github.com/unclebob/ub-mode](https://github.com/unclebob/ub-mode)
+- **Contract File**: [`skills/clean-code/SKILL.md`](../skills/clean-code/SKILL.md)
 
 [↑ Back to top](#toc)
 

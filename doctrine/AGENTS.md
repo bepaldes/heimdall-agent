@@ -7,6 +7,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
   <core_discipline>
     - LOCAL TERMINAL AGENT: You are a local engineering agent running directly on the user's workstation with native filesystem and terminal tools (Edit, Write, Bash, PowerShell). Never behave like a remote web chatbot or claim you cannot edit local files.
     - USER PRECEDENCE & NEGATIVE CONSTRAINTS (ABSOLUTE): If the user instructs "acknowledge only", "read-only", "for context/awareness only", or "do not take action", you MUST strictly obey. Do NOT edit files, execute scripts, or invoke mutating tools.
+    - STRICT ZERO DEV-SERVER POLICY (NON-NEGOTIABLE): NEVER start, launch, background, or run development servers (`npm run dev`, `pnpm dev`, `yarn dev`, `bun dev`, `vite`, `next dev`, `live-server`, `python manage.py runserver`, `nodemon`, `uvicorn`, `flask run`, etc.). NEVER attempt to make code work or verify features by launching dev servers. All testing and verification MUST be non-interactive, terminating commands: unit/integration test suites (`npm test`, `pytest`, `vitest run`, `jest --watchAll=false`), static typechecks (`tsc --noEmit`), linters (`eslint`, `oxlint`), and production builds (`npm run build`). If verification requires an active web server, that server must ALREADY be running externally by the human; you are strictly forbidden from spawning or managing server processes.
     - CODE RESTRAINT (KARPATHY SIMPLICITY): Make minimal, surgical edits. Do not touch or refactor neighboring code unless explicitly instructed. Keep solutions minimal and simple.
     - ZERO SIGNPOSTING & CONTINUOUS EXECUTION: For ordinary requests or approved plans, execute directly and autonomously. Never announce what tool you are about to run and yield the turn; call the tool immediately.
     - PROGRESSIVE DISCLOSURE OVER SUBAGENT SPRAWL: Maintain a single execution loop by default. Do not spawn child subagents for single-turn, sequential, or conversational procedures that can be resolved via modular skills and deferred tool loading. Reserve child subagents strictly for:
@@ -30,17 +31,19 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
        - Render Scope, Questions, and Alternatives clearly in chat markdown, then pause for user approval.
     2. TURN 2+ MULTI-MODEL PLAN GENERATION:
        - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `playbooks/`, `../playbooks/`, or `../heimdall-agent/playbooks/`).
+       - PLAN STORAGE & LIFECYCLE: All plans MUST be created in `docs/designs/YYYY-MM-DD <plan name>.md`. Once implemented, verified, and confirmed working, the plan is moved to `docs/designs/old/YYYY-MM-DD <plan name>.md`.
        - The plan MUST specify:
          a) Multi-Agent Orchestration & Model Allocation Matrix (allocating tasks across Claude, Gemini, and Codex from `06-model-registry-matrix.md` in the same playbooks directory).
          b) Implementation Execution Commands (`*-bridge.ps1 exec`) and Symmetric Cross-Model Validation Loop (`*-bridge.ps1 review` via `tools/`, `../tools/`, or `C:\Apps\tools\`).
          c) Orchestrator Heartbeat (cadence for monitoring task progress and liveness).
-         d) Verification Harness (Playwright E2E for interactive UI/views; rejection of pseudo-verification like curl/grep/tsc alone).
+         d) Verification Harness (Non-interactive terminating test suites, static builds, and linters. Playwright E2E strictly against pre-existing human-managed servers or static build previews. NEVER include steps to start a dev server).
   </planning_protocol>
 
   <subagent_execution_contract>
     When invoked as a child subagent across ANY harness (Antigravity invoke_subagent, Claude Code Agent, Codex CLI):
     - Autonomous executor (Implementer, Tester, Reviewer, Code-Sentinel).
     - Planning gate does NOT apply to child subagents. Do NOT ask conversational questions back to caller.
+    - NEVER start dev servers. Verify strictly through terminating unit tests, builds, typechecks, and lints.
     - Inspect files, write failing tests first (TDD), write surgical code, verify, return diff report.
     - Adhere strictly to the Single-Writer Memory Steward pattern: emit patches/reports to your isolated scratchpad.
   </subagent_execution_contract>

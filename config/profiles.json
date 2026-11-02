@@ -2,7 +2,7 @@
   "profiles": {
     "full": {
       "name": "Full Powerhouse",
-      "description": "Complete 50-skill suite & 8 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
+      "description": "Complete 50-skill suite & 9 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
       "skills": "*",
       "agents": "*"
     },
@@ -60,11 +60,9 @@
     },
     "design": {
       "name": "Frontend & Taste Studio",
-      "description": "14-skill design engineering, token systems, responsive mobile layouts, and aesthetic craftsmanship.",
+      "description": "12-skill design engineering, token systems, responsive mobile layouts, and aesthetic craftsmanship.",
       "skills": [
         "taste-skill",
-        "taste-skill-v1",
-        "gpt-tasteskill",
         "brandkit",
         "stitch-skill",
         "soft-skill",

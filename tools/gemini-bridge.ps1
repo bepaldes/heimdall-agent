@@ -76,19 +76,17 @@ Check-Agy
 $canonicalModel = $null
 if ($Model) {
     switch -Regex ($Model.ToLower().Trim()) {
-        "^(gemini[- ])?4([- ]?argon)?$" { $canonicalModel = "gemini-4" }
+        "^(gemini[- ])?4([- ]?argon)?$" { $canonicalModel = "gemini-4-argon" }
         "^(gemini[- ])?flash([- ]?3(\.8)?)?$" { $canonicalModel = "gemini-3.8-flash" }
-        "^(gemini[- ])?pro([- ]?3(\.1)?)?$" { $canonicalModel = "gemini-3.1-pro" }
         "argon" { $canonicalModel = "gemini-4" }
         "flash" { $canonicalModel = "gemini-3.8-flash" }
-        "pro" { $canonicalModel = "gemini-3.1-pro" }
         default { $canonicalModel = $Model }
     }
 }
 
 if ($Effort -and $canonicalModel) {
     switch ($canonicalModel) {
-        "gemini-4" {
+        "gemini-4-argon" {
             if ($Effort -notin @("low", "medium", "high", "xhigh", "max")) {
                 Write-Warning "[Model Registry] Gemini 4 (Argon) allowed effort is low, medium, high, or xhigh (requested: $Effort)."
             }
@@ -98,22 +96,15 @@ if ($Effort -and $canonicalModel) {
                 Write-Warning "[Model Registry] Gemini 3.8 Flash allowed effort is low, medium, or high (requested: $Effort)."
             }
         }
-        "gemini-3.1-pro" {
-            if ($Effort -notin @("medium", "high", "xhigh")) {
-                Write-Warning "[Model Registry] Gemini 3.1 Pro allowed effort is medium, high, or xhigh (requested: $Effort)."
-            }
-        }
     }
 }
 
-$agyModelFlags = @()
+$agyModelString = ""
 if ($canonicalModel) {
-    $agyModelFlags += @("--model", $canonicalModel)
+    $cliEffort = if ($Effort) { if ($Effort -eq "xhigh") { "max" } else { $Effort } } else { "medium" }
+    $agyModelString = "$canonicalModel-$cliEffort"
 }
-if ($Effort) {
-    $cliEffort = if ($Effort -eq "xhigh") { "max" } else { $Effort }
-    $agyModelFlags += @("--effort", $cliEffort)
-}
+$agyModelFlags = if ($agyModelString) { @("--model", $agyModelString) } else { @() }
 $agyFlagsStr = if ($agyModelFlags.Count -gt 0) { $agyModelFlags -join " " } else { "" }
 
 # Determine display mode:
@@ -278,7 +269,8 @@ if ($targetMode -eq "headless") {
     if ($agyModelFlags.Count -gt 0) {
         $flags += $agyModelFlags
     }
-    $resolvedPrompt | & agy @flags
+    $flags += "--print=$resolvedPrompt"
+    & agy @flags
     $ec = if ($LASTEXITCODE -ne $null) { $LASTEXITCODE } else { 0 }
     exit $ec
 }
@@ -324,9 +316,9 @@ Write-Host ">>> Starting interactive Antigravity CLI session below...`n" -Foregr
 
 `$initPrompt = Get-Content -Raw '$summaryFile'
 if (`$initPrompt -and `$initPrompt.Trim() -and (`$initPrompt.Trim() -ne "(Interactive Session)")) {
-    agy $agyFlagsStr -i `$initPrompt --dangerously-skip-permissions
+    agy --model '$agyModelString' -i `$initPrompt --dangerously-skip-permissions
 } else {
-    agy $agyFlagsStr --dangerously-skip-permissions
+    agy --model '$agyModelString' --dangerously-skip-permissions
 }
 Set-Content -Path '$doneFile' -Value "0"
 "@
@@ -357,7 +349,8 @@ Write-Host "--------------------------------------------------------------------
     $innerScript += @"
 `$sw = [System.Diagnostics.Stopwatch]::StartNew()
 try {
-    Get-Content -Raw '$promptFile' | agy $agyFlagsStr --dangerously-skip-permissions | Tee-Object -FilePath '$outputFile'
+    `$promptContent = Get-Content -Raw '$promptFile'
+    agy --model '$agyModelString' "--print=`$promptContent" --dangerously-skip-permissions | Tee-Object -FilePath '$outputFile'
     `$ec = if (`$LASTEXITCODE -ne `$null) { `$LASTEXITCODE } else { 0 }
 } catch {
     `$ec = 1

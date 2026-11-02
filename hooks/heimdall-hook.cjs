@@ -142,6 +142,19 @@ async function main() {
         process.exit(2);
       }
 
+      // Block dev server commands (STRICT ZERO DEV-SERVER POLICY)
+      const isDevServer =
+        /(^|[;&|\s])(npm|pnpm|yarn|bun)\s+(run\s+)?(dev|start|serve)(\b|:|\s)/i.test(command) ||
+        /(^|[;&|\s])(npx\s+)?(vite|live-server|http-server|nodemon)(\b|\s)/i.test(command) ||
+        /(^|[;&|\s])(next|nuxt)\s+dev(\b|\s)/i.test(command) ||
+        /(^|[;&|\s])python\s+manage\.py\s+runserver(\b|\s)/i.test(command) ||
+        /(^|[;&|\s])(flask\s+run|uvicorn)(\b|\s)/i.test(command);
+
+      if (isDevServer) {
+        process.stderr.write(`[Heimdall Sentinel Guardrail] BLOCKED: Dev server execution detected ("${command}"). Running development servers is strictly prohibited by user doctrine. Use non-interactive terminating checks (npm test, npm run build, vitest run, lint, typecheck).\n`);
+        process.exit(2);
+      }
+
       // Branch-aware force push check
       if (/git\s+push\s+.*(-f\b|--force\b|--force-with-lease\b)/i.test(command)) {
         // Explicit protected branch in command target

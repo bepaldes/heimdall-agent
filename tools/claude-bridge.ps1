@@ -98,19 +98,22 @@ if ($Model) {
         "^(claude[- ])?sonnet([- ]?5)?$" { $canonicalModel = "claude-sonnet-5" }
         "^(claude[- ])?fable([- ]?5(\.1)?)?$" { $canonicalModel = "claude-fable-5.1" }
         "^(gpt[- ]?6[- ]?)?astra$" { $canonicalModel = "gpt-6-astra" }
+        "^(z[- ]?ai\/)?glm([- ]?5(\.3)?)?[- ]?flash$" { $canonicalModel = "z-ai/glm-5.3-flash" }
         "^(z[- ]?ai\/)?glm([- ]?5(\.3)?)?$" { $canonicalModel = "z-ai/glm-5.3" }
-        "opus" { $canonicalModel = "claude-opus-5-5" }
-        "sonnet" { $canonicalModel = "claude-sonnet-5" }
-        "fable" { $canonicalModel = "claude-fable-5.1" }
-        "astra" { $canonicalModel = "gpt-6-astra" }
-        "glm" { $canonicalModel = "z-ai/glm-5.3" }
+        "^opus$" { $canonicalModel = "claude-opus-5-5" }
+        "^sonnet$" { $canonicalModel = "claude-sonnet-5" }
+        "^fable$" { $canonicalModel = "claude-fable-5.1" }
+        "^astra$" { $canonicalModel = "gpt-6-astra" }
+        "^glm[- ]?flash$" { $canonicalModel = "z-ai/glm-5.3-flash" }
+        "^flash$" { $canonicalModel = "z-ai/glm-5.3-flash" }
+        "^glm$" { $canonicalModel = "z-ai/glm-5.3" }
         default { $canonicalModel = $Model }
     }
     $env:ANTHROPIC_MODEL = $canonicalModel
 }
 
 if ($Effort -and $canonicalModel) {
-    $ghostCliModels = @("claude-opus-5-5", "claude-sonnet-5", "claude-fable-5.1", "gpt-6-astra", "z-ai/glm-5.3")
+    $ghostCliModels = @("claude-opus-5-5", "claude-sonnet-5", "claude-fable-5.1", "gpt-6-astra", "z-ai/glm-5.3", "z-ai/glm-5.3-flash")
     if ($ghostCliModels -contains $canonicalModel) {
         if ($Effort -notin @("low", "medium", "high", "xhigh")) {
             Write-Warning "[Model Registry] $canonicalModel allowed effort is low, medium, high, or xhigh (requested: $Effort)."

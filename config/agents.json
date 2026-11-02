@@ -34,8 +34,6 @@
       },
       "skills": [
         "taste-skill",
-        "taste-skill-v1",
-        "gpt-tasteskill",
         "brandkit",
         "minimalist-skill",
         "brutalist-skill",
@@ -132,6 +130,7 @@
       },
       "skills": [
         "karpathy-guidelines",
+        "clean-code",
         "antislop",
         "antislop-code",
         "antislop-copywriting",
@@ -158,6 +157,25 @@
         "codex-collaborator",
         "using-superpowers",
         "diagnosing-superpowers",
+        "output-skill"
+      ]
+    },
+    "modernizer": {
+      "name": "Legacy Migration & Modernization Specialist",
+      "capabilityTier": "legacy_migration_safety",
+      "description": "Executes legacy codebase transformations, runtime upgrades, and Strangler Fig migrations guarded by Golden Master characterization tests.",
+      "vendorPreferences": {
+        "gemini": "gemini-3.8-flash",
+        "claude": "claude-sonnet-5",
+        "codex": "gpt-6-astra",
+        "default": "inherit"
+      },
+      "skills": [
+        "test-driven-development",
+        "verification-before-completion",
+        "systematic-debugging",
+        "karpathy-guidelines",
+        "project-hygiene",
         "output-skill"
       ]
     }

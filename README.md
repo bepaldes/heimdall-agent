@@ -3,14 +3,14 @@
 <p align="left">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
-  <a href="#8-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-8%20predefined-orange.svg?style=flat-square" alt="Agents: 8 Predefined" /></a>
-  <a href="#skill-inventory-51-modules-across-16-toolkits"><img src="https://img.shields.io/badge/skills-16%20toolkits%20%2851%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 16 Toolkits (51 Modules)" /></a>
+  <a href="#9-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-9%20predefined-orange.svg?style=flat-square" alt="Agents: 9 Predefined" /></a>
+  <a href="#skill-inventory-50-modules-across-18-toolkits"><img src="https://img.shields.io/badge/skills-18%20toolkits%20%2850%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 18 Toolkits (50 Modules)" /></a>
   <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Language / Idioma:** **English** | [Português (Brasil)](README.pt-BR.md)
 
-Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **9 specialized agent personas** and **51 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **9 specialized agent personas** and **50 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
 
 ---
 
@@ -34,7 +34,7 @@ Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent so
 **Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. 
 
 Instead of manually maintaining scattered custom instructions, system prompts, and configuration files across different AI clients, Heimdall provides a single source of truth:
-* **Modular Skills**: 51 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
+* **Modular Skills**: 50 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
 * **Specialized Agent Personas**: 9 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`).
 * **Universal Doctrine**: Central rules (`AGENTS.md`) synchronized across all harnesses, enforcing planning gates, test-driven development (TDD), and minimal surgical code edits.
 
@@ -82,14 +82,16 @@ When Heimdall bootstraps, it establishes live junctions (Windows) or symlinks (P
 
 | Source in Heimdall | Deployed Location | Purpose |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<tool>/skills/` | 51 domain toolkits loaded progressively on demand. |
-| `agents/` | `~/.<tool>/agents/` | 8 specialized agent persona definitions. |
+| `skills/` | `~/.<tool>/skills/` | 50 domain toolkits loaded progressively on demand. |
+| `agents/` | `~/.<tool>/agents/` | 9 specialized agent persona definitions. |
 | `hooks/` | `~/.claude/hooks/` | Event-driven lifecycle hooks for Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (optional) | Universal native Git pre-push hook for all tools. |
 | `doctrine/AGENTS.md` | `~/.claude/CLAUDE.md`<br>`~/.gemini/GEMINI.md`<br>`~/.codex/AGENTS.md`<br>`~/.hermes/AGENTS.md` | Universal cross-agent doctrine and operational constraints. |
-| `playbooks/` | `~/.<tool>/playbooks/` | Operational playbooks (grilling gate, TDD, reviews, plans). |
+| `playbooks/` | `~/.<tool>/playbooks/` | Operational playbooks (grilling gate, TDD, reviews, plans, backlog & CR flow). |
 | `commands/` | `~/.claude/commands/` | Slash commands (`/orchestrator`, `/orchestrate`, `/plan`, `/grill-me`). |
 | `tools/` | `PATH` candidate directory | Cross-model bridge scripts (`claude-bridge`, `gemini-bridge`, `codex-bridge`) and `heimdall` CLI. |
+| `docs/designs/` | Workspace root | Canonical plan home (`YYYY-MM-DD <name>.md`); verified plans archived to `old/`. |
+| `docs/backlog.md` | Workspace root | Single-source-of-truth product backlog and Change Request ledger. |
 
 ### 2. The Google Elephant-Goldfish Model (EGM)
 
@@ -150,10 +152,10 @@ Select a profile tier based on your machine and workflow needs:
 
 | Profile | Skills | Predefined Agents | Description | Best For |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Default)* | 50 | 8 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
+| **`full`** *(Default)* | 50 | 9 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
 | **`minimal`** | 16 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Lightweight laptops, smaller context windows |
 | **`security`** | 12 | 4 | AppSec suite: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Penetration testing & pre-deployment audits |
-| **`design`** | 14 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
+| **`design`** | 12 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
 
 To deploy a specific profile:
 ```powershell
@@ -256,6 +258,22 @@ flowchart TD
 3. **Subagent Execution (Turn 3+)**: The Orchestrator delegates tasks to isolated subagents with specialized briefs.
 4. **Verification & Review**: Mandates automated test execution, Playwright browser E2E verification, and adversarial Goldfish peer review before merge.
 
+---
+
+### 3. Backlog Management & Plan Lifecycle (Playbook 08)
+
+To preserve codebase stability and prevent architectural drift, Heimdall enforces two distinct tracks:
+
+#### A. The Four Engineering Flows
+1. **Bugfixes (Fast-Path Loop)**: Receive report -> assess/plan surgical fix -> implement via TDD (failing test first) -> verify with tests & Playwright -> complete.
+2. **New Features (Backlog Intake)**: New requirements are not coded immediately; they are captured in [`docs/backlog.md`](docs/backlog.md) with context and priority.
+3. **Change Request (CR) Analysis Gate**: Backlog items undergo technical impact, blast radius, and dependency analysis. Upon human approval -> author plan -> implement -> verify -> archive.
+4. **Rejection & Postponement**: Discarded or deferred requests return to the backlog with technical rationales or get deleted.
+
+#### B. Plan Storage & Archiving Rules
+* **Authoring**: All implementation plans are written to `docs/designs/YYYY-MM-DD <plan-name>.md`.
+* **Archiving**: Once verified and confirmed working, the plan is moved to `docs/designs/old/YYYY-MM-DD <plan-name>.md`.
+
 [↑ Back to top](#table-of-contents)
 
 ---
@@ -264,30 +282,31 @@ flowchart TD
 ## 6. Full List of Skills & Agents
 
 <a id="8-predefined-agent-personas"></a>
-### 8 Predefined Agent Personas
+<a id="9-predefined-agent-personas"></a>
+### 9 Predefined Agent Personas
 
 All personas declare `model: inherit` to run on whichever active model or vendor is configured on your machine without vendor lock-in.
 
 | Persona | Capability Tier | Role & Responsibilities | Bound Skills |
 | :--- | :--- | :--- | :--- |
 | **`orchestrator`** | `deep_reasoning` | Planning gatekeeper (`/grill-me`), requirements interrogation, modular task decomposition, Playwright E2E verification enforcement, and subagent coordination. | `brainstorming`, `writing-plans`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills`, `executing-plans` |
-| **`frontend-designer`** | `high_polish_vision` | Enforces design read, typography hierarchy, token mappings, and anti-slop UI aesthetics for web surfaces. | `taste-skill`, `taste-skill-v1`, `gpt-tasteskill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill` |
+| **`frontend-designer`** | `high_polish_vision` | Enforces design read, typography hierarchy, token mappings, and anti-slop UI aesthetics for web surfaces. | `taste-skill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill` |
 | **`mobile-designer`** | `responsive_flex_safety` | Mobile viewport safety (320px–430px), 48px touch targets, zero-clipping overflow flex containers, and responsive assets. | `antislop-layoutmobile`, `antislop-human`, `antislop-ui`, `imagegen-frontend-mobile`, `taste-skill` |
 | **`tester`** | `fast_verification` | Enforces strict Test-Driven Development (TDD) and browser verification (Playwright). Rejects pseudo-verification (`curl`, `grep`, `tsc`). | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `executing-plans` |
 | **`security-auditor`** | `deep_assurance_audit` | Dynamic differential HTTP probing across auth levels, OWASP Top 10 defenses, and Trail of Bits insecure defaults detection. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
 | **`database-architect`** | `schema_migration_safety` | Governs non-destructive migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
-| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments, purges defensive dead code, and enforces anti-slop standards. | `karpathy-guidelines`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
+| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments, purges defensive dead code, and enforces anti-slop standards. | `karpathy-guidelines`, `clean-code`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
 | **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, catches silent regressions and swallowed errors, and coordinates cross-model validation reviews. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
 | **`modernizer`** | `legacy_migration_safety` | Executes legacy codebase transformations, runtime upgrades, and Strangler Fig migrations guarded by Golden Master characterization tests. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `karpathy-guidelines`, `project-hygiene`, `output-skill` |
 
 ---
 
-<a id="skill-inventory-51-modules-across-16-toolkits"></a>
-### Skill Inventory (51 Modules Across 16 Toolkits)
+<a id="skill-inventory-50-modules-across-18-toolkits"></a>
+### Skill Inventory (50 Modules Across 18 Toolkits)
 
-Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** and **11 Standalone Toolkits (11 modules)**:
+Heimdall organizes capabilities into **5 Core Multi-Skill Suites (37 modules)** and **13 Standalone Toolkits (13 modules)**:
 
-#### Core Multi-Skill Suites (5 Suites / 39 Modules)
+#### Core Multi-Skill Suites (5 Suites / 37 Modules)
 
 <details open>
 <summary><b>1. Superpowers Engineering Suite (15 modules) — Jesse Vincent / obra</b></summary>
@@ -311,11 +330,9 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 </details>
 
 <details>
-<summary><b>2. Taste Design & Aesthetic Studio (12 modules)</b></summary>
+<summary><b>2. Taste Design & Aesthetic Studio (10 modules)</b></summary>
 
 - `taste-skill`: Enforces cohesive design reads, purpose-driven typography, and brand-first color logic.
-- `taste-skill-v1`: Baseline visual hierarchy and layout balance heuristics.
-- `gpt-tasteskill`: Aesthetic evaluation and UI critique prompt harness.
 - `brandkit`: Manages design tokens, invariant brand assets, and multi-palette themes.
 - `brutalist-skill`: High-contrast, bold typographic layouts with deliberate structural tension.
 - `minimalist-skill`: Ultra-clean editorial layouts emphasizing typography, space, and restraint.
@@ -358,11 +375,12 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (39 modules)** 
 
 </details>
 
-#### Standalone Toolkits (11 Curated Toolkits / 11 Modules)
+#### Standalone Toolkits (13 Curated Toolkits / 13 Modules)
 
 <details open>
 <summary><b>Browse Standalone Toolkits</b></summary>
 
+- **`clean-code` (`ub-mode`)**: Robert C. "Uncle Bob" Martin's disciplined Clean Code engineering standard. Enforces TDD cycles, laziness protocol, premise interrogation, boundary discipline, and mathematical complexity gates (CRAP < 10, DRY similarity < 0.8, mutant-killing test design).
 - **`ponytail`**: Pragmatic senior developer discipline. Enforces Dietrich Gebert's Decision Ladder: YAGNI checks, codebase reuse, built-in standard library, native platform features, and zero premature abstractions.
 - **`karpathy-guidelines`**: Andrej Karpathy's simplicity heuristics: write minimal surgical code, reject speculative configurability, surface hidden assumptions, and never touch adjacent working code.
 - **`caveman`**: Julius Brussee's token-reduction protocol slashing conversational ceremony while preserving raw code, shell commands, and structured diffs.

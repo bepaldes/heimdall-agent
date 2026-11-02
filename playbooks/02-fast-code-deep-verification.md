@@ -19,13 +19,14 @@
 - Implement the minimal fix until the test turns green.
 
 ## 3. Deep Verification (Never Accept Shallow Checkboxes)
-- Verification is NOT a single unit test or a superficial DOM row count.
+- STRICT ZERO DEV-SERVER RULE: NEVER spin up or run a development server (`npm run dev`, `vite`, `next dev`, `live-server`, `python manage.py runserver`, etc.) to test, verify, or make things work. All verification commands must be terminating, non-interactive CLI executions (`npm test`, `npm run build`, `npm run typecheck`, `pytest`, `oxlint`, etc.).
 - In UI applications (e.g. Playwright):
+  - Run tests strictly against pre-built static artifacts or against a pre-existing server already launched by the user outside the agent session. Never spawn dev servers from an agent session.
   - Always assert visible non-zero bounding box (`expect(element).toBeVisible()`).
   - Verify state transitions, loading skeletons, and error toast lifecycles.
   - Verify layout integrity at standard desktop and mobile viewports.
 - In API applications:
   - Test negative payloads (null, malformed, unauthorized).
   - Verify database transaction rollbacks and audit logs.
-- Never claim work is complete without displaying verifiable command output.
+- Never claim work is complete without displaying verifiable command output from terminating runs.
 ```

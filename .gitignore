@@ -1,6 +1,7 @@
 node_modules/
 .npm-cache/
 docs/runs/
+docs/designs/
 hooks/herdr-agent-state.ps1
 *.tgz
 .DS_Store

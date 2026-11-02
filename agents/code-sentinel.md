@@ -7,12 +7,13 @@ description: >
 model: inherit
 skills:
   - karpathy-guidelines
-  - ponytail
+  - clean-code
   - antislop
   - antislop-code
   - antislop-copywriting
   - antislop-human
   - finishing-a-development-branch
+  - ponytail
 ---
 
 # Heimdall Code Restraint & Anti-Slop Sentinel

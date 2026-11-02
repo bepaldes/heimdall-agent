@@ -1,6 +1,6 @@
 ---
 name: antislop-human
-description: "Human and accessibility skill for antislop. Contrast, keyboard, focus, and states for real people. Includes the contrast checker."
+description: "Human and accessibility skill for antislop. Contrast, keyboard, focus, states, and interaction affordances for real people. Includes the contrast checker."
 allowed-tools: Bash(python *) Bash(python3 *) Read Write Edit Glob Grep
 ---
 # antislop-human
@@ -62,7 +62,7 @@ If the `${CLAUDE_SKILL_DIR}` variable is not available in this agent, point the 
 1. Contrast ratio = (L1 + 0.05) / (L2 + 0.05), where L1 is the lighter relative luminance and L2 the darker.
 2. Relative luminance L of one color: convert each channel to 0-1 (`c = hex / 255`), then linearize: if `c <= 0.03928`, `c_lin = c / 12.92`; otherwise `c_lin = ((c + 0.055) / 1.055)^2.4`.
 3. `L = 0.2126*R + 0.7152*G + 0.0722*B`.
-4. Round the ratio to two decimals and compare: 4.5:1 for normal text, 3:1 for large text (18px+, per R-25). The maximum ratio is 21.0 (black on white).
+4. Compare the unrounded ratio: 4.5:1 for normal text, 3:1 for large text (18px+, per R-25). Round only for display, so a pairing at 4.498:1 prints as 4.50 and still fails 4.5:1. The maximum ratio is 21.0 (black on white).
 
 **The reference table** (common pairings, computed with the formula):
 
@@ -73,9 +73,12 @@ If the `${CLAUDE_SKILL_DIR}` variable is not available in this agent, point the 
 | White on #333333 | 12.63 | Pass | Pass |
 | White on #666666 | 5.74 | Pass | Pass |
 | #777777 on white | 4.48 | Fail | Pass |
+| #777777 on #070707 | 4.50 | Fail | Pass |
 | White on #888888 | 3.54 | Fail | Pass |
 | White on #999999 | 2.85 | Fail | Fail |
 | #555555 on black | 2.82 | Fail | Fail |
+
+The `#777777 on #070707` row is the near-threshold case: 4.4983:1 rounds to 4.50 for display and still fails 4.5:1.
 
 Read the table as a sanity check, not as a substitute. Any pairing not listed, or anything near a threshold, goes through the formula or the script.
 
@@ -135,6 +138,59 @@ The layout mechanics behind mobile (breakpoints, scale, grids, overflow, tap tar
 - **Why:** a form the user cannot see or reach is a form they cannot complete. It is a mobile-only exclusion (R-03).
 - **Fix:** when an input is focused, it scrolls into view above the keyboard, with enough bottom padding that the focused field is never covered. Test with a real device or an emulated keyboard.
 
+## Interaction Affordances
+
+Enforced by R-39: the small signals that tell a person "this can be used". Keyboard and focus stay with R-32, target size with R-03.
+
+### Clickable Without a Pointer Cursor
+
+- **Tell:** a `<button>`, a `<summary>`, a `<label>` for a checkbox, a custom `[role="button"]`, a clickable card, or a styled `<select>` that keeps the arrow cursor. Common after a CSS reset (Tailwind preflight resets `button` to `cursor: default`).
+- **Why:** the cursor is the first affordance a mouse user reads. An arrow over a control says "this is text", so people hesitate or never click. It reads as a template that was styled but never used.
+- **Fix:** every enabled interactive element gets `cursor: pointer`, set once in the base layer, not per component; disabled controls get `cursor: not-allowed`. Never put `cursor: pointer` on something that does nothing (R-26). The base-layer selector list is in [references/A11Y-PATTERNS.md](references/A11Y-PATTERNS.md).
+
+### Div or Span Pretending to Be a Control
+
+- **Tell:** `<div onClick>`, `<span onClick>`, or `<a>` without `href` used as a button; `<a href="#" onClick>` used for an action.
+- **Why:** it has no role, so a screen reader does not announce it as a control, and it drops out of keyboard use.
+- **Fix:** an action is a `<button type="button">`, a navigation is an `<a href>` to a real destination. A custom control that cannot be native gets a `role`, its state attributes (`aria-pressed`, `aria-expanded`), and full keyboard support (R-32).
+
+### Icon-Only Control With No Name
+
+- **Tell:** a close, menu, search, or social button that contains only an SVG or icon font, with no text, `aria-label`, or visually hidden label.
+- **Why:** a screen reader announces "button" and nothing else. Voice-control users cannot say its name.
+- **Fix:** give it an accessible name (`aria-label="Close dialog"` or a `.sr-only` span) that matches the visible word, and mark the icon `aria-hidden="true"`.
+
+### No Hover, Active, or Disabled State
+
+- **Tell:** buttons and links that look identical at rest, on hover, while pressed, and when disabled; a disabled button that is only greyed out and still clickable.
+- **Why:** state feedback tells people their action registered. Without it a click feels lost and a disabled control looks broken.
+- **Fix:** distinct `:hover`, `:active`, and disabled styles, held to the Non-Text Contrast bar above. Prefer the `disabled` attribute; a disabled control that must stay focusable uses `aria-disabled="true"` and blocks the action in code.
+
+### Motion That Ignores the User Setting
+
+- **Tell:** parallax, auto-playing carousels, scroll-jacking, or large entrance animations that still run under `prefers-reduced-motion: reduce`.
+- **Why:** motion can trigger nausea and vestibular disorders, and an auto-advancing carousel moves content away from slow readers.
+- **Fix:** wrap non-essential motion in `@media (prefers-reduced-motion: no-preference)`, and give anything that moves for more than 5 seconds a visible pause control.
+
+### Form Field Without a Real Label
+
+- **Tell:** a placeholder as the only label, or a label not tied to its input.
+- **Why:** the placeholder disappears on typing, and an unlabeled input is announced as "edit text".
+- **Fix:** a visible `<label for>` on every field. Error text follows Color-Only Feedback above.
+
+### Missing Page-Level Semantics (whole documents only)
+
+- **Tell:** a page with no `lang` on `<html>`, no `<main>`, headings chosen for size instead of order, or a generic `<title>`.
+- **Why:** screen-reader users move by landmarks, headings, and the title; without them the page is one undifferentiated stream, read in the wrong voice.
+- **Fix:** applies only when the task produces a whole document, never to a single component: `<html lang>`, one `<main>` with `<header>`/`<nav>`/`<footer>`, one `<h1>` and no skipped levels, and a unique `<title>`. Skip links are under Broken Tab Order (R-32).
+
+## WCAG 2.2 Depth
+
+Read on demand, instead of guessing a success criterion:
+
+- [references/A11Y-PATTERNS.md](references/A11Y-PATTERNS.md): copy-ready markup for the pointer-cursor base layer, modal focus traps, skip links, form labels, error announcement, dragging alternatives, ARIA tabs, and live regions.
+- [references/WCAG.md](references/WCAG.md): every WCAG 2.2 success criterion by level, for checking a conformance claim. A Lighthouse score alone never proves conformance (R-36).
+
 ## Human Skill Checklist
 
 Run these alongside the core Delivery Gate when the task involves UI. All answers must be **yes**:
@@ -145,3 +201,4 @@ Run these alongside the core Delivery Gate when the task involves UI. All answer
 - [ ] Is every interactive element reachable and operable by keyboard, with dialogs closable via Escape and no `outline: none` without a replacement? (R-32, R-26)
 - [ ] Are the empty, loading, and error states of every data view present and perceivable, not color-only? (R-27, C-4)
 - [ ] Can text be resized to 200% without being clipped, and does the mobile keyboard never cover a focused input? (R-35)
+- [ ] Does every enabled control show `cursor: pointer`, use a native element, carry an accessible name and a visible label, and respect `prefers-reduced-motion`? (R-39)

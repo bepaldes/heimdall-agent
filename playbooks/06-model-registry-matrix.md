@@ -42,9 +42,8 @@ Accessed via `gemini-bridge.ps1` hitting Google's API directly (never through Gh
 
 | Model Name | Canonical Flag | Allowed Effort Levels | Optimal Specialization |
 | :--- | :--- | :--- | :--- |
-| **Gemini 4 (Argon)** | `gemini-4` (`gemini-4-argon`, `argon`) | `low`, `medium`, `high`, `xhigh` | Next-generation flagship Gemini reasoning, complex multi-file architecture, deep cross-workspace synthesis, high-velocity full-stack implementation. |
-| **Gemini 3.8 Flash** | `gemini-3.8-flash` | `low`, `medium`, `high` | Fast scans, workspace audits, boilerplate generation, unit test scaffolding, rapid prototyping, responsive styling. |
-| **Gemini 3.1 Pro** | `gemini-3.1-pro` | `medium`, `high`, `xhigh` | Massive context analysis, repository-wide multi-file refactoring, deep documentation synthesis, architectural audits. |
+| **Gemini 4 Argon** | `gemini-4-argon-{effort}` (e.g. `gemini-4-argon-high`) | `low`, `medium`, `high`, `xhigh` | Next-generation flagship Gemini reasoning, complex multi-file architecture, deep cross-workspace synthesis, high-velocity full-stack implementation. |
+| **Gemini 3.8 Flash** | `gemini-3.8-flash-{effort}` (e.g. `gemini-3.8-flash-high`) | `low`, `medium`, `high` | Fast scans, workspace audits, boilerplate generation, unit test scaffolding, rapid prototyping, responsive styling. |
 
 ---
 
@@ -78,4 +77,5 @@ Gemini models (`gemini-4`, `gemini-3.8-flash`, `gemini-3.1-pro`) are never reach
 ## 6. Effort Constraint & Fallback Rules
 
 - **Effort Constraint Rule**: Each task in a plan must explicitly declare one of the registered models and an allowed effort level matching the tables above.
-- **Quota Fallback Rule**: When Gemini 4 Argon reaches quota cooldown, immediately fallback to Gemini 3.8 Flash (for fast scans/reviews) or Gemini 3.1 Pro (for massive context), or Claude Sonnet 5 / GPT-6 Astra via GhostCLI.
+- **Quota Fallback Rule**: When Gemini 4 Argon reaches quota cooldown, immediately fallback to Gemini 3.8 Flash (for fast scans/reviews) or Claude Sonnet 5 / GPT-6 Astra via GhostCLI.
+- **Headless Execution Limitation**: The `agy` CLI requires a TTY for all execution modes including `--print`. Non-interactive/headless invocations from scripts, CI, or piped environments will hang indefinitely. Use Herdr split/tab/window modes instead, or run `agy` interactively.

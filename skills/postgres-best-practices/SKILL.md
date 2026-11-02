@@ -1,64 +1,42 @@
 ---
-name: supabase-postgres-best-practices
-description: "Postgres best practices maintained by Supabase, for Postgres running anywhere. Load this skill BEFORE writing or changing anything that lives in a Postgres database: creating or altering tables and columns (including choosing column types), schema design, migrations and declarative schema files, RLS policies and the tests that verify them, indexes, triggers, database functions, queues and scheduled jobs (pg_cron, pgmq), vector/semantic search (pgvector), and restoring dumps (pg_restore) or importing data. Also load it when diagnosing slow queries, high CPU, timeouts, EXPLAIN plans, connection exhaustion, locking, bloat, or rows visible to the wrong user or tenant. This is not just a performance guide — schema, migration, security, and SQL authoring tasks need these rules too, even for a one-column change or a single query."
-license: MIT
-metadata:
-  author: supabase
-  version: "1.1.1"
-  organization: Supabase
-  date: January 2026
-  abstract: Comprehensive Postgres performance optimization guide for developers using Supabase and Postgres. Contains performance rules across 8 categories, prioritized by impact from critical (query performance, connection management) to incremental (advanced features). Each rule includes detailed explanations, incorrect vs. correct SQL examples, query plan analysis, and specific performance metrics to guide automated optimization and code generation.
+name: postgres-best-practices
+description: Best practices and guidelines for working with Postgres. Covers schema design, indexing strategies, query optimization, migrations, and common pitfalls. Use when writing SQL, designing database schemas, optimizing queries, or setting up a Postgres database.
 ---
 
-# Supabase Postgres Best Practices
+# Postgres Best Practices
 
-Comprehensive performance optimization guide for Postgres, maintained by Supabase. Contains rules across 8 categories, prioritized by impact to guide automated query optimization and schema design.
+Guidelines and best practices for working with Postgres, covering schema design, indexing, query optimization, and common pitfalls.
 
-## When to Apply
+## Supported Versions
 
-Reference these guidelines when:
-- Writing SQL queries or designing schemas
-- Implementing indexes or query optimization
-- Reviewing database performance issues
-- Configuring connection pooling or scaling
-- Optimizing for Postgres-specific features
-- Working with Row-Level Security (RLS)
+This skill covers PostgreSQL 14 through 18. Version-specific features are tagged (e.g., `[PG15+]`, `[PG18+]`); environment-dependent examples identify required privileges, extensions, or multi-node setup.
 
-## Rule Categories by Priority
+PostgreSQL provides 5 years of support per major version. Always run the latest minor release.
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Query Performance | CRITICAL | `query-` |
-| 2 | Connection Management | CRITICAL | `conn-` |
-| 3 | Security & RLS | CRITICAL | `security-` |
-| 4 | Schema Design | HIGH | `schema-` |
-| 5 | Concurrency & Locking | MEDIUM-HIGH | `lock-` |
-| 6 | Data Access Patterns | MEDIUM | `data-` |
-| 7 | Monitoring & Diagnostics | LOW-MEDIUM | `monitor-` |
-| 8 | Advanced Features | LOW | `advanced-` |
+| Version | Initial Release    | End of Life        |
+| ------- | ------------------ | ------------------ |
+| 18      | September 2025     | November 2030      |
+| 17      | September 2024     | November 2029      |
+| 16      | September 2023     | November 2028      |
+| 15      | October 2022       | November 2027      |
+| 14      | September 2021     | November 2026      |
 
-## How to Use
-
-Read individual rule files for detailed explanations and SQL examples:
-
-```
-references/query-missing-indexes.md
-references/query-partial-indexes.md
-references/_sections.md
-```
-
-Each rule file contains:
-- Brief explanation of why it matters
-- Incorrect SQL example with explanation
-- Correct SQL example with explanation
-- Optional EXPLAIN output or metrics
-- Additional context and references
-- Supabase-specific notes (when applicable)
+Source: [postgresql.org/support/versioning](https://www.postgresql.org/support/versioning/)
 
 ## References
 
-- https://www.postgresql.org/docs/current/
-- https://supabase.com/docs
-- https://wiki.postgresql.org/wiki/Performance_Optimization
-- https://supabase.com/docs/guides/database/overview
-- https://supabase.com/docs/guides/auth/row-level-security
+| Area                    | Resource                                | When to Use                                                        |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------------------ |
+| Schema Design           | `references/schema-design.md`           | Designing tables, choosing data types, normalizing, partitioning   |
+| Indexing                | `references/indexing.md`                | Choosing index types, composite indexes, partial/covering indexes  |
+| Query Optimization      | `references/query-optimization.md`      | Reading EXPLAIN ANALYZE, fixing bottlenecks, planner tuning        |
+| Query Patterns          | `references/query-patterns.md`          | CTEs, window functions, lateral joins, UPSERT, JSONB, anti-patterns|
+| Performance Diagnostics | `references/performance-diagnostics.md` | pg_stat views, lock analysis, VACUUM, connection management        |
+| Logical Replication     | `references/logical-replication.md`     | Pub/sub replication, live migrations, CDC                          |
+| Hot Standby             | `references/hot-standby.md`             | Streaming replication, read replicas, failover                     |
+| Transaction Isolation   | `references/transaction-isolation.md`   | Isolation levels, lost updates, serialization failures, retry logic |
+| Backup & Restore        | `references/backup-restore.md`          | pg_dump/pg_restore, pg_basebackup, PITR, recovery                 |
+| Security & Roles        | `references/security-roles.md`          | Privileges, RLS, pg_hba.conf, authentication, SSL                 |
+| Bulk Data Loading       | `references/bulk-loading.md`            | COPY patterns, ETL staging, optimizing large loads, batch ops      |
+| Connection Pooling      | `references/connection-pooling.md`      | PgBouncer config, pool modes, prepared statements, sizing          |
+| Major Version Upgrades  | `references/major-version-upgrades.md`  | pg_upgrade, logical replication migration, pre/post checklists     |

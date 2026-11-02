@@ -2,6 +2,15 @@
 
 > **For Desktop & Web AI**: Use this authoritative schema whenever generating implementation plans (`/plan`, plan mode, or architectural prompts). Generic, simplified, or abbreviated templates are strictly forbidden.
 
+## Mandatory Plan Storage & Archiving Lifecycle
+1. **Creation Path & Naming**:
+   - All plans MUST be written directly to disk under the `docs/designs/` directory.
+   - The file name MUST strictly follow the format: `YYYY-MM-DD <plan name>.md` (e.g. `docs/designs/2026-10-31 user-authentication-flow.md`).
+2. **Archiving Upon Completion**:
+   - Once all phases of the plan have finished, tests have passed, and functionality is confirmed working, the plan file MUST be moved into:
+     `docs/designs/old/YYYY-MM-DD <plan name>.md`
+   - Active plans remain in `docs/designs/`; only finalized, delivered work is archived to `docs/designs/old/`.
+
 ---
 
 ````markdown
@@ -46,7 +55,8 @@
 - Orchestrator monitors progress every 3 minutes.
 
 ## 7. Verification Harness
-- **Playwright E2E Primary Gate**: Real browser execution (DOM state, visibility assertions, non-zero bounding box checks).
+- **Strict Zero Dev-Server Policy**: NEVER include steps to run or launch dev servers (`npm run dev`, `vite`, `next dev`, etc.). All agent verification must be non-interactive and terminating (`npm test`, `npm run build`, `vitest run`, `lint`, `typecheck`).
+- **Playwright E2E Primary Gate**: Real browser execution (DOM state, visibility assertions, non-zero bounding box checks) strictly against pre-existing human-managed servers or static build artifacts. Agents do NOT spin up servers.
 - **Backend-with-UI-Impact Rule**: Backend tasks affecting user views must include browser verification.
 - **Rejection of Pseudo-Verification**: No task sign-off on `tsc`, `curl`, `grep`, or container health alone.
 - **Environment Detection**: Confirm Playwright presence; if absent, ask user during planning for preferred setup.
@@ -79,8 +89,9 @@
 6. **Section 6: Orchestrator Heartbeat**:
    - Cadence for monitoring task progress, status checks, and liveness during subagent runs.
 7. **Section 7: Verification Harness**:
-   - Primary verification standard is full Playwright E2E with real DOM state and non-zero bounding box assertions.
-   - Enforces the strict ban on pseudo-verification (`curl`, `grep`, `tsc --noEmit`, container status).
+   - Zero Dev-Server policy: No agent may start background or dev servers (`npm run dev`, `vite`, `next dev`).
+   - Primary verification standard is full Playwright E2E with real DOM state and non-zero bounding box assertions against pre-existing servers or static builds.
+   - Enforces the strict ban on pseudo-verification (`curl`, `grep`, `tsc --noEmit` alone, container status).
    - Mandates browser verification for backend changes with UI impact.
 
 ### Effort Constraint Rules

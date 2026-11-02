@@ -1,65 +1,66 @@
 ---
-name: strix-security
-description: Autonomous AI penetration testing and dynamic HTTP differential probing methodology (based on usestrix/strix). Never trust code comments alone; verify every mounted route, static asset prefix, reverse-proxy rule, and Host-header boundary with concrete Proof-of-Concept (PoC) HTTP probes across Anonymous, Unprivileged, Cross-Tenant/Venue, and Authorized principals.
+name: application-security-testing
+description: Application security testing (AppSec) across a whole product with Strix — decide which asset needs which test (source code, running web app, API, CI pipeline), run it, and turn the results into a ranked remediation plan. Autonomous agents exploit and prove each issue instead of emitting static-analysis alerts, so the plan is ordered by what is actually reachable. Use when the user asks for an application security review or audit, an appsec assessment, vulnerability scanning across their stack, a security review before a launch or a customer security questionnaire, or does not yet know which kind of security test they need.
+license: Apache-2.0
+metadata:
+  author: usestrix
+  homepage: https://docs.strix.ai
 ---
 
-# Strix Security — Dynamic Penetration Testing & Differential HTTP Probing
+# Application security testing
 
-Based on the open-source [usestrix/strix](https://github.com/usestrix/strix) autonomous penetration testing framework. This skill closes the gap between **static code reading** and **runtime exploitability** by requiring dynamic, differential HTTP verification of every surface.
+Entry point for "make my application secure" requests, where the target is not yet a single URL or repo. The job here is to pick the right test per asset, run it, and produce one ranked plan — not to run everything at maximum depth.
 
-## Core Doctrine: "Comments Are Claims, Not Controls"
+Install, LLM setup, all CLI flags, and the managed-cloud path live in the **penetration-testing-with-strix** skill. Read it first if `strix --version` fails. For a run with no Docker and no LLM key, the same binary drives the managed platform: `strix cloud login`, then `strix cloud scans start ...` (details in **managed-pentesting-with-strix**).
 
-Static security audits fail when an auditor reads a code comment (e.g., *"Caddy blocks `/internal/*`"* or *"Caddy gates `/data/*` via `forward_auth`"*) and marks the control as `PASS` without sending a single request.
+Only test assets the user owns or is authorized to test. Confirm authorization before the first run, and prefer staging over production, because the agents send real exploit payloads and can change data.
 
-Under `strix-security`:
-1. **Zero Trust in Comments**: A comment describing a proxy rule, auth hook, or upstream gate is treated as an *unverified hypothesis* until proven by both configuration inspection and a live or injected HTTP probe.
-2. **Every Static Mount Is an Attack Surface**: Every `@fastify/static` registration, `sendFile` handler, `public/` directory, and reverse-proxy `file_server` block must be enumerated and probed directly.
-3. **Differential Principal Matrix**: Every protected endpoint and static data path must be probed across 4 principals:
-   - **P0 (Anonymous)**: No session cookie, no token $\rightarrow$ Must return `401` (or `404` for internal routes).
-   - **P1 (Unprivileged / Zero-Grant User)**: Valid session cookie, `grants: []`, `allowedModules: []` $\rightarrow$ Must return `403`.
-   - **P2 (Cross-Scope / Wrong-Venue User)**: Valid session cookie with a grant on Venue A (`MCC`), requesting Venue B (`ALA`) tiles, metadata, or API routes $\rightarrow$ Must return `403`.
-   - **P3 (Authorized User)**: Valid session cookie with a grant on Venue B (`ALA`) $\rightarrow$ Returns `200` with `Cache-Control: private, no-cache, no-store, must-revalidate`.
+## 1. Map the assets
 
----
+Ask (or read from the repo) and write the answers down before scanning:
 
-## 5 Mandatory Strix Hunting Vectors
+- **Source** — one repo, a monorepo, several services? Which languages/frameworks?
+- **Running environments** — is there a staging deployment? A public production site? A local dev server only?
+- **APIs** — REST, GraphQL, gRPC? Is there an OpenAPI/GraphQL schema?
+- **Authentication** — can you get two test accounts in different tenants? Most high-impact bugs need them.
+- **Constraints** — out-of-scope paths, whether production may be touched, budget and wall-clock limits.
 
-### Vector 1: Static Asset & Extension-Bypass Probing
-- **Target**: Global `preHandler`/`onRequest` hooks (`packages/auth-node/src/plugin.ts`) and `@fastify/static` mounts (`apps/api/src/static.ts`).
-- **Attack**: Append static file extensions (`.png`, `.json`, `.svg`, `.js`, `.css`, `.map`) or hit static-mounted data trees (`/layer/data/<VENUE>/venue.json`, `/layer/data/<VENUE>/tiles/.../*.png`, `/data/<VENUE>/*`, `/staging/*`, `/layer/staging/*`) without a session cookie.
-- **Invariant**: No regex or extension allowlist may classify non-bundle paths as public. Only content-hashed bundle directories (`/assets/`, `/layer/assets/`, `/pulse/assets/`) and explicitly named public PWA files (`favicon.ico`, `manifest.json`, `service-worker.js`) may bypass session authentication.
+If there is no staging environment and production is off limits, say so early. A code-only review is still valuable, but it cannot prove exploitability against a live app.
 
-### Vector 2: Reverse-Proxy & `Host`-Header Differential Probing
-- **Target**: `/internal/*`, `/api/*/internal/*`, `forward_auth` gates, and `Caddyfile` site blocks.
-- **Attack**: Probe internal endpoints using:
-  1. Primary public domain (`Host: podium.test`)
-  2. Alternate tunnel/edge hostnames (`Host: podium.tail42997.ts.net`)
-  3. Arbitrary spoofed `Host` headers (`Host: evil.example.com`, `Host: 127.0.0.1:443`)
-- **Invariant**:
-  - `Caddyfile` must explicitly reject `/internal/*` and `/api/*/internal/*` at the edge (`respond @internal 404`).
-  - Internal origin checks (`isInternallyOriginated`) must enforce a **strict internal container host allowlist** (`api:3000`, `layer:3000`, `pulse:3000`, `localhost:3000`), never just a `PUBLIC_DOMAIN` blocklist that fails open when accessed through Tailscale or an alternate DNS name.
+## 2. Pick the right test per asset
 
-### Vector 3: Horizontal BOLA / Cross-Venue & Cross-Team Traversal
-- **Target**: All venue-scoped and team-scoped routes (`/api/layer/venues/:venue/*`, `/layer/data/:venue/*`, `/data/:venue/*`, `/api/crew/*`).
-- **Attack**: Authenticate as a principal granted access to `MCC` and request `ALA` resources (both JSON API routes and static tile/manifest files).
-- **Invariant**: Every handler and static `preHandler` serving venue-specific data must verify `canSeeVenue(request, venueCode)` (or equivalent scope predicate) before reading from disk or database.
+| Asset | Skill to use |
+| --- | --- |
+| Repository or working tree | **find-security-vulnerabilities-in-code** |
+| Live web app or staging site | **web-app-penetration-testing** |
+| REST/GraphQL/gRPC API | **api-security-testing** |
+| Assessment mapped to OWASP categories | **owasp-top-10-testing** |
+| Every pull request, continuously | **ci-security-scanning-with-strix** |
+| No Docker, no LLM key, or a report an auditor will accept | **managed-pentesting-with-strix** |
 
-### Vector 4: Path Traversal & Sibling-Prefix Escape
-- **Target**: File-streaming and upload handlers (`modules/layer/src/pipeline.ts`, `/staging/*`, `/layer/staging/*`).
-- **Attack**: Supply `..`, URL-encoded `%2e%2e%2f`, or sibling-directory prefixes (e.g., `/srv/layer-staging-other` when base is `/srv/layer-staging`).
-- **Invariant**: Path containment checks must always verify `targetPath.startsWith(normalizedBase + path.sep)` (with the trailing path separator), never a bare string prefix check.
+Those skills carry the flags, credential handling, and result-reading details. Do not duplicate their instructions here.
 
-### Vector 5: Cache Poisoning & Post-Logout Artifact Persistence
-- **Target**: `Cache-Control` headers on `/api/*`, `/auth/*`, `/data/*`, `/layer/data/*`, `/staging/*`, and `/layer/staging/*`.
-- **Attack**: Inspect response headers on authenticated tile `.png` and `venue.json` responses for `public` or positive `max-age` values that allow shared proxies or browser disk caches to serve confidential drawings after logout.
-- **Invariant**: Every authenticated API, tile, manifest, and staging response must emit `Cache-Control: no-store` or `private, no-cache, no-store, must-revalidate`.
+Sequence for a first assessment:
 
----
+1. Review the code. It is the cheapest run and it maps the authorization model.
+2. Pentest staging with credentials, and pass the repo as a second target so the agents keep source context.
+3. Add CI scanning, so later regressions are caught without another manual pass.
 
-## Automated Execution in Podium
+Run one asset at a time and read each report before starting the next. Findings from the code review make the live run sharper.
 
-Whenever executing a security audit or modifying auth/static/proxy code in Podium, run the automated Strix probe suite:
-```powershell
-pnpm audit:security-probes
-```
-If any probe fails, treat it as a **Critical blocker** and remediate before completing the task.
+## 3. Consolidate into one plan
+
+Findings arrive per run in `strix_runs/<run>/`. Merge them into a single list and rank by **proven impact**, not by scanner severity:
+
+1. Validated exploits reachable without authentication.
+2. Validated cross-tenant or privilege-escalation issues.
+3. Validated issues needing an authenticated account.
+4. Unproven observations (configuration, dependency, and hardening notes) — flag as such, and never present them as confirmed vulnerabilities.
+
+Deduplicate: the same root cause often surfaces in both the code review and the live pentest.
+
+## 4. Be honest about coverage
+
+State plainly what was *not* tested — assets with no staging environment, categories a black-box run cannot reach (logging and alerting, supply-chain integrity, insecure design), and any run that hit its budget or turn cap before finishing. Check `run.json` status and cost against `--max-budget` for each run. An empty result set from a truncated scan is not a clean bill of health.
+
+Then remediate with **fix-security-vulnerabilities-with-strix**, which re-runs Strix against each fix to prove the exploit no longer works.
