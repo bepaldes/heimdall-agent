@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **18 Primary Toolkits & Suites (50 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **19 Primary Toolkits & Suites (51 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -39,6 +39,7 @@ heimdall update-skill all
 - [⚡ Structured Analysis & Output Formatting](#output-skill)
 - [⚡ Caveman Chat Token Brevity Protocol](#caveman)
 - [⚡ Clean Code & ub-mode Quality Sentinel](#clean-code)
+- [⚡ Communication Doctrine (BLUF & STE)](#communication-doctrine)
 
 ---
 
@@ -300,6 +301,17 @@ heimdall update-skill all
 - **Description**: Enforces Uncle Bob's Clean Code discipline, TDD cycles, laziness protocol, and mathematical quality gates (CRAP < 10, DRY similarity < 0.8, mutant-killing test design).
 - **Upstream Source**: [https://github.com/unclebob/ub-mode](https://github.com/unclebob/ub-mode)
 - **Contract File**: [`skills/clean-code/SKILL.md`](../skills/clean-code/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="communication-doctrine"></a>
+### ⚡ Communication Doctrine (BLUF & Simplified Technical English)
+
+- **Module Name**: `communication-doctrine`
+- **Description**: Enforces zero-latency Bottom Line Up Front (BLUF) headers on subagent handoffs, code reviews, and plans, alongside Simplified Technical English (STE) imperative syntax that eliminates ambiguous qualifiers.
+- **Contract File**: [`skills/communication-doctrine/SKILL.md`](../skills/communication-doctrine/SKILL.md)
 
 [↑ Back to top](#toc)
 

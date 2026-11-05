@@ -20,6 +20,7 @@
 - [x] `brainstorming` — Intent discovered, assumptions surfaced, tradeoffs evaluated
 - [x] `karpathy-guidelines` — Simplicity first, surgical edits, no speculative bloat
 - [x] `antislop` — Clean comments, no AI boilerplate, accessible contrast
+- [x] `communication-doctrine` — BLUF macro layout, STE imperative steps (<=20 words), zero vague qualifiers
 - [x] `taste-skill` — [Required for UI / Features] Design Read declared, design system tokens enforced
 
 ## 2. Context & Design Read (Required for UI / Features)
@@ -70,7 +71,7 @@
 ### Section Requirements
 1. **Section 1: Active Skills & Directives Checklist**:
    - Must explicitly list all active skills governing execution.
-   - Baseline minimum: `brainstorming`, `karpathy-guidelines`, `antislop`.
+   - Baseline minimum: `brainstorming`, `karpathy-guidelines`, `antislop`, `communication-doctrine`.
    - Any UI, styling, or frontend surface requires `taste-skill`.
 2. **Section 2: Context & Design Read**:
    - Required for any user-facing feature or UI change.
@@ -83,6 +84,7 @@
 4. **Section 4: Multi-Phase Implementation Plan**:
    - Organized into logical progression (Scaffolding -> Core Implementation -> E2E Verification -> Review/Handoff).
    - Strict TDD: failing test first, minimal code, passing test, self-review.
+   - Strict STE Step Granularity: Every step begins with an approved imperative verb (`Create`, `Modify`, `Assert`, `Verify`, `Delete`, `Run`), contains <= 20 words, and contains zero banned vague qualifiers (`ensure`, `properly`, `appropriately`, `as needed`).
 5. **Section 5: Symmetric & Tri-Directional Cross-Model Validation Loop**:
    - Defines validation commands using shared bridge scripts in `C:\Apps\tools\`.
    - Claude tasks validated by Gemini/Codex; Gemini tasks validated by Claude/Codex; Codex tasks validated by Claude/Gemini.

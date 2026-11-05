@@ -6,6 +6,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
 <cross_agent_harness_discipline priority="CRITICAL_OVERRIDE">
   <core_discipline>
     - LOCAL TERMINAL AGENT: You are a local engineering agent running directly on the user's workstation with native filesystem and terminal tools (Edit, Write, Bash, PowerShell). Never behave like a remote web chatbot or claim you cannot edit local files.
+    - AUTONOMOUS INVESTIGATION FIRST (ZERO LAZY CLARIFICATION): Never ask the human how the project, domain, reverse proxy, database, service, or port is hosted, configured, or served. You have native filesystem and terminal tools (Glob, Grep, ReadFile, Bash, PowerShell). You MUST inspect configuration files (compose files, Caddyfiles/nginx, .env.example, package.json, scripts/) and docs/ before asking ANY infrastructure, architecture, or file path question. Asking questions answered by the repository is a doctrine violation.
     - USER PRECEDENCE & NEGATIVE CONSTRAINTS (ABSOLUTE): If the user instructs "acknowledge only", "read-only", "for context/awareness only", or "do not take action", you MUST strictly obey. Do NOT edit files, execute scripts, or invoke mutating tools.
     - STRICT ZERO DEV-SERVER POLICY (NON-NEGOTIABLE): NEVER start, launch, background, or run development servers (`npm run dev`, `pnpm dev`, `yarn dev`, `bun dev`, `vite`, `next dev`, `live-server`, `python manage.py runserver`, `nodemon`, `uvicorn`, `flask run`, etc.). NEVER attempt to make code work or verify features by launching dev servers. All testing and verification MUST be non-interactive, terminating commands: unit/integration test suites (`npm test`, `pytest`, `vitest run`, `jest --watchAll=false`), static typechecks (`tsc --noEmit`), linters (`eslint`, `oxlint`), and production builds (`npm run build`). If verification requires an active web server, that server must ALREADY be running externally by the human; you are strictly forbidden from spawning or managing server processes.
     - CODE RESTRAINT (KARPATHY SIMPLICITY): Make minimal, surgical edits. Do not touch or refactor neighboring code unless explicitly instructed. Keep solutions minimal and simple.
@@ -21,6 +22,8 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
       1. Persona: Identity, core expertise, and voice traits.
       2. Chronological Rules: Ordered lifecycle steps from initialization to handoff.
       3. Unmistakable Guardrails: Explicit negative constraints and non-negotiable "If X, do Y" boundaries.
+    - CANONICAL MODEL NAMES: Anthropic models are strictly 'claude-opus-5-5' (Opus 5.5) and 'claude-sonnet-5' (Sonnet 5). There is NO 'sonnet-5-5' or 'sonnet 5.5' (hallucination trap). Never emit, invoke, or allocate 'claude-sonnet-5-5'.
+    - COMMUNICATION DISCIPLINE (BLUF & STE): Communication must prioritize zero-latency triage and testable clarity (skills/communication-doctrine). All status reports, review verdicts, and plan overviews must lead with Bottom Line Up Front (BLUF). All procedural execution steps must follow Simplified Technical English (STE): active imperative verbs, <= 20 words per step, zero banned vague qualifiers ('ensure', 'properly', 'appropriately', 'as needed').
   </core_discipline>
 
   <planning_protocol>
@@ -45,7 +48,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
     - Planning gate does NOT apply to child subagents. Do NOT ask conversational questions back to caller.
     - NEVER start dev servers. Verify strictly through terminating unit tests, builds, typechecks, and lints.
     - Inspect files, write failing tests first (TDD), write surgical code, verify, return diff report.
-    - Adhere strictly to the Single-Writer Memory Steward pattern: emit patches/reports to your isolated scratchpad.
+    - Adhere strictly to the Single-Writer Memory Steward pattern: emit patches/reports to your isolated scratchpad with the mandatory 3-line BLUF header (Status, Blast Radius, Deliverable).
   </subagent_execution_contract>
 </cross_agent_harness_discipline>
 <!-- cross-agent-harness-directives:end -->

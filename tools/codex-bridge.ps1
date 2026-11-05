@@ -110,7 +110,7 @@ if ($Model) {
         "^(gpt[- ]?6[- ]?)?astra$" { $canonicalModel = "gpt-6-astra" }
         "astra" { $canonicalModel = "gpt-6-astra" }
         "^(claude[- ])?opus([- ]?5(\.5)?)?$" { $canonicalModel = "claude-opus-5-5" }
-        "^(claude[- ])?sonnet([- ]?5)?$" { $canonicalModel = "claude-sonnet-5" }
+        "^(claude[- ])?sonnet([- ]?5(\.5|-5)?)?$" { $canonicalModel = "claude-sonnet-5" }
         "^(claude[- ])?fable([- ]?5(\.1)?)?$" { $canonicalModel = "claude-fable-5.1" }
         "^(z[- ]?ai\/)?glm([- ]?5(\.3)?)?$" { $canonicalModel = "z-ai/glm-5.3" }
         "opus" { $canonicalModel = "claude-opus-5-5" }

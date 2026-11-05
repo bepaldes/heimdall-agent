@@ -95,7 +95,7 @@ $canonicalModel = $null
 if ($Model) {
     switch -Regex ($Model.ToLower().Trim()) {
         "^(claude[- ])?opus([- ]?5(\.5)?)?$" { $canonicalModel = "claude-opus-5-5" }
-        "^(claude[- ])?sonnet([- ]?5)?$" { $canonicalModel = "claude-sonnet-5" }
+        "^(claude[- ])?sonnet([- ]?5(\.5|-5)?)?$" { $canonicalModel = "claude-sonnet-5" }
         "^(claude[- ])?fable([- ]?5(\.1)?)?$" { $canonicalModel = "claude-fable-5.1" }
         "^(gpt[- ]?6[- ]?)?astra$" { $canonicalModel = "gpt-6-astra" }
         "^(z[- ]?ai\/)?glm([- ]?5(\.3)?)?[- ]?flash$" { $canonicalModel = "z-ai/glm-5.3-flash" }

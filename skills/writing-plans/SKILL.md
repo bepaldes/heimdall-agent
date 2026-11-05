@@ -40,14 +40,17 @@ deliverable needs them; split only where a reviewer could meaningfully
 reject one task while approving its neighbor. Each task ends with an
 independently testable deliverable.
 
-## Step Granularity
+## Step Granularity & STE Discipline
 
-**Each step is one action with a checkable result:**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
-- "Commit" - step
+**Each step is one action with a checkable result, adhering strictly to Simplified Technical English (STE):**
+- **Imperative Verb First**: Begin with `Create`, `Modify`, `Assert`, `Verify`, `Delete`, `Run`, or `Replace`.
+- **Word Limit**: Maximum 20 words per procedural step.
+- **Banned Vague Qualifiers**: Never use `ensure`, `properly`, `appropriately`, `as needed`, `gracefully`, `robustly`, or `etc.` Replace with observable, testable assertions.
+- "Write the failing test in `tests/feature.test.ts`" - step
+- "Run `npm test tests/feature.test.ts` to confirm failure" - step
+- "Implement minimal code in `src/feature.ts` to pass test" - step
+- "Run `npm test` and assert exit code 0" - step
+- "Commit changes with concise message" - step
 
 ## Plan Document Header
 

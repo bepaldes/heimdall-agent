@@ -34,6 +34,9 @@ All GhostCLI models support text and image input:
 | **GLM 5.3 Flash** | `z-ai/glm-5.3-flash` | 1M | 128K | ❌ | ❌ | `low`, `medium`, `high` | Fast responses for code tasks, rapid reasoning, lightweight context queries. |
 | **GPT-6 Astra** | `gpt-6-astra` | 1M | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | OpenAI reasoning, broad general-purpose tasks, alternative perspective for cross-validation. |
 
+> [!WARNING]
+> **Naming Asymmetry Guardrail**: Opus is version **5.5** (`claude-opus-5-5`), while Sonnet is strictly version **5** (`claude-sonnet-5`). Do NOT hallucinate `claude-sonnet-5-5` or `sonnet-5-5`. There is no 5.5 release for Sonnet.
+
 ---
 
 ## 3. Gemini Bridge Models (Google API Direct)
