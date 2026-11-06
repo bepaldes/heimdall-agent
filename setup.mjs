@@ -821,7 +821,7 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
-  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (50), minimal (16), security (12), design (14) [default: full]
+  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (51), minimal (16), security (12), design (14) [default: full]
   ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, desktop, all [default: all]
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
@@ -1692,7 +1692,7 @@ async function runInteractive(options, detected) {
     }
 
     console.log(`\n${colors.yellow}Select Installation Profile Tier:${colors.reset}`);
-    console.log(`  1. full     - All 50 curated skills (Complete Powerhouse)`);
+    console.log(`  1. full     - All 51 curated skills (Complete Powerhouse)`);
     console.log(`  2. minimal  - 16 core skills (Planning, TDD, Anti-Slop, Taste, Hygiene)`);
     console.log(`  3. security - 12 security skills (Differential HTTP probing, OWASP, Trail of Bits)`);
     console.log(`  4. design   - 14 frontend skills (Taste, GSAP motion, Brandkit, Tokens)`);

@@ -57,4 +57,21 @@ test('Communication Doctrine (BLUF & STE) Invariants', async (t) => {
     assert.ok(content.includes('BLUF Verdict Standard'), 'Reviewer persona must include BLUF Verdict Standard');
     assert.ok(content.includes('Review Verdict: APPROVED | BLOCKED | REVISION_NEEDED'), 'Step 6 must format Review Verdict');
   });
+
+  await t.test('README.md and README.pt-BR.md accurately reflect canonical 51 skills and 19 suites', () => {
+    const readmeEn = fs.readFileSync(path.join(rootDir, 'README.md'), 'utf8');
+    const readmePt = fs.readFileSync(path.join(rootDir, 'README.pt-BR.md'), 'utf8');
+    const docsSkills = fs.readFileSync(path.join(rootDir, 'docs', 'SKILLS.md'), 'utf8');
+
+    assert.ok(readmeEn.includes('51 modular skills'), 'README.md must specify 51 modular skills');
+    assert.ok(readmeEn.includes('51 Modules Across 19 Toolkits'), 'README.md heading must specify 51 Modules Across 19 Toolkits');
+    assert.ok(readmeEn.includes('communication-doctrine'), 'README.md must list communication-doctrine');
+
+    assert.ok(readmePt.includes('51 skills modulares'), 'README.pt-BR.md must specify 51 skills modulares');
+    assert.ok(readmePt.includes('51 Módulos em 19 Toolkits'), 'README.pt-BR.md heading must specify 51 Módulos em 19 Toolkits');
+    assert.ok(readmePt.includes('communication-doctrine'), 'README.pt-BR.md must list communication-doctrine');
+
+    assert.ok(docsSkills.includes('19 Primary Toolkits & Suites (51 modular capabilities)'), 'docs/SKILLS.md must declare 51 modular capabilities');
+    assert.ok(docsSkills.includes('communication-doctrine'), 'docs/SKILLS.md must list communication-doctrine');
+  });
 });
