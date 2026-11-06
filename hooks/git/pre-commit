@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# Heimdall Git Pre-Commit Guardrail
+# Runs the automated verification suite before permitting any commit.
+
+npm test || {
+  echo "" >&2
+  echo "[Heimdall Pre-Commit Guardrail] BLOCKED: npm test failed. Fix test failures or run 'heimdall sync-docs' before committing." >&2
+  exit 1
+}
+
+exit 0

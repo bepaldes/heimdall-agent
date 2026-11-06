@@ -21,6 +21,7 @@ import { execSync } from 'node:child_process';
 import { resolveModelMaxContext, resolveCustomModelsEndpoint } from './lib/model-context.cjs';
 import { updateHermesConfigContext } from './lib/hermes-context.cjs';
 import { detectPathCandidates } from './lib/path-discovery.cjs';
+import { syncCatalogCounts } from './lib/catalog-sync.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -813,6 +814,7 @@ ${colors.dim}Note: 'heimdall' and 'node setup.mjs' are identical. 'heimdall' is 
 
 ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}sync${colors.reset} (or ${colors.dim}--sync${colors.reset})           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
+  ${colors.green}sync-docs${colors.reset} (or ${colors.dim}--sync-docs${colors.reset})      Synchronize documentation and config count references from Single Source of Truth
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
   ${colors.green}uninstall${colors.reset} (or ${colors.dim}--uninstall${colors.reset})     Safely remove Heimdall skills and agent personas from all harnesses
   ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
@@ -854,6 +856,7 @@ function parseArgs() {
     link: false,
     clean: false,
     sync: false,
+    syncDocs: false,
     uninstall: false,
     tools: true,
     doctrine: true,
@@ -876,6 +879,7 @@ function parseArgs() {
     if (arg === 'help' || arg === '--help' || arg === '-h') options.help = true;
     else if (arg === 'audit' || arg === '--audit') options.audit = true;
     else if (arg === 'sync' || arg === '--sync') options.sync = true;
+    else if (arg === 'sync-docs' || arg === '--sync-docs' || arg === 'syncdocs') options.syncDocs = true;
     else if (arg === 'uninstall' || arg === '--uninstall') options.uninstall = true;
     else if (arg === 'sync-models' || arg === '--sync-models' || arg === 'syncmodels') options.syncModels = true;
     else if (arg === 'skills' || arg === '--skills') options.listSkills = true;
@@ -1189,6 +1193,12 @@ async function syncModelsFromEndpoint() {
 
 async function runSync(options, detected) {
   console.log(`${colors.bold}${colors.cyan}=== Heimdall Auto-Sync Engine ===${colors.reset}\n`);
+
+  const countSyncResult = syncCatalogCounts(__dirname, options.dryRun);
+  if (countSyncResult && countSyncResult.modified) {
+    console.log(`   ${colors.green}✔ Synchronized documentation & catalog counts (${countSyncResult.suiteCount} suites / ${countSyncResult.skillCount} modules)${colors.reset}\n`);
+  }
+
   console.log(`Scanning for newly installed AI tools on PATH...\n`);
 
   const allAvailableSkills = fs.readdirSync(skillsDir, { withFileTypes: true })
@@ -1907,6 +1917,16 @@ async function main() {
 
   if (options.syncModels) {
     await syncModelsFromEndpoint();
+    process.exit(0);
+  }
+
+  if (options.syncDocs) {
+    const res = syncCatalogCounts(__dirname, options.dryRun);
+    if (res) {
+      console.log(`${colors.green}✔ Documentation and catalog counts synchronized (${res.suiteCount} suites / ${res.skillCount} modules).${colors.reset}\n`);
+    } else {
+      console.log(`${colors.red}Failed to synchronize catalog counts.${colors.reset}\n`);
+    }
     process.exit(0);
   }
 
