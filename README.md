@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#10-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-10%20predefined-orange.svg?style=flat-square" alt="Agents: 10 Predefined" /></a>
-  <a href="#skill-inventory-53-modules-across-21-toolkits"><img src="https://img.shields.io/badge/skills-21%20toolkits%20%2853%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 21 Toolkits (53 Modules)" /></a>
+  <a href="#skill-inventory-54-modules-across-22-toolkits"><img src="https://img.shields.io/badge/skills-22%20toolkits%20%2854%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 22 Toolkits (54 Modules)" /></a>
   <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Language / Idioma:** **English** | [Português (Brasil)](README.pt-BR.md)
 
-Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **53 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **54 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
 
 ---
 
@@ -34,7 +34,7 @@ Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent so
 **Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. 
 
 Instead of manually maintaining scattered custom instructions, system prompts, and configuration files across different AI clients, Heimdall provides a single source of truth:
-* **Modular Skills**: 53 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
+* **Modular Skills**: 54 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
 * **Specialized Agent Personas**: 10 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Universal Doctrine**: Central rules (`AGENTS.md`) synchronized across all harnesses, enforcing planning gates, test-driven development (TDD), and minimal surgical code edits.
 
@@ -82,7 +82,7 @@ When Heimdall bootstraps, it establishes live junctions (Windows) or symlinks (P
 
 | Source in Heimdall | Deployed Location | Purpose |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<tool>/skills/` | 53 domain toolkits loaded progressively on demand. |
+| `skills/` | `~/.<tool>/skills/` | 54 domain toolkits loaded progressively on demand. |
 | `agents/` | `~/.<tool>/agents/` | 10 specialized agent persona definitions. |
 | `hooks/` | `~/.claude/hooks/` | Event-driven lifecycle hooks for Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (optional) | Universal native Git pre-push hook for all tools. |
@@ -152,7 +152,7 @@ Select a profile tier based on your machine and workflow needs:
 
 | Profile | Skills | Predefined Agents | Description | Best For |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Default)* | 53 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
+| **`full`** *(Default)* | 54 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
 | **`minimal`** | 16 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Lightweight laptops, smaller context windows |
 | **`security`** | 12 | 4 | AppSec suite: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Penetration testing & pre-deployment audits |
 | **`design`** | 12 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
@@ -302,10 +302,10 @@ All personas declare `model: inherit` to run on whichever active model or vendor
 
 ---
 
-<a id="skill-inventory-53-modules-across-21-toolkits"></a>
-### Skill Inventory (53 Modules Across 21 Toolkits)
+<a id="skill-inventory-54-modules-across-22-toolkits"></a>
+### Skill Inventory (54 Modules Across 22 Toolkits)
 
-Heimdall organizes capabilities into **5 Core Multi-Skill Suites (37 modules)** and **16 Standalone Toolkits (16 modules)**:
+Heimdall organizes capabilities into **5 Core Multi-Skill Suites (37 modules)** and **17 Standalone Toolkits (17 modules)**:
 
 #### Core Multi-Skill Suites (5 Suites / 37 Modules)
 
@@ -376,7 +376,7 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (37 modules)** 
 
 </details>
 
-#### Standalone Toolkits (16 Curated Toolkits / 16 Modules)
+#### Standalone Toolkits (17 Curated Toolkits / 17 Modules)
 
 <details open>
 <summary><b>Browse Standalone Toolkits</b></summary>
@@ -384,6 +384,7 @@ Heimdall organizes capabilities into **5 Core Multi-Skill Suites (37 modules)** 
 - **`communication-doctrine`**: Bottom Line Up Front (BLUF) and Simplified Technical English (STE) communication doctrine for AI agents, implementation plans, code reviews, and subagent handoffs.
 - **`threat-modeling`**: Systematic STRIDE threat modeling, trust boundary mapping, and mitigation verification for architecture, API, and cloud infrastructure changes.
 - **`mcp-engineering`**: Standards, JSON-RPC 2.0 protocol compliance, schema validation, and stdio/SSE transport discipline for authoring Model Context Protocol (MCP) servers and tools.
+- **`herdr`**: Control Herdr, a terminal workspace manager for coding agents. Inspect or control panes, tabs, workspaces, commands, or coordinate with peer agents in persistent terminal sessions.
 - **`clean-code` (`ub-mode`)**: Robert C. "Uncle Bob" Martin's disciplined Clean Code engineering standard. Enforces TDD cycles, laziness protocol, premise interrogation, boundary discipline, and mathematical complexity gates (CRAP < 10, DRY similarity < 0.8, mutant-killing test design).
 - **`ponytail`**: Pragmatic senior developer discipline. Enforces Dietrich Gebert's Decision Ladder: YAGNI checks, codebase reuse, built-in standard library, native platform features, and zero premature abstractions.
 - **`karpathy-guidelines`**: Andrej Karpathy's simplicity heuristics: write minimal surgical code, reject speculative configurability, surface hidden assumptions, and never touch adjacent working code.

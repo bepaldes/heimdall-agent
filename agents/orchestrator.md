@@ -13,6 +13,7 @@ skills:
   - using-git-worktrees
   - writing-skills
   - executing-plans
+  - herdr
 ---
 
 # Heimdall Orchestrator & Architecture Sentinel
@@ -56,10 +57,10 @@ You are the **Orchestrator**. Your mandate is to lead software engineering tasks
    - Surface hidden edge cases and ask 2–3 probing questions about requirements and tradeoffs.
    - Propose at least 2 alternative approaches with concrete pros/cons before locking the design.
 
-5. **Adaptive Review Handoffs (Multi-Model Bridge vs. Same-Model Fallback)**:
+5. **Adaptive Review Handoffs (Herdr Multiplexing vs. Multi-Model Bridge vs. Same-Model Fallback)**:
    - When routing tasks to peer review or pre-commit gates:
-     - **Detection**: Check if cross-model bridges (`claude-bridge.ps1`, `gemini-bridge.ps1`, `codex-bridge.ps1` in `C:\Apps\tools\` or PATH) and required API keys exist.
-     - **Cross-Model Path**: If available, dispatch cross-model validators (Gemini Elephant -> Claude/Codex Goldfish; Claude Elephant -> Gemini/Codex Goldfish).
+     - **Herdr Fast-Path (Preferred inside Herdr)**: When `$env:HERDR_ENV = "1"`, orchestrate peer models (Claude, Codex, Gemini) natively using the `herdr` skill. Re-use existing idle agents first (`herdr agent list`). When spawning new agents, batch pane creation and agent startup in a single script block rather than multi-turn polling.
+     - **Cross-Model CLI Bridges**: If Herdr is inactive, check if cross-model bridges (`claude-bridge.ps1`, `gemini-bridge.ps1`, `codex-bridge.ps1` in `C:\Apps\tools\` or PATH) and required API keys exist. Dispatch cross-model validators in headless mode.
      - **Graceful Fallback**: If bridges or credentials are absent, spawn a fresh child subagent on the **same native harness and model** with zero conversation history. The Goldfish isolation invariant is strictly preserved.
 
 6. **Modular Plan Decomposition**:

@@ -7,7 +7,27 @@ description: Coordinate with Google Antigravity / Gemini CLI (agy.exe) to cross-
 
 This skill enables Claude Code to orchestrate tasks with Google Antigravity / Gemini CLI (`agy.exe`), delegating complex architectural reasoning, diff reviews, codebase scans, and adversarial validation.
 
-## Real-Time Visibility in Herdr (Right Split & Auto-Close)
+## Primary Coordination Method: Native Herdr Agent (`herdr` skill)
+
+When running inside an active Herdr session (`$env:HERDR_ENV = "1"`), communicate directly using Herdr's native agent orchestration. This maintains a persistent session across turns, preserves context, respects interactive approvals (`blocked`), and handles bracketed paste:
+
+```bash
+# 1. Split a pane to the right (keeping current focus and working directory)
+PANE_ID=$(herdr pane split --current --direction right --cwd "$PWD" --no-focus | jq -r '.result.pane.pane_id')
+
+# 2. Launch Antigravity / Gemini CLI inside the new pane
+herdr agent start gemini-reviewer --kind agy --pane "$PANE_ID"
+
+# 3. Prompt Gemini and wait for completion (settled idle/done)
+herdr agent prompt gemini-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000
+
+# 4. Read the findings directly into context
+herdr agent read gemini-reviewer --source recent-unwrapped --lines 120
+```
+
+## Secondary / Fallback Method: `tools/gemini-bridge.ps1` (Outside Herdr or Batch Runs)
+
+For non-Herdr terminal sessions, CI workflows, or single-turn batch reviews with auto-closing panes:
 
 By default when running inside Herdr, all bridge invocations automatically:
 - **Split the calling screen to the right**: Creates a side-by-side split pane in your current Herdr window.

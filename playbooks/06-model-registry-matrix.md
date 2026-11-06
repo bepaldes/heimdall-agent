@@ -12,11 +12,11 @@ Models are partitioned into two architectural access channels:
   - Powers **Claude Code CLI**, **OpenAI Codex CLI**, and **Hermes Agent**.
   - Serves all Anthropic models (`claude-*`), OpenAI models (`gpt-6-astra`), and Zhipu AI models (`z-ai/glm-5.3`, `z-ai/glm-5.3-flash`).
   - Because GhostCLI exposes multi-protocol translation (`/v1/messages`, `/v1/responses`, `/v1/chat/completions`), Claude Code can run GPT-6 Astra or GLM directly (`claude --model gpt-6-astra`), and Codex can run Claude Sonnet directly (`codex --model claude-sonnet-5`).
-  - `claude-bridge.ps1` and `codex-bridge.ps1` are **not API protocol bridges**; they are **Process & Multiplexer Bridges** used for Herdr pane splitting, background pane execution, and launching fresh, zero-context review processes.
+  - When running inside Herdr (`HERDR_ENV=1`), use native Herdr multiplexing (`herdr agent start/prompt`) directly. The `*-bridge.ps1` scripts serve as secondary CLI wrappers for non-Herdr or headless execution.
 
 - **Channel 2: Google Gemini Direct API (`gemini.googleapis.com`)**
   - Powers **Google Antigravity** natively (via direct Google OAuth).
-  - Accessed from outside Antigravity via **`gemini-bridge.ps1`**.
+  - Accessed from outside Antigravity via **`gemini-bridge.ps1`** (or via native Herdr when running `herdr agent start --kind agy`).
   - **`gemini-bridge.ps1` is the true API Gateway Bridge**: it provides the only bridge link into Google's direct native Gemini 4 / 3.8 / 3.1 infrastructure (bypassing GhostCLI).
 
 ---

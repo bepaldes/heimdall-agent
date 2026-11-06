@@ -42,15 +42,17 @@
 ### Phase 4: Review, Purge & Handoff
 
 ## 5. Symmetric & Tri-Directional Cross-Model Validation Loop
-- Tasks executed by Claude -> Validate with Gemini or Codex:
-  `powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`
-  `powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`
-- Tasks executed by Gemini -> Validate with Claude or Codex:
-  `powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`
-  `powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`
-- Tasks executed by Codex -> Validate with Claude or Gemini:
-  `powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`
-  `powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`
+- **Primary in Herdr (`HERDR_ENV=1`)**: Use native Herdr agent prompts (`herdr agent prompt <target-reviewer> "Review diff..." --wait`).
+- **Outside Herdr (CLI Bridges)**:
+  - Tasks executed by Claude -> Validate with Gemini or Codex:
+    `powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`
+    `powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`
+  - Tasks executed by Gemini -> Validate with Claude or Codex:
+    `powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`
+    `powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`
+  - Tasks executed by Codex -> Validate with Claude or Gemini:
+    `powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`
+    `powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`
 
 ## 6. Orchestrator Heartbeat
 - Orchestrator monitors progress every 3 minutes.

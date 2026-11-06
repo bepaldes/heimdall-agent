@@ -1,8 +1,8 @@
 {
   "version": "1.3.0",
   "description": "Heimdall Canonical Skill Registry & 18-Suite Hierarchy",
-  "totalSuites": 21,
-  "totalModules": 53,
+  "totalSuites": 22,
+  "totalModules": 54,
   "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
   "suites": {
     "superpowers": {
@@ -203,6 +203,14 @@
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "modules": [
         "mcp-engineering"
+      ]
+    },
+    "herdr": {
+      "name": "Herdr Coding Agent Multiplexer & Orchestrator",
+      "type": "Standalone Toolkit",
+      "upstream": "https://herdr.dev",
+      "modules": [
+        "herdr"
       ]
     }
   },
@@ -630,6 +638,14 @@
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
       "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+    },
+    "herdr": {
+      "name": "herdr",
+      "category": "Multi-Agent & Orchestration",
+      "description": "Control Herdr, a terminal workspace manager for coding agents. Inspect or control panes, tabs, workspaces, commands, or coordinate with peer agents (claude, codex, gemini/agy, etc.) in persistent terminal sessions.",
+      "upstream": "https://herdr.dev",
+      "sourceRevision": "v0.1.0",
+      "updateProtocol": "Run herdr update and herdr --skill to refresh the skill instructions from the local binary."
     }
   }
 }

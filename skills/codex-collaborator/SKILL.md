@@ -11,7 +11,27 @@ version: 1.0.0
 
 This skill enables Google Antigravity and Claude Code to orchestrate tasks with OpenAI Codex CLI (`codex.exe`), delegating complex architectural reasoning, diff reviews, and adversarial validation across the tri-directional bridge.
 
-## Real-Time Visibility in Herdr (Right Split & Auto-Close)
+## Primary Coordination Method: Native Herdr Agent (`herdr` skill)
+
+When running inside an active Herdr session (`$env:HERDR_ENV = "1"`), communicate directly using Herdr's native agent orchestration. This maintains a persistent session across turns, preserves context, respects interactive approvals (`blocked`), and handles bracketed paste:
+
+```bash
+# 1. Split a pane to the right (keeping current focus and working directory)
+PANE_ID=$(herdr pane split --current --direction right --cwd "$PWD" --no-focus | jq -r '.result.pane.pane_id')
+
+# 2. Launch Codex CLI inside the new pane
+herdr agent start codex-reviewer --kind codex --pane "$PANE_ID"
+
+# 3. Prompt Codex and wait for completion (settled idle/done)
+herdr agent prompt codex-reviewer "Review git diff for security regressions and boundary conditions." --wait --timeout 120000
+
+# 4. Read the findings directly into context
+herdr agent read codex-reviewer --source recent-unwrapped --lines 120
+```
+
+## Secondary / Fallback Method: `tools/codex-bridge.ps1` (Outside Herdr or Batch Runs)
+
+For non-Herdr terminal sessions, CI workflows, or single-turn batch reviews with auto-closing panes:
 
 By default when running inside Herdr, all bridge invocations automatically:
 - **Split the calling screen to the right**: Creates a side-by-side split pane in your current Herdr window.

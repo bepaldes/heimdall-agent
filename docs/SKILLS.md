@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **21 Primary Toolkits & Suites (53 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **22 Primary Toolkits & Suites (54 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -42,6 +42,7 @@ heimdall update-skill all
 - [⚡ Communication Doctrine (BLUF & STE)](#communication-doctrine)
 - [⚡ STRIDE Threat Modeling & Attack Surface Sentinel](#threat-modeling)
 - [⚡ MCP Server & Tool Engineering Standards](#mcp-engineering)
+- [⚡ Herdr Coding Agent Multiplexer & Orchestrator](#herdr)
 
 ---
 
@@ -336,6 +337,17 @@ heimdall update-skill all
 - **Module Name**: `mcp-engineering`
 - **Description**: Standards, JSON-RPC 2.0 protocol compliance, schema validation, and stdio/SSE transport discipline for authoring Model Context Protocol (MCP) servers and tools.
 - **Contract File**: [`skills/mcp-engineering/SKILL.md`](../skills/mcp-engineering/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="herdr"></a>
+### ⚡ Herdr Coding Agent Multiplexer & Orchestrator
+
+- **Module Name**: `herdr`
+- **Description**: Control Herdr, a terminal workspace manager for coding agents. Inspect or control panes, tabs, workspaces, commands, or coordinate with peer agents (claude, codex, gemini/agy, etc.) in persistent terminal sessions.
+- **Contract File**: [`skills/herdr/SKILL.md`](../skills/herdr/SKILL.md)
 
 [↑ Back to top](#toc)
 
