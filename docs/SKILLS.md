@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **19 Primary Toolkits & Suites (51 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **21 Primary Toolkits & Suites (53 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -40,6 +40,8 @@ heimdall update-skill all
 - [⚡ Caveman Chat Token Brevity Protocol](#caveman)
 - [⚡ Clean Code & ub-mode Quality Sentinel](#clean-code)
 - [⚡ Communication Doctrine (BLUF & STE)](#communication-doctrine)
+- [⚡ STRIDE Threat Modeling & Attack Surface Sentinel](#threat-modeling)
+- [⚡ MCP Server & Tool Engineering Standards](#mcp-engineering)
 
 ---
 
@@ -317,3 +319,24 @@ heimdall update-skill all
 
 ---
 
+<a id="threat-modeling"></a>
+### ⚡ STRIDE Threat Modeling & Attack Surface Sentinel
+
+- **Module Name**: `threat-modeling`
+- **Description**: Systematic STRIDE threat modeling, trust boundary mapping, and mitigation verification for architecture, API, and cloud infrastructure changes.
+- **Contract File**: [`skills/threat-modeling/SKILL.md`](../skills/threat-modeling/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="mcp-engineering"></a>
+### ⚡ MCP Server & Tool Engineering Standards
+
+- **Module Name**: `mcp-engineering`
+- **Description**: Standards, JSON-RPC 2.0 protocol compliance, schema validation, and stdio/SSE transport discipline for authoring Model Context Protocol (MCP) servers and tools.
+- **Contract File**: [`skills/mcp-engineering/SKILL.md`](../skills/mcp-engineering/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---

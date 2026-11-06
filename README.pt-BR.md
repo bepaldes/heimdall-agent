@@ -3,14 +3,14 @@
 <p align="left">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
-  <a href="#9-personas-de-agentes-predefinidas"><img src="https://img.shields.io/badge/agents-9%20predefinidos-orange.svg?style=flat-square" alt="Agentes: 9 Predefinidos" /></a>
-  <a href="#inventario-de-skills-51-modulos-em-19-toolkits"><img src="https://img.shields.io/badge/skills-19%20toolkits%20%2851%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 19 Toolkits (51 Módulos)" /></a>
+  <a href="#10-personas-de-agentes-predefinidas"><img src="https://img.shields.io/badge/agents-10%20predefinidos-orange.svg?style=flat-square" alt="Agentes: 10 Predefinidos" /></a>
+  <a href="#inventario-de-skills-53-modulos-em-21-toolkits"><img src="https://img.shields.io/badge/skills-21%20toolkits%20%2853%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 21 Toolkits (53 Módulos)" /></a>
   <a href="#ferramentas-e-runtimes-suportados"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Idioma / Language:** [English](README.md) | **Português (Brasil)**
 
-O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **9 personas de agentes especializados** e **51 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
+O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **10 personas de agentes especializados** e **53 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
 
 ---
 
@@ -34,8 +34,8 @@ O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para en
 O **Heimdall** é um bootstrapper de ambiente e camada de coordenação multi-agente para ferramentas de programação com IA.
 
 Em vez de manter manualmente instruções customizadas, prompts de sistema e arquivos de configuração espalhados em diferentes clientes de IA, o Heimdall fornece uma fonte única da verdade (*Single Source of Truth*):
-* **Skills Modulares**: 51 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
-* **Personas de Agentes Especializados**: 9 papéis predefinidos com janelas de contexto isoladas (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`).
+* **Skills Modulares**: 53 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
+* **Personas de Agentes Especializados**: 10 papéis predefinidos com janelas de contexto isoladas (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Doutrina Universal**: Regras centrais (`AGENTS.md`) sincronizadas em todas as ferramentas, exigindo portões de planejamento, desenvolvimento orientado a testes (TDD) e edições cirúrgicas mínimas.
 
 O Heimdall roda em **Windows, macOS e Linux**, usando *junctions* e *symlinks* nativos do sistema de arquivos para manter todas as ferramentas sincronizadas sem duplicação de arquivos.
@@ -82,8 +82,8 @@ Durante o bootstrap, o Heimdall cria *junctions* (Windows) ou *symlinks* (POSIX)
 
 | Origem no Heimdall | Local Implantado | Finalidade |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<ferramenta>/skills/` | 51 toolkits de domínio carregados progressivamente sob demanda. |
-| `agents/` | `~/.<ferramenta>/agents/` | 9 definições de personas de agentes especializados. |
+| `skills/` | `~/.<ferramenta>/skills/` | 53 toolkits de domínio carregados progressivamente sob demanda. |
+| `agents/` | `~/.<ferramenta>/agents/` | 10 definições de personas de agentes especializados. |
 | `hooks/` | `~/.claude/hooks/` | Hooks de ciclo de vida orientados a eventos para o Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (opcional) | Hook Git `pre-push` nativo universal para todas as ferramentas. |
 | `doctrine/AGENTS.md` | `~/.claude/CLAUDE.md`<br>`~/.gemini/GEMINI.md`<br>`~/.codex/AGENTS.md`<br>`~/.hermes/AGENTS.md` | Doutrina universal entre agentes e restrições operacionais. |
@@ -97,7 +97,7 @@ Durante o bootstrap, o Heimdall cria *junctions* (Windows) ou *symlinks* (POSIX)
 
 O Heimdall adota a divisão central de trabalho do [`google/elephant-goldfish-model`](https://github.com/google/elephant-goldfish-model):
 
-* **O Elefante (Coordenador)**: A sessão principal e a persona [`orchestrator`](#8-personas-de-agentes-predefinidas) retêm a memória de longo prazo, a narrativa do projeto e o histórico profundo de contexto.
+* **O Elefante (Coordenador)**: A sessão principal e a persona [`orchestrator`](#10-personas-de-agentes-predefinidas) retêm a memória de longo prazo, a narrativa do projeto e o histórico profundo de contexto.
 * **O Peixe-Dourado (Revisores e Testadores)**: Subagentes despachados para revisão de código (`reviewer`) e diagnóstico de bugs (`tester`) são intencionalmente isolados do histórico de conversa e dos debates do autor. Eles avaliam `git diffs` brutos e critérios de aceite diretamente, prevenindo viés de confirmação.
 * **Escada de Fronteira em 3 Níveis (3-Tier Boundary Ladder)**:
   - **Tier 1 (Spike / Bugfix < 50 LOC)**: Zero cerimônia. Código cirúrgico mínimo com teste falhando primeiro.
@@ -152,7 +152,7 @@ Escolha o perfil de acordo com sua máquina e fluxo de trabalho:
 
 | Perfil | Skills | Agentes Predefinidos | Descrição | Ideal Para |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Padrão)* | 51 | 9 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
+| **`full`** *(Padrão)* | 53 | 10 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
 | **`minimal`** | 16 | 4 | Núcleo enxuto: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Notebooks leves, janelas de contexto menores |
 | **`security`** | 12 | 4 | Suíte AppSec: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Pentest e auditorias pré-deploy |
 | **`design`** | 12 | 4 | Frontend e mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | Design de UI/UX e design systems |
@@ -281,8 +281,8 @@ Para manter a estabilidade da base de código e evitar deriva arquitetural, o He
 <a id="6-lista-completa-de-skills-e-agentes"></a>
 ## 6. Lista completa de Skills e Agentes
 
-<a id="9-personas-de-agentes-predefinidas"></a>
-### 9 Personas de Agentes Predefinidas
+<a id="10-personas-de-agentes-predefinidas"></a>
+### 10 Personas de Agentes Predefinidas
 
 Todas as personas declaram `model: inherit` para rodar em qualquer modelo ou provedor configurado na sua máquina, sem *vendor lock-in*.
 
@@ -297,13 +297,14 @@ Todas as personas declaram `model: inherit` para rodar em qualquer modelo ou pro
 | **`code-sentinel`** | `surgical_restraint` | Simplicidade Karpathy: escreve código cirúrgico mínimo, remove comentários redundantes, elimina código morto defensivo e aplica padrões anti-slop. | `karpathy-guidelines`, `clean-code`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
 | **`reviewer`** | `adversarial_diff_eval` | Realiza análise adversarial de diffs, captura regressões silenciosas e erros engolidos, e coordena revisões cruzadas entre modelos. | `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
 | **`modernizer`** | `legacy_migration_safety` | Executa transformações de código legado, upgrades de runtime e migrações Strangler Fig protegidas por testes de caracterização Golden Master. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `karpathy-guidelines`, `project-hygiene`, `output-skill` |
+| **`cloud-engineer`** | `infra_container_safety` | Governa conteinerização (Docker, Compose), manifestos Kubernetes, Infraestrutura como Código (Terraform), proxies reversos (Caddy, Nginx), CI/CD e verificação terminante. | `communication-doctrine`, `karpathy-guidelines`, `clean-code`, `systematic-debugging`, `project-hygiene`, `progressive-disclosure` |
 
 ---
 
-<a id="inventario-de-skills-51-modulos-em-19-toolkits"></a>
-### Inventário de Skills (51 Módulos em 19 Toolkits)
+<a id="inventario-de-skills-53-modulos-em-21-toolkits"></a>
+### Inventário de Skills (53 Módulos em 21 Toolkits)
 
-O Heimdall organiza as capacidades em **5 Suítes Multi-Skill Principais (37 módulos)** e **14 Toolkits Independentes (14 módulos)**:
+O Heimdall organiza as capacidades em **5 Suítes Multi-Skill Principais (37 módulos)** e **16 Toolkits Independentes (16 módulos)**:
 
 #### Suítes Multi-Skill Principais (5 Suítes / 37 Módulos)
 
@@ -374,7 +375,7 @@ O Heimdall organiza as capacidades em **5 Suítes Multi-Skill Principais (37 mó
 
 </details>
 
-#### Toolkits Independentes (14 Toolkits Curados / 14 Módulos)
+#### Toolkits Independentes (16 Toolkits Curados / 16 Módulos)
 
 <details open>
 <summary><b>Explorar Toolkits Independentes</b></summary>

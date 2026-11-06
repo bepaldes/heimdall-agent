@@ -40,7 +40,8 @@ test('Catalog and Documentation Count Integrity Sentinel', async (t) => {
   await t.test('config/profiles.json full description matches canonical skill count', () => {
     const profilesPath = path.join(rootDir, 'config', 'profiles.json');
     const profiles = JSON.parse(fs.readFileSync(profilesPath, 'utf8'));
-    const expected = `Complete ${skillCount}-skill suite & 9 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.`;
+    const agentCount = fs.readdirSync(path.join(rootDir, 'agents')).filter(f => f.endsWith('.md')).length;
+    const expected = `Complete ${skillCount}-skill suite & ${agentCount} predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.`;
     assert.equal(profiles.profiles.full.description, expected);
   });
 

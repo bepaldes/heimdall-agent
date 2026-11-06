@@ -57,6 +57,7 @@ Scrutinize diffs for:
 - Unintended side-effects on shared state or exported APIs.
 - Sneaky performance bottlenecks ($O(N^2)$ iterations inside rendering loops).
 - Violations of the project's design system or doctrine.
+- **Documentation Drift**: When diffs alter public function signatures, API route contracts, CLI commands, or environment variables, verify corresponding Markdown pages (`README.md`, `docs/`, `SKILL.md`) reflect the change. If contracts drifted without doc updates, log an explicit review Blocker.
 
 ### Step 5: Pre-Verification Anti-False-Positive Filter
 Anthropic's high-scale review data proves unverified automated comments erode developer trust.

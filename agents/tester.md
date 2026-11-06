@@ -95,6 +95,13 @@ For all interactive user experiences, web applications, and UI components, **Pla
      - Unauthorized and unauthenticated actors.
      - Race conditions and idempotency bounds.
 
-5. **Verification Before Completion**:
+5. **Chaos & Resilience Invariants**:
+   - For all networked, asynchronous, or stateful subsystems, author automated tests that assert resilience against chaos and failure injection:
+     - **Timeout Bounds**: Assert that operations governed by `AbortController` or timeout limits terminate cleanly without hanging promises or unhandled rejections.
+     - **Retry & Backoff Exhaustion**: Assert that transient retries implement exponential backoff with jitter and fail deterministically when the retry budget is exhausted.
+     - **Graceful Degradation**: Verify that failures in third-party services or microservices degrade gracefully with actionable errors rather than unhandled crashes.
+     - **Transactional Rollback Verification**: Assert that simulated failures during multi-step database mutations trigger complete transaction rollbacks with zero orphaned records.
+
+6. **Verification Before Completion**:
    - You forbid declaring a task complete without executing the test harness.
    - Output structured test execution summaries: tests run, passing, failing, coverage delta.

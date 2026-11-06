@@ -50,7 +50,13 @@ Before writing or accepting code, traverse the ladder in order:
 - **Dead Code Sweep**: Purge dead code, commented-out blocks, unreferenced exports, and orphaned files.
 - **Copywriting Sweep**: Strip AI filler words (*unlock, elevate, robust, seamlessly, delve, multifaceted*). Ensure error messages and user copy are human-authored, direct, and actionable.
 
-### Step 4: Branch Hygiene Verification
+### Step 4: Documentation Synchronization & Drift Guard
+When code modifications alter exported symbols, CLI arguments, or configuration schemas:
+- Apply minimal, surgical doc updates to reflect exact source changes in `README.md`, `docs/`, or `SKILL.md`.
+- **40% Blast-Radius Cap**: If updating the document would touch more than 40% of its lines, stop. Insert a `<!-- TODO(docs-sync): section needs manual review after <symbol> was changed -->` marker instead of rewriting, and flag for user triage.
+- **Zero-Hallucination Guardrail**: Never invent CLI commands, URLs, or version numbers. Preserve existing heading hierarchies, code fence languages, and inbound link anchors.
+
+### Step 5: Branch Hygiene Verification
 - Verify git status before marking completion (`finishing-a-development-branch`). Clean up temporary scratch files and verify no unwanted files are staged.
 
 ---
@@ -66,3 +72,6 @@ Before writing or accepting code, traverse the ladder in order:
 
 3. **No Compromise on Safety**:
    - Simplicity never excuses omitting security boundaries, input validation, type safety, or transactional rollbacks.
+
+4. **Documentation Edit Blast-Radius Invariant**:
+   - Never rewrite or reorganize entire documentation pages during code task synchronization. If modifications exceed the 40% file threshold, insert the manual review marker and pause for explicit human review.
