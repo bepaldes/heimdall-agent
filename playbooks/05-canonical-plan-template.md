@@ -31,9 +31,9 @@
 ## 3. Multi-Agent Orchestration & Model Allocation Matrix
 | Task ID | Phase & Task Description | Assigned Model | Effort Level | Selection Rationale | Cross-Reviewer & Tool Command |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| T1 | Phase 1: Scaffolding | claude-sonnet-5 | high | Schema & component structure | Gemini 3.8 Flash (`gemini-bridge review`) |
-| T2 | Phase 2: Implementation | claude-sonnet-5 | high | Core business logic & UI | Gemini 3.8 Flash (`gemini-bridge review`) |
-| T3 | Phase 3: Playwright E2E | claude-sonnet-5 | high | Full user journey verification | Gemini 3.8 Flash (`gemini-bridge review`) |
+| T1 | Phase 1: Scaffolding | claude-sonnet-5 | high | Schema & component structure | Gemini 3.8 Flash (`herdr agent prompt gemini-reviewer`) |
+| T2 | Phase 2: Implementation | claude-sonnet-5 | high | Core business logic & UI | Gemini 3.8 Flash (`herdr agent prompt gemini-reviewer`) |
+| T3 | Phase 3: Playwright E2E | claude-sonnet-5 | high | Full user journey verification | Gemini 3.8 Flash (`herdr agent prompt gemini-reviewer`) |
 
 ## 4. Multi-Phase Implementation Plan
 ### Phase 1: Architecture & Scaffolding
@@ -42,17 +42,16 @@
 ### Phase 4: Review, Purge & Handoff
 
 ## 5. Symmetric & Tri-Directional Cross-Model Validation Loop
-- **Primary in Herdr (`HERDR_ENV=1`)**: Use native Herdr agent prompts (`herdr agent prompt <target-reviewer> "Review diff..." --wait`).
-- **Outside Herdr (CLI Bridges)**:
+- In Herdr (`HERDR_ENV=1`), validate tasks directly via peer agent prompts:
   - Tasks executed by Claude -> Validate with Gemini or Codex:
-    `powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`
-    `powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`
+    `herdr agent prompt gemini-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
+    `herdr agent prompt codex-reviewer "Review git diff for security regressions and boundary conditions." --wait --timeout 120000`
   - Tasks executed by Gemini -> Validate with Claude or Codex:
-    `powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`
-    `powershell -File C:/Apps/tools/codex-bridge.ps1 review -Model "gpt-6-astra" -Effort "high"`
+    `herdr agent prompt claude-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
+    `herdr agent prompt codex-reviewer "Review git diff for security regressions and boundary conditions." --wait --timeout 120000`
   - Tasks executed by Codex -> Validate with Claude or Gemini:
-    `powershell -File C:/Apps/tools/claude-bridge.ps1 review -Model "claude-sonnet-5" -Effort "high"`
-    `powershell -File C:/Apps/tools/gemini-bridge.ps1 review -Model "Gemini 3.8 Flash" -Effort "high"`
+    `herdr agent prompt claude-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
+    `herdr agent prompt gemini-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
 
 ## 6. Orchestrator Heartbeat
 - Orchestrator monitors progress every 3 minutes.
@@ -82,13 +81,13 @@
 3. **Section 3: Model Allocation Matrix**:
    - Decomposes plan into discrete tasks with explicit task IDs.
    - Each task assigns a canonical model and effort level from [`playbooks/06-model-registry-matrix.md`](file:///C:/Apps/heimdall-agent/playbooks/06-model-registry-matrix.md).
-   - Declares the cross-reviewer harness and bridge execution command.
+   - Declares the cross-reviewer harness and Herdr prompt command.
 4. **Section 4: Multi-Phase Implementation Plan**:
    - Organized into logical progression (Scaffolding -> Core Implementation -> E2E Verification -> Review/Handoff).
    - Strict TDD: failing test first, minimal code, passing test, self-review.
    - Strict STE Step Granularity: Every step begins with an approved imperative verb (`Create`, `Modify`, `Assert`, `Verify`, `Delete`, `Run`), contains <= 20 words, and contains zero banned vague qualifiers (`ensure`, `properly`, `appropriately`, `as needed`).
 5. **Section 5: Symmetric & Tri-Directional Cross-Model Validation Loop**:
-   - Defines validation commands using shared bridge scripts in `C:\Apps\tools\`.
+   - Defines validation commands using native Herdr agent commands.
    - Claude tasks validated by Gemini/Codex; Gemini tasks validated by Claude/Codex; Codex tasks validated by Claude/Gemini.
 6. **Section 6: Orchestrator Heartbeat**:
    - Cadence for monitoring task progress, status checks, and liveness during subagent runs.

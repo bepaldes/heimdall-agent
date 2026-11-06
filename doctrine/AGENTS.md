@@ -37,7 +37,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
        - PLAN STORAGE & LIFECYCLE: All plans MUST be created in `docs/designs/YYYY-MM-DD <plan name>.md`. Once implemented, verified, and confirmed working, the plan is moved to `docs/designs/old/YYYY-MM-DD <plan name>.md`.
        - The plan MUST specify:
          a) Multi-Agent Orchestration & Model Allocation Matrix (allocating tasks across Claude, Gemini, and Codex from `06-model-registry-matrix.md` in the same playbooks directory).
-         b) Implementation Execution Commands (`*-bridge.ps1 exec`) and Symmetric Cross-Model Validation Loop (`*-bridge.ps1 review` via `tools/`, `../tools/`, or `C:\Apps\tools\`).
+         b) Symmetric Cross-Model Validation Loop (`herdr agent prompt`) and Non-Interactive Verification Harness.
          c) Orchestrator Heartbeat (cadence for monitoring task progress and liveness).
          d) Verification Harness (Non-interactive terminating test suites, static builds, and linters. Playwright E2E strictly against pre-existing human-managed servers or static build previews. NEVER include steps to start a dev server).
   </planning_protocol>

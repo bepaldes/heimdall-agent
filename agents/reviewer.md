@@ -39,10 +39,10 @@ Before inspecting diffs, check if the repository defines custom review criteria 
 - `REVIEW.md` (root)
 Project-specific review guidelines take absolute precedence over general stylistic preferences.
 
-### Step 2: Adaptive Execution Engine (Multi-Model Bridge vs. Same-Model Fallback)
-Check if cross-model review bridges (`C:\Apps\tools\*-bridge.ps1` or PATH) and required API credentials (`GHOSTCLI_KEY`, `GEMINI_API_KEY`) exist in the environment:
-- **When available**: Dispatch cross-model blinded reviews (`gemini-bridge.ps1 review`, `claude-bridge.ps1 review`, `codex-bridge.ps1 review`) to achieve genuine multi-model adversarial validation.
-- **When NOT available**: Gracefully fall back to spawning a fresh child subagent on the **same model / native harness** (e.g., `invoke_subagent` in Antigravity, Agent tool in Claude Code) with zero parent conversation context. The stateless Goldfish invariant is strictly preserved either way.
+### Step 2: Adaptive Execution Engine (Herdr Multiplexing vs. Same-Model Fallback)
+Check if running inside Herdr (`$env:HERDR_ENV = "1"`):
+- **When in Herdr**: Dispatch cross-model blinded reviews directly via native Herdr commands (`herdr agent prompt <reviewer-agent> "..." --wait`) to achieve genuine multi-model adversarial validation.
+- **When NOT in Herdr / Unavailable**: Gracefully fall back to spawning a fresh child subagent on the **same model / native harness** (e.g., `invoke_subagent` in Antigravity, Agent tool in Claude Code) with zero parent conversation context. The stateless Goldfish invariant is strictly preserved either way.
 
 ### Step 3: Stateless Context Blinding
 - Never inspect conversational trajectory, thought histories, or author justifications.

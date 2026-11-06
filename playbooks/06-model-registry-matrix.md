@@ -4,7 +4,7 @@
 
 ---
 
-## 1. Access Channels & Bridge Architecture
+## 1. Access Channels & Multi-Agent Multiplexing
 
 Models are partitioned into two architectural access channels:
 
@@ -12,12 +12,11 @@ Models are partitioned into two architectural access channels:
   - Powers **Claude Code CLI**, **OpenAI Codex CLI**, and **Hermes Agent**.
   - Serves all Anthropic models (`claude-*`), OpenAI models (`gpt-6-astra`), and Zhipu AI models (`z-ai/glm-5.3`, `z-ai/glm-5.3-flash`).
   - Because GhostCLI exposes multi-protocol translation (`/v1/messages`, `/v1/responses`, `/v1/chat/completions`), Claude Code can run GPT-6 Astra or GLM directly (`claude --model gpt-6-astra`), and Codex can run Claude Sonnet directly (`codex --model claude-sonnet-5`).
-  - When running inside Herdr (`HERDR_ENV=1`), use native Herdr multiplexing (`herdr agent start/prompt`) directly. The `*-bridge.ps1` scripts serve as secondary CLI wrappers for non-Herdr or headless execution.
+  - When coordinating between harnesses in Herdr (`HERDR_ENV=1`), use native Herdr multiplexing (`herdr agent start/prompt`) directly.
 
 - **Channel 2: Google Gemini Direct API (`gemini.googleapis.com`)**
   - Powers **Google Antigravity** natively (via direct Google OAuth).
-  - Accessed from outside Antigravity via **`gemini-bridge.ps1`** (or via native Herdr when running `herdr agent start --kind agy`).
-  - **`gemini-bridge.ps1` is the true API Gateway Bridge**: it provides the only bridge link into Google's direct native Gemini 4 / 3.8 / 3.1 infrastructure (bypassing GhostCLI).
+  - Coordinated across harnesses via native Herdr (`herdr agent start <name> --kind agy`).
 
 ---
 
@@ -39,9 +38,9 @@ All GhostCLI models support text and image input:
 
 ---
 
-## 3. Gemini Bridge Models (Google API Direct)
+## 3. Google Antigravity Models (Google API Direct)
 
-Accessed via `gemini-bridge.ps1` hitting Google's API directly (never through GhostCLI):
+Accessed natively via Google Antigravity / `agy` CLI (never through GhostCLI):
 
 | Model Name | Canonical Flag | Allowed Effort Levels | Optimal Specialization |
 | :--- | :--- | :--- | :--- |
@@ -73,7 +72,7 @@ The `/model` picker in Claude Code shows a hardcoded list that may include model
 
 To dispatch any GhostCLI model — including those invisible in the picker — pass its canonical flag via the Agent tool's `model` parameter when spawning subagents (e.g. `model: "gpt-6-astra"`, `model: "z-ai/glm-5.3"`). The API call routes through GhostCLI regardless of what `/model` displays.
 
-Gemini models (`gemini-4`, `gemini-3.8-flash`, `gemini-3.1-pro`) are never reachable through GhostCLI; they require `gemini-bridge.ps1` hitting Google's API directly.
+Gemini models (`gemini-4`, `gemini-3.8-flash`, `gemini-3.1-pro`) are never reachable through GhostCLI; they are accessed natively via Google Antigravity (`agy` CLI in Herdr).
 
 ---
 

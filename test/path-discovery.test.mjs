@@ -18,15 +18,15 @@ describe('Cross-Agent Bridge Tools PATH Candidate Discovery', () => {
     fs.mkdirSync(localBin, { recursive: true });
     fs.mkdirSync(appsTools, { recursive: true });
 
-    // Place a bridge script in Apps/tools
-    fs.writeFileSync(path.join(appsTools, 'claude-bridge.ps1'), '# bridge', 'utf8');
+    // Place a tool script in Apps/tools
+    fs.writeFileSync(path.join(appsTools, 'heimdall.ps1'), '# heimdall', 'utf8');
 
     const fakePath = [jdkBin, agyCliBin, localBin, appsTools].join(path.delimiter);
     const candidates = detectPathCandidates(fakePath, tmpRoot);
 
     assert.ok(!candidates.includes(jdkBin), 'Must exclude JDK Program Files bin');
     assert.ok(!candidates.includes(agyCliBin), 'Must exclude antigravity-cli internal bin');
-    assert.equal(candidates[0], appsTools, 'Must prioritize tools directory with active bridge scripts first');
+    assert.equal(candidates[0], appsTools, 'Must prioritize tools directory with active heimdall scripts first');
     assert.ok(candidates.includes(localBin), 'Should still include valid user .local/bin as secondary candidate');
 
     fs.rmSync(tmpRoot, { recursive: true, force: true });

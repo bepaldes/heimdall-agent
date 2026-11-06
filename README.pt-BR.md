@@ -103,7 +103,7 @@ O Heimdall adota a divisão central de trabalho do [`google/elephant-goldfish-mo
   - **Tier 1 (Spike / Bugfix < 50 LOC)**: Zero cerimônia. Código cirúrgico mínimo com teste falhando primeiro.
   - **Tier 2 (Feature Delimitada)**: Verificação rápida de design no chat com revisões de crítica e prontidão.
   - **Tier 3 (Arquitetural)**: Especificação gravada em disco (`docs/designs/<feature>.md`), revisão em 4 estágios (Zoom Out, Compreensão, Crítica, Prontidão) e ledger de convergência de até 5 rodadas.
-* **Execução Multi-Modelo Adaptativa**: Se as pontes entre modelos (`gemini-bridge.ps1`, `claude-bridge.ps1`, `codex-bridge.ps1`) e credenciais estiverem presentes, o Heimdall roteia revisões entre modelos distintos (ex.: Elefante Gemini validado por Claude/Codex); caso contrário, recorre automaticamente a subagentes independentes no mesmo modelo.
+* **Execução Multi-Modelo Adaptativa**: No Herdr (`HERDR_ENV=1`), o Heimdall roteia revisões entre modelos distintos (ex.: Elefante Gemini validado por Claude/Codex) via multiplexação nativa do Herdr; caso contrário, recorre automaticamente a subagentes independentes no mesmo modelo.
 
 ### 3. Hooks de Ciclo de Vida Orientados a Eventos
 

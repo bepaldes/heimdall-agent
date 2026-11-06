@@ -103,7 +103,7 @@ Heimdall adopts the core division of labor from [`google/elephant-goldfish-model
   - **Tier 1 (Spike / Bugfix < 50 LOC)**: Zero ceremony. Minimal surgical code with a failing test first.
   - **Tier 2 (Bounded Feature)**: Fast in-chat design check with critic and readiness reviews.
   - **Tier 3 (Architectural)**: Spec written to disk (`docs/designs/<feature>.md`), 4-stage review (Zoom Out, Comprehension, Critique, Readiness), and a 5-round convergence ledger.
-* **Adaptive Multi-Model Execution**: If cross-model bridges (`gemini-bridge.ps1`, `claude-bridge.ps1`, `codex-bridge.ps1`) and credentials exist, Heimdall routes reviews across different models (e.g. Gemini Elephant validated by Claude/Codex); otherwise, it falls back to stateless child subagents on the same model.
+* **Adaptive Multi-Model Execution**: In Herdr (`HERDR_ENV=1`), Heimdall routes reviews across different models (e.g. Gemini Elephant validated by Claude/Codex) via native Herdr multiplexing; otherwise, it falls back to stateless child subagents on the same model.
 
 ### 3. Event-Driven Lifecycle Hooks
 

@@ -34,10 +34,9 @@ For Tier 2 reviews, all findings must be tracked in an authoritative ledger:
   4. If round returns `"No findings"` AND all previous items are Resolved/Rebutted -> **Clean Exit**.
   5. If 5 rounds are reached with open Blockers -> **Halt and Escalate** to the user with the complete ledger. Never commit unverified code.
 
-## 4. Adaptive Execution Engine (Herdr Multiplexing vs. Bridge vs. Same-Model Fallback)
+## 4. Adaptive Execution Engine (Herdr Multiplexing vs. Same-Model Fallback)
 - **Primary Route in Herdr (Native Herdr Agent)**: When running inside Herdr (`$env:HERDR_ENV = "1"`), orchestrate the Goldfish reviewer directly via the `herdr` skill (`herdr agent start reviewer --kind <claude|codex|agy> --pane <id>` and `herdr agent prompt reviewer "..." --wait`). Re-use live idle agents first.
-- **Secondary Route (Cross-Model Bridge Scripts)**: If outside Herdr, use multi-model bridge scripts (`claude-bridge.ps1`, `gemini-bridge.ps1`, `codex-bridge.ps1`) to run headless reviews.
-- **Graceful Fallback (Same-Model Stateless Goldfish)**: If bridge tools or credentials are absent, fire a fresh, isolated child subagent on the current harness and model with zero conversational context. The stateless Goldfish discipline is strictly preserved.
+- **Graceful Fallback (Same-Model Stateless Goldfish)**: If outside Herdr or peer agents are unavailable, fire a fresh, isolated child subagent on the current harness and model with zero conversational context. The stateless Goldfish discipline is strictly preserved.
 
 ## 5. Adversarial Scrutiny & Silent Failure Hunter Checklist
 - [ ] **Empty Catch Blocks**: Does any `catch (e) {}` or `.catch(() => [])` swallow exceptions without logging, tracing, or propagation?

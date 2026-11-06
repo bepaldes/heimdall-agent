@@ -1,7 +1,7 @@
 ---
 name: codex-collaborator
 description: >
-  Coordinate with OpenAI Codex CLI (codex.exe) to cross-validate changes, request second-opinion
+  Coordinate with OpenAI Codex CLI (codex.exe) via Herdr to cross-validate changes, request second-opinion
   adversarial reviews on git diffs, or validate test and build executions.
 upstream: https://github.com/bepaldes/heimdall-agent
 version: 1.0.0
@@ -9,39 +9,7 @@ version: 1.0.0
 
 # Codex Collaborator Skill
 
-This skill enables Google Antigravity and Claude Code to orchestrate tasks with OpenAI Codex CLI (`codex.exe`), delegating complex architectural reasoning, diff reviews, and adversarial validation across the tri-directional bridge.
-
-## Primary Coordination Method: Native Herdr Agent (`herdr` skill)
-
-When running inside an active Herdr session (`$env:HERDR_ENV = "1"`), communicate directly using Herdr's native agent orchestration. This maintains a persistent session across turns, preserves context, respects interactive approvals (`blocked`), and handles bracketed paste:
-
-```bash
-# 1. Split a pane to the right (keeping current focus and working directory)
-PANE_ID=$(herdr pane split --current --direction right --cwd "$PWD" --no-focus | jq -r '.result.pane.pane_id')
-
-# 2. Launch Codex CLI inside the new pane
-herdr agent start codex-reviewer --kind codex --pane "$PANE_ID"
-
-# 3. Prompt Codex and wait for completion (settled idle/done)
-herdr agent prompt codex-reviewer "Review git diff for security regressions and boundary conditions." --wait --timeout 120000
-
-# 4. Read the findings directly into context
-herdr agent read codex-reviewer --source recent-unwrapped --lines 120
-```
-
-## Secondary / Fallback Method: `tools/codex-bridge.ps1` (Outside Herdr or Batch Runs)
-
-For non-Herdr terminal sessions, CI workflows, or single-turn batch reviews with auto-closing panes:
-
-By default when running inside Herdr, all bridge invocations automatically:
-- **Split the calling screen to the right**: Creates a side-by-side split pane in your current Herdr window.
-- **Display a prominent request banner**:
-  - Caller AI $\rightarrow$ Target Model (`gpt-6-astra`)
-  - Action & Working Directory
-  - **`>> WHAT IS BEING REQUESTED:`** A highlighted box showing the exact prompt/instructions.
-  - Summary of modified files (`git diff --stat`) for code reviews.
-- **Stream Codex's live execution**: Real-time display of reasoning, tool calls, and output right in that split pane.
-- **Auto-close when complete**: Automatically closes the right pane after finishing and collapses your screen back to normal, returning the captured output to the caller.
+This skill enables Google Antigravity and Claude Code to orchestrate tasks with OpenAI Codex CLI (`codex.exe`) directly through native Herdr multiplexing, delegating complex architectural reasoning, diff reviews, and adversarial validation.
 
 ## When to Activate
 
@@ -49,47 +17,38 @@ By default when running inside Herdr, all bridge invocations automatically:
 - In multi-agent plans requiring tri-directional cross-model validation (Claude $\rightarrow$ Codex, or Gemini $\rightarrow$ Codex).
 - When validating complex TypeScript types, database migrations, or edge-case logic with an alternative reasoning perspective.
 
-## Available Actions via `tools/codex-bridge.ps1`
+## Orchestration Method: Native Herdr Agent (`herdr` skill)
 
-Run commands using the project PowerShell helper script:
+When running inside Herdr (`$env:HERDR_ENV = "1"`), communicate directly using Herdr's native agent orchestration. This maintains a persistent session across turns, preserves context, respects interactive approvals (`blocked`), and handles bracketed paste:
 
-### 1. Adversarial Code Review of Git Diff
-Splits the screen to the right, runs Codex CLI review, streams live, and auto-closes:
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/codex-bridge.ps1 review
+### 1. Fast Path: Re-use Active Idle Agent
+Before splitting a pane, check if a Codex agent is already running and idle:
+```bash
+herdr agent list
 ```
-To provide specific review instructions:
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/codex-bridge.ps1 review "Focus on security vulnerabilities and boundary conditions"
-```
-
-### 2. Consult Codex for Architectural Second Opinion
-Sends an inquiry or architectural prompt directly to Codex (Astra) in a right-split pane:
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/codex-bridge.ps1 ask "How should we design idempotency keys for external webhook processing?"
+If an agent named `codex-reviewer` or `codex` is idle or done, prompt it directly:
+```bash
+herdr agent prompt codex-reviewer "Review the latest changes." --wait --timeout 120000
 ```
 
-### 3. Validate Test or Build Run
-Runs a test command and has Codex analyze output and errors in a right-split pane:
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/codex-bridge.ps1 validate "pnpm test"
+### 2. Spawning a New Codex Agent (Single-Execution Batch)
+If no active Codex agent exists, batch pane creation and agent startup in a single command:
+```bash
+PANE_ID=$(herdr pane split --current --direction right --cwd "$PWD" --no-focus | jq -r '.result.pane.pane_id')
+herdr agent start codex-reviewer --kind codex --pane "$PANE_ID"
+herdr agent prompt codex-reviewer "Review git diff for security regressions and boundary conditions." --wait --timeout 120000
 ```
 
-### 4. Interactive Handoff to Codex in a Right Split Pane
-Launches a full interactive Codex session in a right split pane pre-loaded with a task:
-```powershell
-powershell -ExecutionPolicy Bypass -File tools/codex-bridge.ps1 interactive "Let's investigate this edge case together"
+### 3. Read Findings into Context
+```bash
+herdr agent read codex-reviewer --source recent-unwrapped --lines 120
 ```
 
-### Display & Control Flags:
-- *(default)*: Splits the current Herdr screen to the right, streams live, and auto-closes when done.
-- `-KeepOpen`: Keeps the split pane open after completion instead of auto-closing.
-- `-Tab`: Opens in a new Herdr tab instead of splitting the screen.
-- `-Window`: Forces a standalone OS console window instead of Herdr.
-- `-Headless`: Runs silently in the background (for CI/unattended scripts).
-- `-NoFocus`: Prevents switching focus to the right pane.
-- `-Model <name>`: Override model (e.g. `-Model gpt-6-astra`).
-- `-Effort <level>`: Reasoning effort (`low`, `medium`, `high`, `xhigh`).
+### 4. Interactive Collaboration
+When an interactive session or clarification is needed, send keys or prompt interactively:
+```bash
+herdr agent send-keys codex-reviewer enter
+```
 
 ## Guidelines for Collaborating Agents
 

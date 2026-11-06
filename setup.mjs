@@ -2083,7 +2083,7 @@ async function main() {
       console.log(`\n-> Tools directory not found at ${options.toolsDir} (skipped)`);
     } else {
       console.log(`\n-> Deploying Bridge Tools & 'heimdall' CLI to ${colors.bold}${options.toolsDir}${colors.reset}...`);
-    const tools = fs.readdirSync(toolsDir);
+    const tools = fs.readdirSync(toolsDir).filter(f => fs.statSync(path.join(toolsDir, f)).isFile());
     for (const tool of tools) {
       const src = path.join(toolsDir, tool);
       const dest = path.join(options.toolsDir, tool);

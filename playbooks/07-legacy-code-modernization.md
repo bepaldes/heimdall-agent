@@ -58,7 +58,7 @@ flowchart LR
    - Run the Golden Master test suite with the feature toggle enabled.
    - Verify that all outputs match the legacy outputs bit-for-bit (or within explicitly documented architectural updates).
 2. **Peer Adversarial Review**:
-   - Dispatch the diff to the Reviewer (`powershell -File C:/Apps/tools/claude-bridge.ps1 review` or `gemini-bridge.ps1 review`).
+   - Dispatch the diff to the Reviewer (via `herdr agent prompt <reviewer-agent> "Review diff..." --wait` or child subagent review).
 3. **Decommissioning**:
    - Remove the feature toggle and safely delete the legacy code branch.
 
