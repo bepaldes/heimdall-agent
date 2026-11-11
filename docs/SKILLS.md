@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **22 Primary Toolkits & Suites (54 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **24 Primary Toolkits & Suites (56 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -43,6 +43,8 @@ heimdall update-skill all
 - [⚡ STRIDE Threat Modeling & Attack Surface Sentinel](#threat-modeling)
 - [⚡ MCP Server & Tool Engineering Standards](#mcp-engineering)
 - [⚡ Herdr Coding Agent Multiplexer & Orchestrator](#herdr)
+- [⚡ Thermo Architectural & Maintainability Audit](#thermo)
+- [⚡ PStack Engineering Discipline](#pstack-discipline)
 
 ---
 
@@ -348,6 +350,28 @@ heimdall update-skill all
 - **Module Name**: `herdr`
 - **Description**: Control Herdr, a terminal workspace manager for coding agents. Inspect or control panes, tabs, workspaces, commands, or coordinate with peer agents (claude, codex, gemini/agy, etc.) in persistent terminal sessions.
 - **Contract File**: [`skills/herdr/SKILL.md`](../skills/herdr/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="thermo"></a>
+### ⚡ Thermo Architectural & Maintainability Audit
+
+- **Module Name**: `thermo`
+- **Description**: Unusually strict architectural and maintainability review focusing on "Code Judo" structural simplification, spaghetti conditional elimination, and modularity health.
+- **Contract File**: [`skills/thermo/SKILL.md`](../skills/thermo/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="pstack-discipline"></a>
+### ⚡ PStack Engineering Discipline
+
+- **Module Name**: `pstack-discipline`
+- **Description**: High-rigor engineering discipline from the pstack / poteto framework: "Prove It Works", "Fix Root Causes", "Test Behavior, Not Implementation", and "Subtract Before You Add".
+- **Contract File**: [`skills/pstack-discipline/SKILL.md`](../skills/pstack-discipline/SKILL.md)
 
 [↑ Back to top](#toc)
 

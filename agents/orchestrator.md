@@ -8,6 +8,7 @@ model: inherit
 skills:
   - brainstorming
   - writing-plans
+  - pstack-discipline
   - subagent-driven-development
   - dispatching-parallel-agents
   - using-git-worktrees

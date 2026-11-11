@@ -7,6 +7,7 @@ description: >
 model: inherit
 skills:
   - communication-doctrine
+  - thermo
   - requesting-code-review
   - receiving-code-review
   - claude-collaborator
@@ -56,6 +57,10 @@ Scrutinize diffs for:
 - Edge cases not covered by automated tests.
 - Unintended side-effects on shared state or exported APIs.
 - Sneaky performance bottlenecks ($O(N^2)$ iterations inside rendering loops).
+- **Thermo Maintainability Audit**:
+  - *Code Judo*: Identify opportunities to eliminate entire indirection layers or redundant wrappers.
+  - *Spaghetti Branching*: Flag nested conditional ladders that could be reframed into cleaner state representations.
+  - *Modularity Health*: Check if modified files exhibit runaway bloat or mixed responsibilities (exempting migrations, test fixtures, and generated files).
 - Violations of the project's design system or doctrine.
 - **Documentation Drift**: When diffs alter public function signatures, API route contracts, CLI commands, or environment variables, verify corresponding Markdown pages (`README.md`, `docs/`, `SKILL.md`) reflect the change. If contracts drifted without doc updates, log an explicit review Blocker.
 

@@ -54,8 +54,8 @@
       "description": "O mais rápido sem abrir mão de qualidade"
     },
     {
-      "id": "claude-fable-5.1",
-      "displayName": "Claude Fable 5.1",
+      "id": "claude-fable-5.2",
+      "displayName": "Claude Fable 5.2",
       "context": "1M",
       "context_window_tokens": 1000000,
       "description": "Máxima capacidade disponível"
@@ -66,13 +66,6 @@
       "context": "1M",
       "context_window_tokens": 1000000,
       "description": "Código agêntico com contexto de 1M"
-    },
-    {
-      "id": "z-ai/glm-5.3-flash",
-      "displayName": "GLM 5.3 Flash",
-      "context": "1M",
-      "context_window_tokens": 1000000,
-      "description": "Respostas rápidas para código"
     },
     {
       "id": "gpt-6-astra",
@@ -98,8 +91,8 @@
       "description": "O mais rápido sem abrir mão de qualidade"
     },
     {
-      "id": "claude-fable-5.1",
-      "displayName": "Claude Fable 5.1",
+      "id": "claude-fable-5.2",
+      "displayName": "Claude Fable 5.2",
       "context": "1M",
       "context_window_tokens": 1000000,
       "description": "Máxima capacidade disponível"
@@ -110,13 +103,6 @@
       "context": "1M",
       "context_window_tokens": 1000000,
       "description": "Código agêntico com contexto de 1M"
-    },
-    {
-      "id": "z-ai/glm-5.3-flash",
-      "displayName": "GLM 5.3 Flash",
-      "context": "1M",
-      "context_window_tokens": 1000000,
-      "description": "Respostas rápidas para código"
     },
     {
       "id": "gpt-6-astra",
