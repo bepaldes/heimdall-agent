@@ -4,8 +4,8 @@
   "description": "Autonomous multi-agent engineering sentinel & bootstrapper. Synchronizes specialized agent personas, curated skills, and universal doctrine across Google Antigravity, Claude Code, OpenAI Codex CLI, Hermes Agent, OpenClaw, and Claude Desktop.",
   "type": "module",
   "bin": {
-    "heimdall": "./setup.mjs",
-    "heimdall-agent": "./setup.mjs"
+    "heimdall": "setup.mjs",
+    "heimdall-agent": "setup.mjs"
   },
   "files": [
     "setup.mjs",
