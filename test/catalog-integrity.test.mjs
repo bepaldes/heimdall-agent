@@ -14,7 +14,8 @@ test('Catalog and Documentation Count Integrity Sentinel', async (t) => {
 
   const skillCount = Object.keys(catalog.skills || {}).length;
   const suiteCount = Object.keys(catalog.suites || {}).length;
-  const standaloneCount = suiteCount - 5;
+  const multiSuiteCount = Object.values(catalog.suites || {}).filter(s => s.type === 'Multi-Skill Suite').length;
+  const standaloneCount = suiteCount - multiSuiteCount;
 
   await t.test('config/skills.json internal counts match actual keys', () => {
     assert.equal(catalog.totalModules, skillCount, 'totalModules should match skills count');

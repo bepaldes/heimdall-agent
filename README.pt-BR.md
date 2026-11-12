@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#10-personas-de-agentes-predefinidas"><img src="https://img.shields.io/badge/agents-10%20predefinidos-orange.svg?style=flat-square" alt="Agentes: 10 Predefinidos" /></a>
-  <a href="#inventario-de-skills-56-modulos-em-24-toolkits"><img src="https://img.shields.io/badge/skills-24%20toolkits%20%2856%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 24 Toolkits (56 Módulos)" /></a>
+  <a href="#inventario-de-skills-64-modulos-em-25-toolkits"><img src="https://img.shields.io/badge/skills-25%20toolkits%20%2864%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 25 Toolkits (64 Módulos)" /></a>
   <a href="#ferramentas-e-runtimes-suportados"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Idioma / Language:** [English](README.md) | **Português (Brasil)**
 
-O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **10 personas de agentes especializados** e **56 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
+O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **10 personas de agentes especializados** e **64 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
 
 ---
 
@@ -34,7 +34,7 @@ O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para en
 O **Heimdall** é um bootstrapper de ambiente e camada de coordenação multi-agente para ferramentas de programação com IA.
 
 Em vez de manter manualmente instruções customizadas, prompts de sistema e arquivos de configuração espalhados em diferentes clientes de IA, o Heimdall fornece uma fonte única da verdade (*Single Source of Truth*):
-* **Skills Modulares**: 56 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
+* **Skills Modulares**: 64 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
 * **Personas de Agentes Especializados**: 10 papéis predefinidos com janelas de contexto isoladas (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Doutrina Universal**: Regras centrais (`AGENTS.md`) sincronizadas em todas as ferramentas, exigindo portões de planejamento, desenvolvimento orientado a testes (TDD) e edições cirúrgicas mínimas.
 
@@ -82,28 +82,28 @@ Durante o bootstrap, o Heimdall cria *junctions* (Windows) ou *symlinks* (POSIX)
 
 | Origem no Heimdall | Local Implantado | Finalidade |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<ferramenta>/skills/` | 56 toolkits de domínio carregados progressivamente sob demanda. |
+| `skills/` | `~/.<ferramenta>/skills/` | 64 toolkits de domínio carregados progressivamente sob demanda. |
 | `agents/` | `~/.<ferramenta>/agents/` | 10 definições de personas de agentes especializados. |
 | `hooks/` | `~/.claude/hooks/` | Hooks de ciclo de vida orientados a eventos para o Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (opcional) | Hook Git `pre-push` nativo universal para todas as ferramentas. |
 | `doctrine/AGENTS.md` | `~/.claude/CLAUDE.md`<br>`~/.gemini/GEMINI.md`<br>`~/.codex/AGENTS.md`<br>`~/.hermes/AGENTS.md` | Doutrina universal entre agentes e restrições operacionais. |
 | `playbooks/` | `~/.<ferramenta>/playbooks/` | Playbooks operacionais (portão de perguntas, TDD, revisões, planos, backlog & fluxo CR). |
 | `commands/` | `~/.claude/commands/` | Comandos slash (`/orchestrator`, `/orchestrate`, `/plan`, `/grill-me`). |
-| `tools/` | Diretório no `PATH` | Scripts de ponte entre modelos (`claude-bridge`, `gemini-bridge`, `codex-bridge`) e CLI `heimdall`. |
+| `tools/` | Diretório no `PATH` | Executável da CLI `heimdall` e utilitários de inicialização de ambiente. |
 | `docs/designs/` | Raiz do workspace | Localização canônica de planos (`YYYY-MM-DD <nome>.md`); planos verificados vão para `old/`. |
 | `docs/backlog.md` | Raiz do workspace | Ledger canônico de backlog do produto e Change Requests. |
 
-### 2. O Modelo Elefante-Peixe-Dourado do Google (EGM)
+### 2. Separação de Contexto: Padrão Elephant-Goldfish (Google EGM)
 
 O Heimdall adota a divisão central de trabalho do [`google/elephant-goldfish-model`](https://github.com/google/elephant-goldfish-model):
 
-* **O Elefante (Coordenador)**: A sessão principal e a persona [`orchestrator`](#10-personas-de-agentes-predefinidas) retêm a memória de longo prazo, a narrativa do projeto e o histórico profundo de contexto.
-* **O Peixe-Dourado (Revisores e Testadores)**: Subagentes despachados para revisão de código (`reviewer`) e diagnóstico de bugs (`tester`) são intencionalmente isolados do histórico de conversa e dos debates do autor. Eles avaliam `git diffs` brutos e critérios de aceite diretamente, prevenindo viés de confirmação.
-* **Escada de Fronteira em 3 Níveis (3-Tier Boundary Ladder)**:
-  - **Tier 1 (Spike / Bugfix < 50 LOC)**: Zero cerimônia. Código cirúrgico mínimo com teste falhando primeiro.
-  - **Tier 2 (Feature Delimitada)**: Verificação rápida de design no chat com revisões de crítica e prontidão.
-  - **Tier 3 (Arquitetural)**: Especificação gravada em disco (`docs/designs/<feature>.md`), revisão em 4 estágios (Zoom Out, Compreensão, Crítica, Prontidão) e ledger de convergência de até 5 rodadas.
-* **Execução Multi-Modelo Adaptativa**: No Herdr (`HERDR_ENV=1`), o Heimdall roteia revisões entre modelos distintos (ex.: Elefante Gemini validado por Claude/Codex) via multiplexação nativa do Herdr; caso contrário, recorre automaticamente a subagentes independentes no mesmo modelo.
+* **O Elefante (Orquestrador / Memória Longa)**: A sessão principal e a persona [`orchestrator`](#10-personas-de-agentes-predefinidas) preservam a memória contínua, as decisões consolidadas da arquitetura e o contexto de longo prazo.
+* **O Goldfish (Revisores e Testadores com Contexto Cego)**: Subagentes acionados para revisão (`reviewer`) e testes (`tester`) recebem exclusivamente o `git diff` e os critérios de aceitação, sem acesso a justificativas ou debates anteriores. Essa amnésia intencional elimina o viés de confirmação e elogios vazios.
+* **Governança Gradual em 3 Níveis**:
+  - **Nível 1 (Correções Rápidas / Bugfix < 50 linhas)**: Sem burocracia. Edição cirúrgica mínima orientada por testes automatizados.
+  - **Nível 2 (Funcionalidades Delimitadas)**: Alinhamento ágil de arquitetura com verificação rápida de viabilidade e prontidão.
+  - **Nível 3 (Arquitetura e Alto Impacto)**: Especificação formal persistida em disco (`docs/designs/<feature>.md`), revisão em 4 etapas (Visão Geral, Compreensão, Crítica e Prontidão) e ciclo de convergência com até 5 rodadas.
+* **Execução Multi-Modelo Adaptativa**: No ambiente Herdr (`HERDR_ENV=1`), o Heimdall distribui revisões entre modelos distintos (por exemplo, código gerado pelo Gemini sendo auditado pelo Claude ou Codex) em subpainéis nativos; fora do Herdr, recorre a subagentes isolados no mesmo modelo.
 
 ### 3. Hooks de Ciclo de Vida Orientados a Eventos
 
@@ -152,7 +152,7 @@ Escolha o perfil de acordo com sua máquina e fluxo de trabalho:
 
 | Perfil | Skills | Agentes Predefinidos | Descrição | Ideal Para |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Padrão)* | 56 | 10 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
+| **`full`** *(Padrão)* | 64 | 10 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
 | **`minimal`** | 16 | 4 | Núcleo enxuto: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Notebooks leves, janelas de contexto menores |
 | **`security`** | 12 | 4 | Suíte AppSec: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Pentest e auditorias pré-deploy |
 | **`design`** | 12 | 4 | Frontend e mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | Design de UI/UX e design systems |
@@ -288,25 +288,25 @@ Todas as personas declaram `model: inherit` para rodar em qualquer modelo ou pro
 
 | Persona | Nível de Capacidade | Papel e Responsabilidades | Skills Vinculadas |
 | :--- | :--- | :--- | :--- |
-| **`orchestrator`** | `deep_reasoning` | Guardião do planejamento (`/grill-me`), questionamento de requisitos, decomposição modular de tarefas, exigência de verificação Playwright E2E e coordenação de subagentes. | `brainstorming`, `writing-plans`, `pstack-discipline`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills`, `executing-plans`, `herdr` |
+| **`orchestrator`** | `deep_reasoning` | Guardião do planejamento (`/grill-me`), questionamento de requisitos, decomposição modular de tarefas, exigência de verificação Playwright E2E e coordenação de subagentes. | `grill-me`, `brainstorming`, `writing-plans`, `to-spec`, `to-tickets`, `wayfinder`, `domain-modeling`, `handoff`, `pstack-discipline`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills`, `executing-plans`, `herdr` |
 | **`frontend-designer`** | `high_polish_vision` | Define leitura de design, hierarquia tipográfica, mapeamento de tokens e estética de UI anti-slop para web. | `taste-skill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill` |
 | **`mobile-designer`** | `responsive_flex_safety` | Segurança de viewport mobile (320px–430px), alvos de toque de 48px, containers flex sem corte de overflow e assets responsivos. | `antislop-layoutmobile`, `antislop-human`, `antislop-ui`, `imagegen-frontend-mobile`, `taste-skill` |
 | **`tester`** | `fast_verification` | Impõe TDD estrito e verificação real em navegador (Playwright). Rejeita pseudo-verificação (`curl`, `grep`, `tsc`). | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `executing-plans` |
 | **`security-auditor`** | `deep_assurance_audit` | Sondagem HTTP diferencial dinâmica entre níveis de autenticação, defesas OWASP Top 10 e detecção de padrões inseguros da Trail of Bits. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
 | **`database-architect`** | `schema_migration_safety` | Governa migrações não destrutivas, normalização, auditoria de planos de query (`EXPLAIN ANALYZE`) e pool de conexões (Postgres/Supabase, SQLite, MySQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
-| **`code-sentinel`** | `surgical_restraint` | Simplicidade Karpathy: escreve código cirúrgico mínimo, remove comentários redundantes, elimina código morto defensivo e aplica padrões anti-slop. | `karpathy-guidelines`, `clean-code`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
-| **`reviewer`** | `adversarial_diff_eval` | Realiza análise adversarial de diffs, captura regressões silenciosas e erros engolidos, executa auditorias thermo de manutenibilidade e coordena revisões cruzadas entre modelos. | `communication-doctrine`, `thermo`, `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
-| **`modernizer`** | `legacy_migration_safety` | Executa transformações de código legado, upgrades de runtime e migrações Strangler Fig protegidas por testes de caracterização Golden Master. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `karpathy-guidelines`, `project-hygiene`, `output-skill` |
+| **`code-sentinel`** | `surgical_restraint` | Simplicidade Karpathy: escreve código cirúrgico mínimo, remove comentários redundantes, elimina código morto defensivo, exige módulos profundos e aplica padrões anti-slop. | `karpathy-guidelines`, `clean-code`, `codebase-design`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
+| **`reviewer`** | `adversarial_diff_eval` | Realiza análise adversarial de diffs, audita profundidade de módulos e abstrações rasas, captura regressões silenciosas, executa auditorias thermo e coordena revisões cruzadas entre modelos. | `communication-doctrine`, `thermo`, `codebase-design`, `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
+| **`modernizer`** | `legacy_migration_safety` | Executa transformações de código legado, upgrades de runtime, desacoplamento de dependências e migrações Strangler Fig protegidas por testes de caracterização Golden Master. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `improve-codebase-architecture`, `codebase-design`, `karpathy-guidelines`, `project-hygiene`, `output-skill` |
 | **`cloud-engineer`** | `infra_container_safety` | Governa conteinerização (Docker, Compose), manifestos Kubernetes, Infraestrutura como Código (Terraform), proxies reversos (Caddy, Nginx), CI/CD e verificação terminante. | `communication-doctrine`, `karpathy-guidelines`, `clean-code`, `systematic-debugging`, `project-hygiene`, `progressive-disclosure` |
 
 ---
 
-<a id="inventario-de-skills-56-modulos-em-24-toolkits"></a>
-### Inventário de Skills (56 Módulos em 24 Toolkits)
+<a id="inventario-de-skills-64-modulos-em-25-toolkits"></a>
+### Inventário de Skills (64 Módulos em 25 Toolkits)
 
-O Heimdall organiza as capacidades em **5 Suítes Multi-Skill Principais (37 módulos)** e **19 Toolkits Independentes (19 módulos)**:
+O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 módulos)** e **19 Toolkits Independentes (19 módulos)**:
 
-#### Suítes Multi-Skill Principais (5 Suítes / 37 Módulos)
+#### Suítes Multi-Skill Principais (6 Suítes / 45 Módulos)
 
 <details open>
 <summary><b>1. Suíte de Engenharia Superpowers (15 módulos) — Jesse Vincent / obra</b></summary>
@@ -372,6 +372,20 @@ O Heimdall organiza as capacidades em **5 Suítes Multi-Skill Principais (37 mó
 - `trailofbits-audit-context`: Mapeamento de premissas, garantias de código e dependências arquiteturais críticas.
 - `trailofbits-insecure-defaults`: Detecção de configurações padrão inseguras, padrões *fail-open* e permissões excessivas.
 - `trailofbits-triage-brocards`: Avaliação sistemática de relatórios de vulnerabilidade com base em 7 princípios fundamentais.
+
+</details>
+
+<details>
+<summary><b>6. Suíte de Engenharia Real Matt Pocock (8 módulos) — Matt Pocock</b></summary>
+
+- `codebase-design`: Modela módulos profundos — interfaces enxutas que encapsulam alta complexidade interna —, aplica o teste de deleção e elimina camadas superficiais de abstração.
+- `domain-modeling`: Modela a linguagem ubíqua da aplicação, estrutura glossários de termos de negócio e formaliza Registros de Decisão Arquitetural (ADRs) para evitar divergências conceituais.
+- `improve-codebase-architecture`: Mapeia o acoplamento entre os módulos da base de código, identifica dependências circulares e gera diagnósticos em matriz de dependência.
+- `to-spec`: Transforma requisitos e consensos de alinhamento em especificações técnicas detalhadas, com regras invariantes, jornadas de usuário e matrizes de erro.
+- `to-tickets`: Desdobra especificações em tarefas atômicas e ordenadas por dependência, prontas para execução estruturada por subagentes.
+- `wayfinder`: Rastrea a fronteira de execução em bases de código amplas, separando o que já foi decidido, as tarefas ativas da rodada e as áreas ainda sob análise.
+- `grill-me`: Entrevistas técnicas estruturadas pela fronteira de decisões, com investigação autônoma no repositório e formato de aprovação ágil por recomendação explícita (*Yes-to-Approve*).
+- `handoff`: Condensa o contexto da sessão em documentos estruturados por ponteiros salvos no diretório temporário (`$env:TEMP`), com contratos explícitos de skills recomendadas para o próximo agente.
 
 </details>
 

@@ -16,11 +16,19 @@ When reviewing code, pull requests, or git diffs, assume that edge cases and def
 - **"No Glazing" Rule**: Eliminate sycophancy. Never use validating adjectives like "brilliant," "great," "smart," "perfect," or "spot-on." Ban apologies ("I apologize"). Lead with what is wrong, missing, or risky.
 - **Plain-English Standard**: Plain, direct, jargon-free technical English. No ungrounded promotional adjectives or buzzwords.
 
-## 2. Two-Tier Review Trigger
-- **Tier 1 (Bounded & Routine Tasks)**: Single-pass adversarial critique targeting edge cases, security, and anti-slop code hygiene.
-- **Tier 2 (Architectural & High-Stakes Tasks)**: Mandatory **5-round convergence loop** with a structured findings ledger.
+## 2. 3-Tier Review & Handoff Policy
+- **Tier 1 (Spikes & Local Fixes < 50 LOC)**:
+  - **Zero Review Ceremony**. Author verifies empirically via terminating automated tests (`npm test`, `pytest`).
+  - No peer model review or handoff document required.
+- **Tier 2 (Bounded Features & Subsystems)**:
+  - **Single Peer Reviewer Gate**. One peer model (e.g. Claude implements -> Gemini reviews; or vice-versa) to prevent self-review blindness. Multiple reviewers are NOT needed.
+  - **Lean Handoff**: Feed the reviewer using the `handoff` skill (pointer to spec, target branch, and diff) to strictly maintain Goldfish blinding without leaking conversational bias.
+  - Single-pass adversarial critique targeting edge cases, security, and anti-slop code hygiene.
+- **Tier 3 (Architectural, Auth, Schema Migrations & High-Stakes)**:
+  - **Multi-Model Consensus & Full Handoff**. Seeded with a formal `handoff` document referencing ADRs (`docs/adr/`) and specifications (`docs/designs/`).
+  - Mandatory **5-round convergence loop** with a structured findings ledger across multiple peer models.
 
-## 3. The 5-Round Convergence Ledger Protocol
+## 3. The 5-Round Convergence Ledger Protocol (Tier 3)
 For Tier 2 reviews, all findings must be tracked in an authoritative ledger:
 
 ```markdown

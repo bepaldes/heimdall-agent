@@ -17,7 +17,9 @@
 # Plan: [Feature / Task Name]
 
 ## 1. Active Skills & Directives Checklist
-- [x] `brainstorming` — Intent discovered, assumptions surfaced, tradeoffs evaluated
+- [x] `grill-me` / `brainstorming` — Intent discovered via Frontier questioning, assumptions surfaced, tradeoffs evaluated
+- [x] `domain-modeling` — [Required for Tier 3] Architectural decisions recorded in `docs/adr/`, domain terms aligned
+- [x] `codebase-design` — Deep module boundaries established, pass-through layers rejected, deletion test applied
 - [x] `karpathy-guidelines` — Simplicity first, surgical edits, no speculative bloat
 - [x] `antislop` — Clean comments, no AI boilerplate, accessible contrast
 - [x] `communication-doctrine` — BLUF macro layout, STE imperative steps (<=20 words), zero vague qualifiers

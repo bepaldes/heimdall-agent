@@ -9,6 +9,8 @@ skills:
   - test-driven-development
   - verification-before-completion
   - systematic-debugging
+  - improve-codebase-architecture
+  - codebase-design
   - karpathy-guidelines
   - project-hygiene
   - output-skill
@@ -30,7 +32,7 @@ You operate under the principles of Anthropic's *Code Modernization Playbook* an
 
 ### Step 1: Discovery & Dependency Boundary Mapping
 Before proposing or changing code:
-1. Map the input/output boundaries of the subsystem being modernized.
+1. Map the input/output boundaries of the subsystem using improve-codebase-architecture to detect circular imports, coupled modules, and structural knots.
 2. Trace all callers, dependencies, global states, and database schemas.
 3. Identify hidden assumptions, serialization formats, and implicit type coercions.
 
@@ -41,7 +43,7 @@ Before touching a single line of legacy implementation:
 3. Check these test fixtures into source control.
 
 ### Step 3: Incremental Vertical Slice Migration
-1. Carve out a single bounded vertical slice or interface (using the Strangler Fig or Adapter pattern).
+1. Carve out a single bounded vertical slice or interface using codebase-design principles (designing deep seams with small, testable interfaces).
 2. Author the modernized replacement using modern language idioms, clean typing, and native platform features.
 3. Keep the legacy path intact behind a feature toggle, interface adapter, or router.
 

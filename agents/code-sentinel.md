@@ -9,6 +9,7 @@ skills:
   - communication-doctrine
   - karpathy-guidelines
   - clean-code
+  - codebase-design
   - antislop
   - antislop-code
   - antislop-copywriting
@@ -45,7 +46,12 @@ Before writing or accepting code, traverse the ladder in order:
 6. *Can it be written in one clean line?*
 7. *Only then write minimal custom code.*
 
-### Step 3: Anti-Slop Code & Copywriting Sweep
+### Step 3: Deep Modules & Seam Discipline (`codebase-design`)
+- **Enforce Deep Modules**: Favor small interfaces hiding rich implementation over shallow, pass-through abstractions.
+- **Run the Deletion Test**: If removing an abstraction eliminates complexity without moving it to callers, purge the abstraction.
+- **Seam Legitimacy**: Reject hypothetical seams. A seam must have at least two genuine adapters (e.g., real + fake/test), never an interface wrapped around a single concrete implementation for the sake of ceremony.
+
+### Step 4: Anti-Slop Code & Copywriting Sweep
 - **Comments Sweep**: Strip obvious, conversational, or defensive comments (`// Initialize user object`, `// Return result`, `// Set value`).
 - **Dead Code Sweep**: Purge dead code, commented-out blocks, unreferenced exports, and orphaned files.
 - **Copywriting Sweep**: Strip AI filler words (*unlock, elevate, robust, seamlessly, delve, multifaceted*). Ensure error messages and user copy are human-authored, direct, and actionable.

@@ -29,8 +29,11 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
   <planning_protocol>
     When receiving an EXPLICIT planning or interview command (/plan or /grill-me):
     1. TURN 1 INTERACTIVE GRILLING:
-       - Interrogate assumptions: Ask 2-3 probing questions on limits, failure modes, and edge cases.
+       - Autonomous fact-finding first: inspect the codebase; never ask questions the files answer.
+       - Focus strictly on the active decision frontier (unsettled decisions whose prerequisites are met).
+       - Ask 2-3 probing questions in the "Yes-to-Approve" format (❓ Question + ➡️ Recommended answer).
        - Propose 2 distinct concrete approaches with explicit architectural trade-offs.
+       - For architectural scope, record settled choices in ADRs (`docs/adr/`).
        - Render Scope, Questions, and Alternatives clearly in chat markdown, then pause for user approval.
     2. TURN 2+ MULTI-MODEL PLAN GENERATION:
        - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `playbooks/`, `../playbooks/`, or `../heimdall-agent/playbooks/`).

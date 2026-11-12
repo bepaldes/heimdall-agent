@@ -23,27 +23,31 @@ Before generating any code, creating plans, or taking action on any user request
      - **Tier 3: Architectural**: Subsystem addition, schema migration, auth boundary, or multi-component flow. Full Google EGM Pipeline (Artifact-First design spec in `docs/designs/<feature>.md` + 4-stage Goldfish review: Zoom Out, Comprehension, Critic, Readiness).
    - Never assume missing requirements. Uncover implicit user assumptions upfront.
 
-2. **The 3-Point Questioning Rule**:
-   - Ask at least 2–3 probing questions about:
-     a) Non-obvious edge cases, error states, and boundary conditions.
-     b) Data flow, persistence, and concurrency/race concerns.
-     c) The exact definition of success and acceptance criteria.
+2. **The Design Tree Frontier & Questioning Protocol**:
+   - **Autonomous Fact-Finding First**: Inspect files, configs, and existing helpers before asking. Never ask the human questions the repository already answers.
+   - **Frontier Rounds**: Ask only questions whose prerequisites are settled now. If Question B depends on Question A's answer, defer Question B to the next round.
+   - **The "Yes-to-Approve" Triage Format**: Formulate each question with an explicit recommendation so the user can accept by replying *"yes"* or providing a 1-line tweak.
 
 3. **Present 2 Concrete Architectural Alternatives**:
    - Offer Approach A (minimal, lighter, faster) vs. Approach B (robust, extensible).
    - Detail the explicit tradeoffs of each.
    - Declare your professional recommendation with clear reasoning.
+   - **ADR Synchronization**: For Tier 3 architectural decisions, record settled choices in `docs/adr/YYYY-MM-DD-<title>.md`.
 
 4. **Hard Gate**:
-   - MANDATORY VISIBLE OUTPUT (ANTI-PATTERN BAN): NEVER keep the questions or alternatives inside internal thinking/scratchpads. NEVER output a bare "awaiting answers..." blocker message. You MUST render the Scope, Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
+   - MANDATORY VISIBLE OUTPUT (ANTI-PATTERN BAN): NEVER keep the questions or alternatives inside internal thinking/scratchpads. NEVER output a bare "awaiting answers..." blocker message. You MUST render the Scope, Frontier Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
      ```markdown
      ### 1. Scope Classification
      - **Scope**: [Spike / Bounded / Architectural]
 
-     ### 2. Probing Questions
-     1. [Question 1: edge cases / failure modes]
-     2. [Question 2: limits / boundary conditions]
-     3. [Question 3: integration / performance constraints]
+     ### 2. Frontier Questions (Yes-to-Approve Format)
+     ❓ **Q1 - [Decision Title]**: [Context, edge cases, and options]
+     ➡️ **Recommended**: [Explicit recommendation + rationale]
+
+     ---
+
+     ❓ **Q2 - [Decision Title]**: [Context, limits, boundary conditions]
+     ➡️ **Recommended**: [Explicit recommendation + rationale]
 
      ### 3. Concrete Alternatives
      - **Alternative 1**: [Description + architectural trade-offs]

@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **24 Primary Toolkits & Suites (56 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **25 Primary Toolkits & Suites (64 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -24,6 +24,7 @@ heimdall update-skill all
 - [📦 Anti-Slop Quality & Token Efficiency Suite (6 modules)](#antislop)
 - [📦 Tri-Directional Cross-Model Bridges (3 modules)](#cross-model-bridges)
 - [📦 Trail of Bits High-Assurance AppSec Suite (3 modules)](#trailofbits-appsec)
+- [📦 Matt Pocock Real Engineering Suite (8 modules)](#mattpocock-suite)
 
 ### Standalone Power Toolkits
 - [⚡ Ponytail Code Restraint](#ponytail)
@@ -153,6 +154,27 @@ heimdall update-skill all
 ---
 
 ## Standalone Power Toolkits
+
+<a id="mattpocock-suite"></a>
+### 📦 Matt Pocock Real Engineering Suite (8 modules)
+
+- **Upstream Source**: [https://github.com/mattpocock/skills](https://github.com/mattpocock/skills)
+- **Suite Type**: Multi-Skill Suite
+
+#### Included Modules:
+
+* **`codebase-design`**: Design deep modules (small interfaces hiding large implementations), apply the deletion test, and enforce legitimate seams based on John Ousterhout's *Philosophy of Software Design*. ([Contract File](../skills/codebase-design/SKILL.md))
+* **`domain-modeling`**: Extract ubiquitous language, domain models, and record Architecture Decision Records (ADRs) to eliminate terminology drift and document architectural choices. ([Contract File](../skills/domain-modeling/SKILL.md))
+* **`improve-codebase-architecture`**: Audit codebase structure, detect circular dependencies, evaluate module coupling, and generate dependency matrix reports. ([Contract File](../skills/improve-codebase-architecture/SKILL.md))
+* **`to-spec`**: Formalize requirements and interview outcomes into precise specifications with invariants, error matrices, and user journeys. ([Contract File](../skills/to-spec/SKILL.md))
+* **`to-tickets`**: Decompose formal specifications into atomic, dependency-ordered task tickets formatted for subagent task queues. ([Contract File](../skills/to-tickets/SKILL.md))
+* **`wayfinder`**: Map problem frontiers across large codebases, separating settled decisions from active frontier tickets and unexplored fog. ([Contract File](../skills/wayfinder/SKILL.md))
+* **`grill-me`**: Relentless interview protocol using the Design Tree Frontier, autonomous fact-finding, and Yes-to-Approve recommendation format before implementation begins. ([Contract File](../skills/grill-me/SKILL.md))
+* **`handoff`**: Compact session context into pointer-first handoff documents saved to $env:TEMP with mandatory Suggested Skills contracts to eliminate context drift and skill blindness. ([Contract File](../skills/handoff/SKILL.md))
+
+[↑ Back to top](#toc)
+
+---
 
 <a id="ponytail"></a>
 ### ⚡ Ponytail Code Restraint

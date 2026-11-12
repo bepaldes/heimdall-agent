@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Heimdall Predefined Agent Registry — Model-agnostic engineering personas with specialized skill bundles",
   "agents": {
     "orchestrator": {
@@ -13,8 +13,14 @@
         "default": "inherit"
       },
       "skills": [
+        "grill-me",
         "brainstorming",
         "writing-plans",
+        "to-spec",
+        "to-tickets",
+        "wayfinder",
+        "domain-modeling",
+        "handoff",
         "subagent-driven-development",
         "dispatching-parallel-agents",
         "using-git-worktrees",
@@ -131,6 +137,7 @@
       "skills": [
         "karpathy-guidelines",
         "clean-code",
+        "codebase-design",
         "antislop",
         "antislop-code",
         "antislop-copywriting",
@@ -152,6 +159,7 @@
       "skills": [
         "requesting-code-review",
         "receiving-code-review",
+        "codebase-design",
         "claude-collaborator",
         "gemini-collaborator",
         "codex-collaborator",
@@ -174,6 +182,8 @@
         "test-driven-development",
         "verification-before-completion",
         "systematic-debugging",
+        "improve-codebase-architecture",
+        "codebase-design",
         "karpathy-guidelines",
         "project-hygiene",
         "output-skill"

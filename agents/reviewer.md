@@ -8,6 +8,7 @@ model: inherit
 skills:
   - communication-doctrine
   - thermo
+  - codebase-design
   - requesting-code-review
   - receiving-code-review
   - claude-collaborator
@@ -57,6 +58,7 @@ Scrutinize diffs for:
 - Edge cases not covered by automated tests.
 - Unintended side-effects on shared state or exported APIs.
 - Sneaky performance bottlenecks ($O(N^2)$ iterations inside rendering loops).
+- **Deep Module Audit (`codebase-design`)**: Flag shallow abstractions where interfaces expose internal mechanics, leak implementation details, or force callers to coordinate multiple calls instead of invoking one deep operation. Verify that tests exercise the module through its public seam.
 - **Thermo Maintainability Audit**:
   - *Code Judo*: Identify opportunities to eliminate entire indirection layers or redundant wrappers.
   - *Spaghetti Branching*: Flag nested conditional ladders that could be reframed into cleaner state representations.

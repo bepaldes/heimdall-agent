@@ -2,7 +2,7 @@
   "profiles": {
     "full": {
       "name": "Full Powerhouse",
-      "description": "Complete 56-skill suite & 10 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
+      "description": "Complete 64-skill suite & 10 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
       "skills": "*",
       "agents": "*"
     },
