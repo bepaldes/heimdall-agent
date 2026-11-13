@@ -413,6 +413,7 @@ O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 mó
 - **`progressive-disclosure`**: Padrão de divulgação progressiva em 3 camadas alinhado à Anthropic e Google, cortando o uso de tokens de prompt em >80% e prevenindo a proliferação desordenada de subagentes.
 - **`project-hygiene`**: Varre repositórios em busca de código morto, exports não utilizados, dependências circulares e caches de build obsoletos.
 - **`output-skill`**: Garante saídas completas do modelo sem reticências (`...`), blocos de código truncados ou omissões.
+- **`ruminate`**: Minera transcrições históricas de sessões Claude e Gemini em busca de padrões de correção, preferências repetidas, falhas de ativação de skills, violações de doutrina e desvios de consistência entre agentes. Escreve descobertas como arquivos de memória ou emendas de skills. Inspirado em [poteto/brainmaxxing](https://github.com/poteto/brainmaxxing).
 
 </details>
 

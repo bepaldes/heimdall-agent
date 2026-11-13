@@ -103,4 +103,4 @@
 - Every task must explicitly declare one of the registered models and an allowed effort level (`low`, `medium`, `high`, `xhigh`) defined in `playbooks/06-model-registry-matrix.md`.
 - Tasks requiring deep architectural reasoning, type safety, or complex algorithms must use `high` or `xhigh`.
 - Fast scans, boilerplate scaffolding, or rapid audits may use `low` or `medium`.
-- When Gemini 4 Argon reaches quota cooldown, immediately fallback to Gemini 3.8 Flash, Gemini 3.1 Pro, or GhostCLI (Claude Sonnet 5 / GPT-6 Astra).
+- When Gemini 4 Argon reaches quota cooldown, fallback in order: Gemini 4 Hydrogen → Gemini 3.8 Flash → GhostCLI models (Claude/GPT).

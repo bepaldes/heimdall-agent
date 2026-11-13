@@ -398,3 +398,15 @@ heimdall update-skill all
 [↑ Back to top](#toc)
 
 ---
+
+<a id="ruminate"></a>
+### ⚡ Ruminate Session Transcript Mining
+
+- **Module Name**: `ruminate`
+- **Description**: Mine historical Claude and Gemini session transcripts for correction patterns, repeated preferences, skill trigger failures, agent selection accuracy, doctrine violations, and cross-agent consistency drift. Writes findings as memory files or skill amendments. Use when bootstrapping a brain from existing conversation history or running periodic deep audits.
+- **Upstream Inspiration**: [https://github.com/poteto/brainmaxxing](https://github.com/poteto/brainmaxxing)
+- **Contract File**: [`skills/ruminate/SKILL.md`](../skills/ruminate/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---

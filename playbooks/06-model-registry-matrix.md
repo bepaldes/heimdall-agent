@@ -44,8 +44,10 @@ Accessed natively via Google Antigravity / `agy` CLI (never through GhostCLI):
 
 | Model Name | Canonical Flag | Allowed Effort Levels | Optimal Specialization |
 | :--- | :--- | :--- | :--- |
-| **Gemini 4 Argon** | `gemini-4-argon-{effort}` (e.g. `gemini-4-argon-high`) | `low`, `medium`, `high`, `xhigh` | Next-generation flagship Gemini reasoning, complex multi-file architecture, deep cross-workspace synthesis, high-velocity full-stack implementation. |
-| **Gemini 3.8 Flash** | `gemini-3.8-flash-{effort}` (e.g. `gemini-3.8-flash-high`) | `low`, `medium`, `high` | Fast scans, workspace audits, boilerplate generation, unit test scaffolding, rapid prototyping, responsive styling. |
+| **Gemini 4 Hydrogen** | `gemini-4-hydrogen-{effort}` (e.g. `gemini-4-hydrogen-xhigh`) | `low`, `medium`, `high`, `xhigh` | Efficient frontier reasoning with speed and long decodes up to 1M tokens. Supports xhigh effort tier. Replaces Flash branding. |
+| **Gemini 4 Argon** | `gemini-4-argon-{effort}` (e.g. `gemini-4-argon-high`) | `low`, `medium`, `high` | Efficient Gemini 4 frontier reasoning, faster responses and lower token spend. Subject to quota cooldowns. |
+| **Orchestrator (Argon)** | N/A (model dropdown option in Antigravity) | Auto-managed | Dynamic mode that splits tasks between Carbon (planning/review) and Hydrogen (implementation) within one session. Uses ~24% less quota and finishes ~19% faster than Carbon alone. Requires Google AI Ultra subscription; not a standalone model. |
+| **Gemini 3.8 Flash** | `gemini-3.8-flash-{effort}` (e.g. `gemini-3.8-flash-high`) | `low`, `medium`, `high` | Stable previous-generation Flash for software engineering, autonomous agents, and complex enterprise workflows. Current default workhorse. |
 
 ---
 
@@ -72,12 +74,12 @@ The `/model` picker in Claude Code shows a hardcoded list that may include model
 
 To dispatch any GhostCLI model — including those invisible in the picker — pass its canonical flag via the Agent tool's `model` parameter when spawning subagents (e.g. `model: "gpt-6-astra"`, `model: "z-ai/glm-5.3"`). The API call routes through GhostCLI regardless of what `/model` displays.
 
-Gemini models (`gemini-4`, `gemini-3.8-flash`, `gemini-3.1-pro`) are never reachable through GhostCLI; they are accessed natively via Google Antigravity (`agy` CLI in Herdr).
+Gemini models (`gemini-4-hydrogen`, `gemini-4-argon`, `gemini-3.8-flash`) are never reachable through GhostCLI; they are accessed natively via Google Antigravity (`agy` CLI in Herdr). `Orchestrator (Argon)` is a dynamic mode that splits tasks between planning and implementation within one session — it is not a standalone model. Gemini 4 Carbon exists but is unavailable on current plan tier.
 
 ---
 
 ## 6. Effort Constraint & Fallback Rules
 
 - **Effort Constraint Rule**: Each task in a plan must explicitly declare one of the registered models and an allowed effort level matching the tables above.
-- **Quota Fallback Rule**: When Gemini 4 Argon reaches quota cooldown, immediately fallback to Gemini 3.8 Flash (for fast scans/reviews) or Claude Sonnet 5 / GPT-6 Astra via GhostCLI.
+- **Quota Fallback Rule**: When Gemini 4 Argon reaches quota cooldown, fallback in order: Gemini 4 Hydrogen → Gemini 3.8 Flash → GhostCLI models (Claude/GPT).
 - **Headless Execution Limitation**: The `agy` CLI requires a TTY for all execution modes including `--print`. Non-interactive/headless invocations from scripts, CI, or piped environments will hang indefinitely. Use Herdr split/tab/window modes instead, or run `agy` interactively.

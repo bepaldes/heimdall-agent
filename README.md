@@ -400,6 +400,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 - **`progressive-disclosure`**: Anthropic & Google-aligned 3-layer progressive disclosure standard cutting prompt overhead by >80% and preventing subagent sprawl.
 - **`project-hygiene`**: Sweeps workspaces for dead code, unused exports, circular dependencies, and stale build caches.
 - **`output-skill`**: Guarantees unabridged LLM output without ellipses (`...`), incomplete code blocks, or truncation.
+- **`ruminate`**: Mines historical Claude and Gemini session transcripts for correction patterns, repeated preferences, skill trigger failures, doctrine violations, and cross-agent consistency drift. Writes findings as memory files or skill amendments. Inspired by [poteto/brainmaxxing](https://github.com/poteto/brainmaxxing).
 
 </details>
 
