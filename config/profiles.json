@@ -2,7 +2,7 @@
   "profiles": {
     "full": {
       "name": "Full Powerhouse",
-      "description": "Complete 64-skill suite & 10 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
+      "description": "Complete 67-skill suite & 10 predefined agents: Process, Anti-Slop, Design, Security, Hygiene, and Cross-Agent Bridges.",
       "skills": "*",
       "agents": "*"
     },
@@ -60,7 +60,7 @@
     },
     "design": {
       "name": "Frontend & Taste Studio",
-      "description": "12-skill design engineering, token systems, responsive mobile layouts, and aesthetic craftsmanship.",
+      "description": "13-skill design engineering, modern web platform guidance, token systems, responsive mobile layouts, and aesthetic craftsmanship.",
       "skills": [
         "taste-skill",
         "brandkit",
@@ -73,7 +73,8 @@
         "antislop-layoutmobile",
         "image-to-code-skill",
         "imagegen-frontend-web",
-        "imagegen-frontend-mobile"
+        "imagegen-frontend-mobile",
+        "modern-web-guidance"
       ],
       "agents": [
         "orchestrator",

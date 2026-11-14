@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#10-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-10%20predefined-orange.svg?style=flat-square" alt="Agents: 10 Predefined" /></a>
-  <a href="#skill-inventory-64-modules-across-25-toolkits"><img src="https://img.shields.io/badge/skills-25%20toolkits%20%2864%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 25 Toolkits (64 Modules)" /></a>
+  <a href="#skill-inventory-67-modules-across-28-toolkits"><img src="https://img.shields.io/badge/skills-28%20toolkits%20%2867%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 28 Toolkits (67 Modules)" /></a>
   <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Language / Idioma:** **English** | [Português (Brasil)](README.pt-BR.md)
 
-Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **64 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **67 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
 
 ---
 
@@ -34,7 +34,7 @@ Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent so
 **Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. 
 
 Instead of manually maintaining scattered custom instructions, system prompts, and configuration files across different AI clients, Heimdall provides a single source of truth:
-* **Modular Skills**: 64 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
+* **Modular Skills**: 67 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
 * **Specialized Agent Personas**: 10 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Universal Doctrine**: Central rules (`AGENTS.md`) synchronized across all harnesses, enforcing planning gates, test-driven development (TDD), and minimal surgical code edits.
 
@@ -82,7 +82,7 @@ When Heimdall bootstraps, it establishes live junctions (Windows) or symlinks (P
 
 | Source in Heimdall | Deployed Location | Purpose |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<tool>/skills/` | 64 domain toolkits loaded progressively on demand. |
+| `skills/` | `~/.<tool>/skills/` | 67 domain toolkits loaded progressively on demand. |
 | `agents/` | `~/.<tool>/agents/` | 10 specialized agent persona definitions. |
 | `hooks/` | `~/.claude/hooks/` | Event-driven lifecycle hooks for Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (optional) | Universal native Git pre-push hook for all tools. |
@@ -152,7 +152,7 @@ Select a profile tier based on your machine and workflow needs:
 
 | Profile | Skills | Predefined Agents | Description | Best For |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Default)* | 64 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
+| **`full`** *(Default)* | 67 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
 | **`minimal`** | 16 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Lightweight laptops, smaller context windows |
 | **`security`** | 12 | 4 | AppSec suite: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Penetration testing & pre-deployment audits |
 | **`design`** | 12 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
@@ -176,6 +176,41 @@ Heimdall automatically discovers and configures installed AI tools:
 | **OpenClaw** | `openclaw` on PATH | Junctions to `~/.openclaw/skills` + `AGENTS.md` / `SOUL.md` injection |
 | **OpenDesign** | `open-design` on PATH / `.opendesign` | Automatic visual canvas mode: bypasses Turn 1 grilling gate, preserves `data-od-*` attributes & applies `taste-skill` + `antislop-ui` |
 | **Claude Desktop** | `%APPDATA%\Claude` | Auto-configures Context7 MCP and playbooks in `claude_desktop_config.json` |
+
+### MCP Server Architecture
+
+Heimdall manages Model Context Protocol (MCP) servers through a **template-based resolver** that eliminates Windows `npx` process multiplication and ensures consistent configuration across all installed harnesses.
+
+#### How It Works
+
+1. **Global Package Install**: During setup (`node setup.mjs`), Heimdall automatically installs required MCP packages globally via `npm install -g`:
+   - `@upstash/context7-mcp` — up-to-date library documentation queries
+   - `chrome-devtools-mcp` — browser automation and performance profiling
+
+2. **Template Resolution**: The portable template at `config/mcp.template.json` declares server definitions with `{{PLACEHOLDER}}` tokens and `resolve` hints. The resolver script (`scripts/resolve-mcp.mjs`) detects local paths at runtime and generates `config/mcp.resolved.json` with direct `node.exe` entrypoints.
+
+3. **Dynamic Harness Detection**: The resolver syncs to **every installed harness** by checking for config file existence — it does not hardcode a fixed set of targets:
+   - Gemini → `~/.gemini/config/mcp_config.json` (JSON)
+   - Claude Code → `~/.claude/settings.json` (JSON)
+   - Codex CLI → `~/.codex/config.toml` (TOML `[mcp_servers.*]`)
+   - Hermes → `%LOCALAPPDATA%\hermes\config.yaml` (YAML `mcp_servers:`)
+   - Any future harness added to the resolver is auto-detected on next sync
+
+4. **Direct `node.exe` Invocation**: Resolved configs use `C:\Program Files\nodejs\node.exe <entrypoint.js>` instead of `npx`, spawning exactly **1 process per server per session** with zero `cmd.exe` wrappers and zero orphan multiplication on exit.
+
+#### Daily MCP Commands
+
+```powershell
+# Re-resolve paths and sync to all installed harnesses (after toggling servers or updating packages)
+/mcp-sync
+
+# Kill orphaned MCP processes left behind by crashed sessions
+/mcp-cleanup
+```
+
+#### Disabling Heavy Servers
+
+Edit `config/mcp.template.json` and set `"disabled": true` on any server (e.g., `chrome-devtools`) to prevent it from spawning in new sessions. Run `/mcp-sync` after editing.
 
 [↑ Back to top](#table-of-contents)
 
@@ -302,10 +337,10 @@ All personas declare `model: inherit` to run on whichever active model or vendor
 
 ---
 
-<a id="skill-inventory-64-modules-across-25-toolkits"></a>
-### Skill Inventory (64 Modules Across 25 Toolkits)
+<a id="skill-inventory-67-modules-across-28-toolkits"></a>
+### Skill Inventory (67 Modules Across 28 Toolkits)
 
-Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** and **19 Standalone Toolkits (19 modules)**:
+Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** and **22 Standalone Toolkits (22 modules)**:
 
 #### Core Multi-Skill Suites (6 Suites / 45 Modules)
 
@@ -376,7 +411,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 
 </details>
 
-#### Standalone Toolkits (19 Curated Toolkits / 19 Modules)
+#### Standalone Toolkits (22 Curated Toolkits / 22 Modules)
 
 <details open>
 <summary><b>Browse Standalone Toolkits</b></summary>
@@ -401,6 +436,9 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 - **`project-hygiene`**: Sweeps workspaces for dead code, unused exports, circular dependencies, and stale build caches.
 - **`output-skill`**: Guarantees unabridged LLM output without ellipses (`...`), incomplete code blocks, or truncation.
 - **`ruminate`**: Mines historical Claude and Gemini session transcripts for correction patterns, repeated preferences, skill trigger failures, doctrine violations, and cross-agent consistency drift. Writes findings as memory files or skill amendments. Inspired by [poteto/brainmaxxing](https://github.com/poteto/brainmaxxing).
+- **`modern-web-guidance`**: Google Chrome's official modern web platform skill pack (`GoogleChrome/modern-web-guidance`). Steers agents toward Baseline-safe native HTML/CSS/JS APIs, Core Web Vitals (LCP/INP/CLS) best practices, and `legacy-scan` frontend modernization.
+- **`mcp-cleanup`**: Kills orphaned MCP server processes left behind by crashed or closed agent sessions.
+- **`mcp-sync`**: Resolves the Heimdall MCP template to local paths and syncs across installed agent harnesses.
 
 </details>
 

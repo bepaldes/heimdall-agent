@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **25 Primary Toolkits & Suites (64 modular capabilities)**.
+This directory serves as the comprehensive reference manual for Heimdall's **28 Primary Toolkits & Suites (67 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -46,6 +46,9 @@ heimdall update-skill all
 - [⚡ Herdr Coding Agent Multiplexer & Orchestrator](#herdr)
 - [⚡ Thermo Architectural & Maintainability Audit](#thermo)
 - [⚡ PStack Engineering Discipline](#pstack-discipline)
+- [⚡ Google Chrome Modern Web Guidance](#modern-web-guidance)
+- [⚡ MCP Orphan Process Cleanup](#mcp-cleanup)
+- [⚡ MCP Template Resolver & Sync](#mcp-sync)
 
 ---
 
@@ -406,6 +409,40 @@ heimdall update-skill all
 - **Description**: Mine historical Claude and Gemini session transcripts for correction patterns, repeated preferences, skill trigger failures, agent selection accuracy, doctrine violations, and cross-agent consistency drift. Writes findings as memory files or skill amendments. Use when bootstrapping a brain from existing conversation history or running periodic deep audits.
 - **Upstream Inspiration**: [https://github.com/poteto/brainmaxxing](https://github.com/poteto/brainmaxxing)
 - **Contract File**: [`skills/ruminate/SKILL.md`](../skills/ruminate/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="modern-web-guidance"></a>
+### ⚡ Google Chrome Modern Web Guidance
+
+- **Module Name**: `modern-web-guidance`
+- **Description**: Search and retrieve Google Chrome Modern Web Guidance (Baseline-safe native HTML/CSS/JS APIs, Core Web Vitals, accessibility, and `legacy-scan` frontend modernization).
+- **Upstream Source**: [https://github.com/GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance)
+- **Contract File**: [`skills/modern-web-guidance/SKILL.md`](../skills/modern-web-guidance/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="mcp-cleanup"></a>
+### ⚡ MCP Orphan Process Cleanup
+
+- **Module Name**: `mcp-cleanup`
+- **Description**: Kill orphaned MCP server processes left behind by crashed or closed agent sessions.
+- **Contract File**: [`skills/mcp-cleanup/SKILL.md`](../skills/mcp-cleanup/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="mcp-sync"></a>
+### ⚡ MCP Template Resolver & Sync
+
+- **Module Name**: `mcp-sync`
+- **Description**: Resolve Heimdall MCP template to local paths and sync to agent harness configs.
+- **Contract File**: [`skills/mcp-sync/SKILL.md`](../skills/mcp-sync/SKILL.md)
 
 [↑ Back to top](#toc)
 

@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#10-personas-de-agentes-predefinidas"><img src="https://img.shields.io/badge/agents-10%20predefinidos-orange.svg?style=flat-square" alt="Agentes: 10 Predefinidos" /></a>
-  <a href="#inventario-de-skills-64-modulos-em-25-toolkits"><img src="https://img.shields.io/badge/skills-25%20toolkits%20%2864%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 25 Toolkits (64 Módulos)" /></a>
+  <a href="#inventario-de-skills-67-modulos-em-28-toolkits"><img src="https://img.shields.io/badge/skills-28%20toolkits%20%2867%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 28 Toolkits (67 Módulos)" /></a>
   <a href="#ferramentas-e-runtimes-suportados"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Idioma / Language:** [English](README.md) | **Português (Brasil)**
 
-O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **10 personas de agentes especializados** e **64 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
+O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **10 personas de agentes especializados** e **67 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
 
 ---
 
@@ -34,7 +34,7 @@ O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para en
 O **Heimdall** é um bootstrapper de ambiente e camada de coordenação multi-agente para ferramentas de programação com IA.
 
 Em vez de manter manualmente instruções customizadas, prompts de sistema e arquivos de configuração espalhados em diferentes clientes de IA, o Heimdall fornece uma fonte única da verdade (*Single Source of Truth*):
-* **Skills Modulares**: 64 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
+* **Skills Modulares**: 67 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
 * **Personas de Agentes Especializados**: 10 papéis predefinidos com janelas de contexto isoladas (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Doutrina Universal**: Regras centrais (`AGENTS.md`) sincronizadas em todas as ferramentas, exigindo portões de planejamento, desenvolvimento orientado a testes (TDD) e edições cirúrgicas mínimas.
 
@@ -82,7 +82,7 @@ Durante o bootstrap, o Heimdall cria *junctions* (Windows) ou *symlinks* (POSIX)
 
 | Origem no Heimdall | Local Implantado | Finalidade |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<ferramenta>/skills/` | 64 toolkits de domínio carregados progressivamente sob demanda. |
+| `skills/` | `~/.<ferramenta>/skills/` | 67 toolkits de domínio carregados progressivamente sob demanda. |
 | `agents/` | `~/.<ferramenta>/agents/` | 10 definições de personas de agentes especializados. |
 | `hooks/` | `~/.claude/hooks/` | Hooks de ciclo de vida orientados a eventos para o Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (opcional) | Hook Git `pre-push` nativo universal para todas as ferramentas. |
@@ -152,7 +152,7 @@ Escolha o perfil de acordo com sua máquina e fluxo de trabalho:
 
 | Perfil | Skills | Agentes Predefinidos | Descrição | Ideal Para |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Padrão)* | 64 | 10 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
+| **`full`** *(Padrão)* | 67 | 10 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
 | **`minimal`** | 16 | 4 | Núcleo enxuto: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Notebooks leves, janelas de contexto menores |
 | **`security`** | 12 | 4 | Suíte AppSec: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Pentest e auditorias pré-deploy |
 | **`design`** | 12 | 4 | Frontend e mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | Design de UI/UX e design systems |
@@ -176,6 +176,41 @@ O Heimdall detecta e configura automaticamente as ferramentas de IA instaladas:
 | **OpenClaw** | `openclaw` no PATH | Junctions em `~/.openclaw/skills` + injeção em `AGENTS.md` / `SOUL.md` |
 | **OpenDesign** | `open-design` no PATH / `.opendesign` | Modo automático de canvas visual: dispensa portões de perguntas no turno 1, preserva atributos `data-od-*` e aplica `taste-skill` + `antislop-ui` |
 | **Claude Desktop** | `%APPDATA%\Claude` | Configura automaticamente o MCP Context7 e playbooks no `claude_desktop_config.json` |
+
+### Arquitetura de servidores MCP
+
+O Heimdall gerencia servidores Model Context Protocol (MCP) por meio de um resolvedor baseado em templates que elimina a multiplicação de processos do `npx` no Windows e mantém a configuração consistente em todos os harnesses instalados.
+
+#### Como funciona
+
+1.  **Instalação global de pacotes**: durante a instalação (`node setup.mjs`), o Heimdall instala automaticamente os pacotes MCP necessários via `npm install -g`:
+    *   `@upstash/context7-mcp` para consultas atualizadas de documentação de bibliotecas
+    *   `chrome-devtools-mcp` para automação de navegador e profiling de performance
+
+2.  **Resolução de templates**: o template portátil em `config/mcp.template.json` declara definições de servidores com tokens `{{PLACEHOLDER}}` e hints de resolução. O script resolvedor (`scripts/resolve-mcp.mjs`) detecta caminhos locais em tempo de execução e gera `config/mcp.resolved.json` com entrypoints diretos via `node.exe`.
+
+3.  **Detecção dinâmica de harnesses**: o resolvedor sincroniza com cada harness instalado verificando a existência do arquivo de configuração. Ele não usa uma lista fixa de alvos:
+    *   Gemini escreve em `~/.gemini/config/mcp_config.json` (JSON)
+    *   Claude Code escreve em `~/.claude/settings.json` (JSON)
+    *   Codex CLI escreve em `~/.codex/config.toml` (TOML `[mcp_servers.*]`)
+    *   Hermes escreve em `%LOCALAPPDATA%\hermes\config.yaml` (YAML `mcp_servers:`)
+    *   Qualquer harness futuro adicionado ao resolvedor é detectado automaticamente na próxima sincronização
+
+4.  **Invocação direta via `node.exe`**: as configurações resolvidas usam `C:\Program Files\nodejs\node.exe <entrypoint.js>` em vez de `npx`, criando exatamente 1 processo por servidor por sessão, sem wrappers `cmd.exe` e sem multiplicação de órfãos ao fechar a sessão.
+
+#### Comandos diários de MCP
+
+```powershell
+# Re-resolve caminhos e sincroniza com todos os harnesses instalados (após ativar/desativar servidores ou atualizar pacotes)
+/mcp-sync
+
+# Mata processos MCP órfãos deixados por sessões que travaram
+/mcp-cleanup
+```
+
+#### Desativar servidores pesados
+
+Edite `config/mcp.template.json` e defina `"disabled": true` no servidor desejado (por exemplo, `chrome-devtools`) para impedir que ele seja iniciado em novas sessões. Execute `/mcp-sync` após editar.
 
 [↑ Voltar ao topo](#indice)
 
@@ -301,10 +336,10 @@ Todas as personas declaram `model: inherit` para rodar em qualquer modelo ou pro
 
 ---
 
-<a id="inventario-de-skills-64-modulos-em-25-toolkits"></a>
-### Inventário de Skills (64 Módulos em 25 Toolkits)
+<a id="inventario-de-skills-67-modulos-em-28-toolkits"></a>
+### Inventário de Skills (67 Módulos em 28 Toolkits)
 
-O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 módulos)** e **19 Toolkits Independentes (19 módulos)**:
+O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 módulos)** e **22 Toolkits Independentes (22 módulos)**:
 
 #### Suítes Multi-Skill Principais (6 Suítes / 45 Módulos)
 
@@ -389,7 +424,7 @@ O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 mó
 
 </details>
 
-#### Toolkits Independentes (19 Toolkits Curados / 19 Módulos)
+#### Toolkits Independentes (22 Toolkits Curados / 22 Módulos)
 
 <details open>
 <summary><b>Explorar Toolkits Independentes</b></summary>
@@ -414,6 +449,9 @@ O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 mó
 - **`project-hygiene`**: Varre repositórios em busca de código morto, exports não utilizados, dependências circulares e caches de build obsoletos.
 - **`output-skill`**: Garante saídas completas do modelo sem reticências (`...`), blocos de código truncados ou omissões.
 - **`ruminate`**: Minera transcrições históricas de sessões Claude e Gemini em busca de padrões de correção, preferências repetidas, falhas de ativação de skills, violações de doutrina e desvios de consistência entre agentes. Escreve descobertas como arquivos de memória ou emendas de skills. Inspirado em [poteto/brainmaxxing](https://github.com/poteto/brainmaxxing).
+- **`modern-web-guidance`**: Pacote oficial de skills de plataforma web moderna do Google Chrome (`GoogleChrome/modern-web-guidance`). Orienta agentes a usar APIs nativas HTML/CSS/JS compatíveis com Baseline, boas práticas de Core Web Vitals (LCP/INP/CLS) e modernização frontend via `legacy-scan`.
+- **`mcp-cleanup`**: Encerra processos órfãos de servidores MCP deixados por sessões encerradas ou travadas.
+- **`mcp-sync`**: Resolve o template MCP do Heimdall para caminhos locais e sincroniza com os harnesses instalados.
 
 </details>
 

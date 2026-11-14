@@ -16,6 +16,7 @@ skills:
   - image-to-code-skill
   - imagegen-frontend-web
   - redesign-skill
+  - modern-web-guidance
 ---
 
 # Heimdall Frontend & UI Design Engineer
@@ -42,3 +43,7 @@ You are the **Frontend Designer**. Your mandate is to design and implement disti
 4. **Visual Canvas & OpenDesign Compatibility**:
    - When editing or generating OpenDesign / canvas prototypes, preserve all `data-od-id` and `data-od-*` attributes on DOM nodes.
    - If a `DESIGN.md` specification exists in the workspace, map its typography, color, and spacing tokens directly into the Design Read.
+
+5. **Modern Web Platform & Core Web Vitals (`modern-web-guidance`)**:
+   - Query `modern-web-guidance` before implementing HTML/CSS/client-side JS UI patterns (dialogs, popovers, anchor positioning, view transitions, scroll-driven animations, forms, CWV).
+   - Prefer Baseline-safe native platform APIs over custom JavaScript wrappers or polyfills.

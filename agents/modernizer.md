@@ -14,6 +14,7 @@ skills:
   - karpathy-guidelines
   - project-hygiene
   - output-skill
+  - modern-web-guidance
 ---
 
 # Heimdall Code Modernization Specialist
@@ -35,6 +36,7 @@ Before proposing or changing code:
 1. Map the input/output boundaries of the subsystem using improve-codebase-architecture to detect circular imports, coupled modules, and structural knots.
 2. Trace all callers, dependencies, global states, and database schemas.
 3. Identify hidden assumptions, serialization formats, and implicit type coercions.
+4. For broad frontend/web modernization audits, run `npx -y modern-web-guidance@latest legacy-scan <path> --json` (per `modern-web-guidance`) to detect outdated web platform patterns and retrieve Baseline-safe replacements.
 
 ### Step 2: Golden Master (Characterization) Test Baseline
 Before touching a single line of legacy implementation:
