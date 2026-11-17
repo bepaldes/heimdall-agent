@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveModelMaxContext, normalizeContextTokens, resolveCustomModelsEndpoint } from '../lib/model-context.cjs';
+import { resolveModelMaxContext, normalizeContextTokens, resolveCustomModelsEndpoint, lookupModelContextFromCatalog } from '../lib/model-context.cjs';
 
 describe('Model Context Discovery & Maximum Context Resolution', () => {
   test('normalizes raw token numbers into integer tokens and human readable string', () => {
@@ -80,5 +80,15 @@ describe('Model Context Discovery & Maximum Context Resolution', () => {
       }),
       'https://my-proxy.internal/v1/models'
     );
+  });
+
+  test('lookupModelContextFromCatalog resolves newly added GhostCLI models from config/models.json', () => {
+    const mimo = lookupModelContextFromCatalog('XiaomiMiMo/MiMo-V2.6-Pro', process.cwd());
+    assert.equal(mimo.tokens, 1000000);
+    assert.equal(mimo.label, '1M');
+
+    const hy4 = lookupModelContextFromCatalog('tencent/Hy4-preview', process.cwd());
+    assert.equal(hy4.tokens, 1000000);
+    assert.equal(hy4.label, '1M');
   });
 });

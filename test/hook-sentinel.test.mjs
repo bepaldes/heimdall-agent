@@ -81,4 +81,62 @@ describe('Runtime Lifecycle Sentinel Hook', () => {
     assert.equal(resPostHtml.status, 0);
     assert.doesNotMatch(resPostHtml.stderr, /\[Heimdall Verification Sentinel\]/);
   });
+
+  test('resolves active context limit dynamically from HEIMDALL_ACTIVE_MODEL', () => {
+    const mediumContent = 'a'.repeat(450000); // ~118K tokens (> 75% of 128K, < 75% of 1M)
+    const payload = JSON.stringify({
+      tool_input: {
+        command: 'echo test',
+        content: mediumContent
+      }
+    });
+
+    // Clear session state for this parent pid first
+    spawnSync(process.execPath, [hookScript, 'pre-compact'], {
+      input: JSON.stringify({}),
+      encoding: 'utf8'
+    });
+
+    const res1M = spawnSync(process.execPath, [hookScript, 'pre-bash'], {
+      input: payload,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        HEIMDALL_ACTIVE_CONTEXT_LIMIT: '',
+        HEIMDALL_ACTIVE_MODEL: 'tencent/Hy4-preview'
+      }
+    });
+    assert.equal(res1M.status, 0);
+    assert.doesNotMatch(res1M.stderr, /\[Heimdall Context Sentinel\]/);
+
+    // Reset and test unknown model (128K fallback) -> should warn at ~118K / 128K
+    spawnSync(process.execPath, [hookScript, 'pre-compact'], {
+      input: JSON.stringify({}),
+      encoding: 'utf8'
+    });
+
+    const res128K = spawnSync(process.execPath, [hookScript, 'pre-bash'], {
+      input: payload,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        HEIMDALL_ACTIVE_CONTEXT_LIMIT: '',
+        HEIMDALL_ACTIVE_MODEL: 'unknown-small-model'
+      }
+    });
+    assert.equal(res128K.status, 0);
+    assert.match(res128K.stderr, /\/ 131K max tokens/);
+  });
+
+  test('user-prompt event injects compact BLUF and ASD-STE100 reminder to stdout', () => {
+    const res = spawnSync(process.execPath, [hookScript, 'user-prompt'], {
+      input: JSON.stringify({ prompt: 'Explain how hooks work.' }),
+      encoding: 'utf8'
+    });
+
+    assert.equal(res.status, 0);
+    assert.match(res.stdout, /\[Heimdall Communication Doctrine\]/);
+    assert.match(res.stdout, /BLUF/);
+    assert.match(res.stdout, /ASD-STE100/);
+  });
 });

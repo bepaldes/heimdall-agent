@@ -1,6 +1,17 @@
 {
   "description": "Heimdall Sentinel Lifecycle Hooks for Claude Code and AI Harnesses",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{HOOKS_DIR}}/heimdall-hook.cjs\" user-prompt"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash|PowerShell",

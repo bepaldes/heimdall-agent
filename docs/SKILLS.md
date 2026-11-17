@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the comprehensive reference manual for Heimdall's **28 Primary Toolkits & Suites (67 modular capabilities)**.
+This directory serves as the reference manual for Heimdall's **30 Primary Toolkits & Suites (69 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -49,6 +49,7 @@ heimdall update-skill all
 - [⚡ Google Chrome Modern Web Guidance](#modern-web-guidance)
 - [⚡ MCP Orphan Process Cleanup](#mcp-cleanup)
 - [⚡ MCP Template Resolver & Sync](#mcp-sync)
+- [⚡ Upstream Skill Sync & Triage](#upstream-skill-sync)
 
 ---
 
@@ -71,7 +72,7 @@ heimdall update-skill all
 * **`systematic-debugging`**: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes ([Contract File](../skills/systematic-debugging/SKILL.md))
 * **`verification-before-completion`**: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always ([Contract File](../skills/verification-before-completion/SKILL.md))
 * **`finishing-a-development-branch`**: Use when implementation is complete, all tests pass, and you need to decide how to integrate the work ([Contract File](../skills/finishing-a-development-branch/SKILL.md))
-* **`using-git-worktrees`**: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback ([Contract File](../skills/using-git-worktrees/SKILL.md))
+* **`using-git-worktrees`**: Use when starting feature work that needs isolation from current workspace or before executing implementation plans - verifies or creates an isolated workspace via native tools or git worktree fallback ([Contract File](../skills/using-git-worktrees/SKILL.md))
 * **`requesting-code-review`**: Use when completing tasks, implementing major features, or before merging to verify work meets requirements ([Contract File](../skills/requesting-code-review/SKILL.md))
 * **`receiving-code-review`**: Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation ([Contract File](../skills/receiving-code-review/SKILL.md))
 * **`using-superpowers`**: Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions ([Contract File](../skills/using-superpowers/SKILL.md))
@@ -443,6 +444,17 @@ heimdall update-skill all
 - **Module Name**: `mcp-sync`
 - **Description**: Resolve Heimdall MCP template to local paths and sync to agent harness configs.
 - **Contract File**: [`skills/mcp-sync/SKILL.md`](../skills/mcp-sync/SKILL.md)
+
+[↑ Back to top](#toc)
+
+---
+
+<a id="upstream-skill-sync"></a>
+### ⚡ Upstream Skill Sync & Triage
+
+- **Module Name**: `upstream-skill-sync`
+- **Description**: Audit upstream skill repositories in `config/skills.json` and classify updates via the 3-tier triage rubric (Safe 1:1, Defer/Selective Merge, Reject).
+- **Contract File**: [`skills/upstream-skill-sync/SKILL.md`](../skills/upstream-skill-sync/SKILL.md)
 
 [↑ Back to top](#toc)
 

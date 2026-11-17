@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>heimdall-agent — Multi-Agent Engineering Sentinel &amp; Environment Bootstrapper</title>
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --surface-alt: #f0eee8;
+      --ink: #14171c;
+      --ink-muted: #4b5563;
+      --border: #dcd8cf;
+      --border-strong: #bdb7ab;
+      --accent: #1d4ed8;
+      --accent-soft: #eff6ff;
+      --pine: #0f766e;
+      --pine-soft: #f0fdfa;
+      --amber: #b45309;
+      --amber-soft: #fffbeb;
+      --crimson: #b91c1c;
+      --crimson-soft: #fef2f2;
+      --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover, a:focus-visible {
+      text-decoration: underline;
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    code, pre {
+      font-family: var(--mono);
+      font-size: 0.88em;
+    }
+
+    code {
+      background: var(--surface-alt);
+      padding: 0.14em 0.38em;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    pre {
+      background: #14171c;
+      color: #f3f4f6;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      line-height: 1.5;
+      margin: 12px 0;
+    }
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    .layout {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 32px;
+      padding: 28px 24px 64px;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .sidebar-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      margin: 0 0 10px;
+    }
+
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar nav li {
+      margin-bottom: 4px;
+    }
+
+    .sidebar nav a {
+      display: block;
+      padding: 5px 8px;
+      border-radius: 4px;
+      color: var(--ink);
+      font-size: 13.5px;
+    }
+
+    .sidebar nav a:hover {
+      background: var(--surface-alt);
+      text-decoration: none;
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--ink);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin: 0 0 8px;
+    }
+
+    h1 {
+      font-size: 28px;
+      line-height: 1.2;
+      margin: 0 0 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .lead {
+      font-size: 16px;
+      color: var(--ink-muted);
+      margin: 0 0 20px;
+      max-width: 72ch;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .kpi {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+    }
+
+    .kpi-value {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-top: 4px;
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin: 0 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 22px 0 10px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--bg);
+    }
+
+    .card-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .tag-blue { background: var(--accent-soft); color: var(--accent); border: 1px solid #bfdbfe; }
+    .tag-pine { background: var(--pine-soft); color: var(--pine); border: 1px solid #99f6e4; }
+    .tag-amber { background: var(--amber-soft); color: var(--amber); border: 1px solid #fde68a; }
+    .tag-crimson { background: var(--crimson-soft); color: var(--crimson); border: 1px solid #fecaca; }
+
+    .card h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+
+    .card p, .card ul {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--ink-muted);
+    }
+
+    .card ul {
+      padding-left: 18px;
+      margin-top: 6px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 14px 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    thead th {
+      background: var(--surface-alt);
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .diagram-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      padding: 16px;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+
+    .diagram-caption {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      margin-top: 8px;
+      font-family: var(--mono);
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .filter-input {
+      flex: 1 1 220px;
+      padding: 8px 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      font-size: 14px;
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .filter-btn {
+      padding: 7px 11px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .filter-btn[aria-pressed="true"] {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+    }
+
+    .skill-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .skill-item {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      background: var(--bg);
+    }
+
+    .skill-item[hidden] {
+      display: none;
+    }
+
+    .skill-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .skill-suite {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .skill-desc {
+      margin: 0;
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .card-grid, .skill-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Document navigation">
+      <p class="sidebar-title">heimdall-agent v1.3.0</p>
+      <nav>
+        <ul>
+          <li><a href="#overview">1. Overview &amp; Metrics</a></li>
+          <li><a href="#way-of-working">2. Way of Working</a></li>
+          <li><a href="#architecture">3. Sync Architecture</a></li>
+          <li><a href="#workflow">4. Engineering Loop</a></li>
+          <li><a href="#hooks">5. Lifecycle Hooks</a></li>
+          <li><a href="#profiles">6. Profiles &amp; Runtimes</a></li>
+          <li><a href="#agents">7. 10 Agent Personas</a></li>
+          <li><a href="#skills">8. 69 Modular Skills</a></li>
+          <li><a href="#cli">9. CLI &amp; MCP Commands</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main>
+      <header class="hero" id="overview">
+        <p class="eyebrow">Multi-Agent Engineering Sentinel &amp; Environment Bootstrapper</p>
+        <h1>heimdall-agent</h1>
+        <p class="lead">
+          More than a skill aggregator, Heimdall installs a complete, opinionated way of working and coding across
+          <strong>Google Antigravity</strong>, <strong>Claude Code</strong>, <strong>OpenAI Codex CLI</strong>,
+          <strong>Hermes Agent</strong>, <strong>OpenClaw</strong>, <strong>OpenDesign</strong>, and <strong>Claude Desktop</strong>.
+        </p>
+        <div class="kpi-grid" role="list" aria-label="Repository metrics">
+          <div class="kpi" role="listitem">
+            <div class="kpi-value">69</div>
+            <div class="kpi-label">Modular Skills (30 Toolkits)</div>
+          </div>
+          <div class="kpi" role="listitem">
+            <div class="kpi-value">10</div>
+            <div class="kpi-label">Isolated Agent Personas</div>
+          </div>
+          <div class="kpi" role="listitem">
+            <div class="kpi-value">7</div>
+            <div class="kpi-label">Supported AI Runtimes</div>
+          </div>
+          <div class="kpi" role="listitem">
+            <div class="kpi-value">4</div>
+            <div class="kpi-label">Runtime + Git Hook Gates</div>
+          </div>
+          <div class="kpi" role="listitem">
+            <div class="kpi-value">187</div>
+            <div class="kpi-label">Sessions Mined via /ruminate</div>
+          </div>
+        </div>
+      </header>
+
+      <section id="way-of-working">
+        <h2>The Heimdall Way of Working (Beyond a Skill Aggregator)</h2>
+        <p>Skills alone do not build reliable software. Heimdall enforces six operational disciplines on every turn:</p>
+
+        <div class="card-grid">
+          <article class="card">
+            <span class="card-tag tag-blue">Communication</span>
+            <h4>1. BLUF (Bottom Line Up Front)</h4>
+            <p>Every report, plan, code review verdict, and subagent handoff opens with the conclusion, verdict, and blast radius in the first 1–2 sentences using standardized headers (<code>Subagent BLUF</code>, <code>Review Verdict</code>, <code>Plan BLUF</code>).</p>
+          </article>
+
+          <article class="card">
+            <span class="card-tag tag-blue">Precision</span>
+            <h4>2. ASD-STE100 Simplified Technical English</h4>
+            <p>Procedural steps start with active imperative verbs (<code>Create</code>, <code>Assert</code>, <code>Verify</code>, <code>Run</code>), stay at &le;20 words per step, name objects explicitly, and ban vague qualifiers.</p>
+          </article>
+
+          <article class="card">
+            <span class="card-tag tag-pine">Poteto / pstack</span>
+            <h4>3. High-Rigor Craftsmanship</h4>
+            <p><code>pstack-discipline</code> enforces <em>Prove It Works</em>, <em>Fix Root Causes</em>, <em>Test Behavior Not Implementation</em>, and <em>Subtract Before You Add</em>—paired with <code>thermo</code>, <code>karpathy-guidelines</code>, <code>clean-code</code>, and <code>modern-web-guidance</code>.</p>
+          </article>
+
+          <article class="card">
+            <span class="card-tag tag-pine">brainmaxxing</span>
+            <h4>4. Self-Healing Sessions (<code>ruminate</code> + <code>handoff</code>)</h4>
+            <p><code>ruminate</code> mines Claude and Gemini session transcripts for corrections and trigger failures. Rules in <code>handoff</code> and <code>writing-plans</code> were extracted directly from 187 sessions, paired with the 75%/40-turn Context Sentinel.</p>
+          </article>
+
+          <article class="card">
+            <span class="card-tag tag-amber">Multi-Model</span>
+            <h4>5. Dynamic Cross-Family Routing</h4>
+            <p>Personas use <code>model: inherit</code>. <code>heimdall sync-models</code> and <code>lib/model-router.cjs</code> classify capabilities dynamically and select cross-family Goldfish reviewers (Claude, Gemini, Codex, GLM, Hunyuan, MiMo).</p>
+          </article>
+
+          <article class="card">
+            <span class="card-tag tag-crimson">Restraint</span>
+            <h4>6. Token, Ceremony &amp; Diff Restraint</h4>
+            <p><code>progressive-disclosure</code> loads skills on demand, <code>caveman</code> strips conversational ceremony, and <code>ponytail</code> (<em>Lazy Senior Dev Mode</em>) enforces the smallest complete diff and a one-read reply.</p>
+          </article>
+
+          <article class="card">
+            <span class="card-tag tag-blue">Matt Pocock · Karpathy</span>
+            <h4>7. Real Engineering Pipeline &amp; 4 Pillars</h4>
+            <p><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener"><code>mattpocock/skills</code></a> chains <code>grill-me</code> &rarr; <code>wayfinder</code> &rarr; <code>domain-modeling</code> &rarr; <code>to-spec</code> &rarr; <code>to-tickets</code> &rarr; <code>codebase-design</code> &rarr; <code>handoff</code>. <code>karpathy-guidelines</code> enforces Think Before Coding, Simplicity First, Surgical Changes, and Goal-Driven Execution.</p>
+          </article>
+
+          <article class="card">
+            <span class="card-tag tag-amber">Triage</span>
+            <h4>8. Upstream Sync (<code>upstream-skill-sync</code>)</h4>
+            <p>Classifies skills as <code>mirror</code>, <code>adapted</code>, or <code>native</code> in <code>config/skills.json</code> and triages upstream updates into <strong>Tier 1 (Safe 1:1)</strong>, <strong>Tier 2 (Selective Merge)</strong>, or <strong>Tier 3 (Reject)</strong> after security scanning.</p>
+          </article>
+        </div>
+
+        <h3>ASD-STE100 Zero-Vagueness Lexicon</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Banned Word</th>
+                <th>Why Prohibited</th>
+                <th>STE Replacement Pattern</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>ensure</code></td>
+                <td>Does not specify the verification mechanism.</td>
+                <td><code>Verify &lt;condition&gt; equals &lt;expected&gt;. If not, &lt;action&gt;.</code></td>
+              </tr>
+              <tr>
+                <td><code>properly</code></td>
+                <td>Subjective without testable criteria.</td>
+                <td><code>Assert &lt;field&gt; matches regex &lt;pattern&gt;.</code></td>
+              </tr>
+              <tr>
+                <td><code>appropriately</code></td>
+                <td>Defers specification to the executor.</td>
+                <td>State the exact configuration parameter or value.</td>
+              </tr>
+              <tr>
+                <td><code>gracefully</code></td>
+                <td>Vague error-handling requirement.</td>
+                <td><code>Catch &lt;ErrorType&gt;, log warning, and return &lt;FallbackValue&gt;.</code></td>
+              </tr>
+              <tr>
+                <td><code>as needed</code> / <code>etc.</code></td>
+                <td>Unbounded scope; executor cannot guess items.</td>
+                <td>List all conditions and items exhaustively.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="architecture">
+        <h2>Single Source of Truth Architecture</h2>
+        <p>Heimdall deploys live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux) from one repository so all installed AI tools stay synchronized with zero file duplication.</p>
+
+        <div class="diagram-box">
+          <svg viewBox="0 0 920 310" width="100%" role="img" aria-label="Heimdall single source of truth architecture diagram">
+            <rect x="20" y="30" width="250" height="250" rx="6" fill="#ffffff" stroke="#14171c" stroke-width="2" />
+            <text x="38" y="60" font-family="ui-monospace, monospace" font-size="14" font-weight="700" fill="#14171c">heimdall-agent/ (Repo)</text>
+            <text x="38" y="88" font-family="ui-monospace, monospace" font-size="12" fill="#1d4ed8">skills/ (68 modules)</text>
+            <text x="38" y="114" font-family="ui-monospace, monospace" font-size="12" fill="#1d4ed8">agents/ (10 personas)</text>
+            <text x="38" y="140" font-family="ui-monospace, monospace" font-size="12" fill="#0f766e">doctrine/AGENTS.md</text>
+            <text x="38" y="166" font-family="ui-monospace, monospace" font-size="12" fill="#b45309">hooks/heimdall-hook.cjs</text>
+            <text x="38" y="192" font-family="ui-monospace, monospace" font-size="12" fill="#4b5563">playbooks/ (01..08)</text>
+            <text x="38" y="218" font-family="ui-monospace, monospace" font-size="12" fill="#4b5563">commands/ (/plan, /grill-me)</text>
+            <text x="38" y="244" font-family="ui-monospace, monospace" font-size="12" fill="#4b5563">config/mcp.template.json</text>
+
+            <rect x="335" y="115" width="210" height="80" rx="6" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5" />
+            <text x="440" y="147" text-anchor="middle" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#14171c">setup.mjs / resolve-mcp.mjs</text>
+            <text x="440" y="168" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11.5" fill="#1d4ed8">NTFS Junctions / Symlinks</text>
+            <text x="440" y="184" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">Direct node.exe MCP</text>
+
+            <line x1="270" y1="155" x2="335" y2="155" stroke="#14171c" stroke-width="2" />
+            <polygon points="335,155 327,150 327,160" fill="#14171c" />
+
+            <g font-family="system-ui, sans-serif" font-size="12" fill="#14171c">
+              <rect x="615" y="18" width="280" height="32" rx="4" fill="#ffffff" stroke="#bdb7ab" />
+              <text x="628" y="39" font-weight="600">Claude Code CLI</text>
+              <text x="748" y="39" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">~/.claude/*</text>
+
+              <rect x="615" y="58" width="280" height="32" rx="4" fill="#ffffff" stroke="#bdb7ab" />
+              <text x="628" y="79" font-weight="600">Google Antigravity</text>
+              <text x="748" y="79" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">~/.gemini/*</text>
+
+              <rect x="615" y="98" width="280" height="32" rx="4" fill="#ffffff" stroke="#bdb7ab" />
+              <text x="628" y="119" font-weight="600">OpenAI Codex CLI</text>
+              <text x="748" y="119" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">~/.codex/*</text>
+
+              <rect x="615" y="138" width="280" height="32" rx="4" fill="#ffffff" stroke="#bdb7ab" />
+              <text x="628" y="159" font-weight="600">Hermes Agent</text>
+              <text x="748" y="159" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">%LOCALAPPDATA%/hermes</text>
+
+              <rect x="615" y="178" width="280" height="32" rx="4" fill="#ffffff" stroke="#bdb7ab" />
+              <text x="628" y="199" font-weight="600">OpenClaw</text>
+              <text x="748" y="199" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">~/.openclaw/*</text>
+
+              <rect x="615" y="218" width="280" height="32" rx="4" fill="#ffffff" stroke="#bdb7ab" />
+              <text x="628" y="239" font-weight="600">OpenDesign</text>
+              <text x="748" y="239" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">Canvas Mode</text>
+
+              <rect x="615" y="258" width="280" height="32" rx="4" fill="#ffffff" stroke="#bdb7ab" />
+              <text x="628" y="279" font-weight="600">Claude Desktop</text>
+              <text x="748" y="279" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">%APPDATA%/Claude</text>
+            </g>
+
+            <g stroke="#6b7280" stroke-width="1.5" fill="none">
+              <path d="M545,155 L580,155 L580,34 L615,34" />
+              <path d="M580,74 L615,74" />
+              <path d="M580,114 L615,114" />
+              <path d="M545,155 L615,155" />
+              <path d="M580,155 L580,274 L615,274" />
+              <path d="M580,194 L615,194" />
+              <path d="M580,234 L615,234" />
+            </g>
+          </svg>
+          <p class="diagram-caption">Figure 1 — One source repository linked across seven AI runtimes with zero file duplication.</p>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <h2>The Elephant–Goldfish Engineering Loop</h2>
+        <p>Heimdall separates long-term orchestration memory (<strong>Elephant</strong>) from blinded, stateless verification (<strong>Goldfish</strong>) across a 3-Tier Boundary Ladder.</p>
+
+        <div class="diagram-box">
+          <svg viewBox="0 0 920 200" width="100%" role="img" aria-label="Heimdall multi-stage engineering workflow diagram">
+            <g font-family="system-ui, sans-serif" font-size="12">
+              <rect x="15" y="45" width="150" height="70" rx="6" fill="#eff6ff" stroke="#1d4ed8" stroke-width="1.5" />
+              <text x="90" y="72" text-anchor="middle" font-weight="700" fill="#14171c">1. Grilling Gate</text>
+              <text x="90" y="90" text-anchor="middle" font-size="11" fill="#4b5563">/grill-me + 2 options</text>
+              <text x="90" y="105" text-anchor="middle" font-size="10.5" fill="#1d4ed8">BLUF + STE Hook Active</text>
+
+              <rect x="195" y="45" width="150" height="70" rx="6" fill="#ffffff" stroke="#14171c" stroke-width="1.5" />
+              <text x="270" y="72" text-anchor="middle" font-weight="700" fill="#14171c">2. Canonical Plan</text>
+              <text x="270" y="90" text-anchor="middle" font-size="11" fill="#4b5563">docs/designs/YYYY-MM-DD</text>
+              <text x="270" y="105" text-anchor="middle" font-size="10.5" fill="#4b5563">Completeness Gate</text>
+
+              <rect x="375" y="45" width="170" height="70" rx="6" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.5" />
+              <text x="460" y="70" text-anchor="middle" font-weight="700" fill="#14171c">3. Isolated Workers</text>
+              <text x="460" y="88" text-anchor="middle" font-size="11" fill="#4b5563">tester (TDD) · code-sentinel</text>
+              <text x="460" y="104" text-anchor="middle" font-size="10.5" fill="#0f766e">ponytail + modern-web</text>
+
+              <rect x="575" y="45" width="165" height="70" rx="6" fill="#fffbeb" stroke="#b45309" stroke-width="1.5" />
+              <text x="657" y="70" text-anchor="middle" font-weight="700" fill="#14171c">4. Goldfish Review</text>
+              <text x="657" y="88" text-anchor="middle" font-size="11" fill="#4b5563">Cross-Family Diff Audit</text>
+              <text x="657" y="104" text-anchor="middle" font-size="10.5" fill="#b45309">Playwright E2E + thermo</text>
+
+              <rect x="770" y="45" width="135" height="70" rx="6" fill="#ffffff" stroke="#14171c" stroke-width="1.5" />
+              <text x="837" y="72" text-anchor="middle" font-weight="700" fill="#14171c">5. Archive &amp; Learn</text>
+              <text x="837" y="90" text-anchor="middle" font-size="11" fill="#4b5563">designs/old/</text>
+              <text x="837" y="105" text-anchor="middle" font-size="10.5" fill="#4b5563">/ruminate + handoff</text>
+            </g>
+            <g stroke="#14171c" stroke-width="1.5" fill="#14171c">
+              <line x1="165" y1="80" x2="195" y2="80" />
+              <polygon points="195,80 188,76 188,84" />
+              <line x1="345" y1="80" x2="375" y2="80" />
+              <polygon points="375,80 368,76 368,84" />
+              <line x1="545" y1="80" x2="575" y2="80" />
+              <polygon points="575,80 568,76 568,84" />
+              <line x1="740" y1="80" x2="770" y2="80" />
+              <polygon points="770,80 763,76 763,84" />
+            </g>
+            <path d="M837,115 L837,158 L90,158 L90,115" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,4" />
+            <polygon points="90,115 86,122 94,122" fill="#6b7280" />
+            <text x="460" y="176" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#4b5563">Context Sentinel (75% / 40 turns) + ruminate memory updates feed back into future turns</text>
+          </svg>
+          <p class="diagram-caption">Figure 2 — Five-stage execution pipeline with blinded Goldfish verification and ruminate feedback.</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Area</th>
+                <th>Vanilla AI Coding</th>
+                <th>With Heimdall</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Initial Prompt</strong></td>
+                <td>Generates 300 lines of unverified code immediately.</td>
+                <td>Pauses at Grilling Gate, probes edge cases, presents 2 architectural options.</td>
+              </tr>
+              <tr>
+                <td><strong>Communication</strong></td>
+                <td>Verbose prose, buried verdicts, vague <em>"ensure it works properly"</em> steps.</td>
+                <td><strong>BLUF + ASD-STE100</strong>: verdict in lines 1–2; imperative, &le;20-word testable steps.</td>
+              </tr>
+              <tr>
+                <td><strong>Code Review</strong></td>
+                <td>Approves its own output with conversational praise.</td>
+                <td>Stateless Goldfish reviewer inspects raw diffs across model families.</td>
+              </tr>
+              <tr>
+                <td><strong>Code Restraint</strong></td>
+                <td>Bloated wrappers, defensive dead code, speculative options.</td>
+                <td><strong>Karpathy, <code>pstack</code> &amp; <code>ponytail</code></strong>: subtract before adding, fix root causes.</td>
+              </tr>
+              <tr>
+                <td><strong>Verification</strong></td>
+                <td>Claims done without tests or relies on shallow checks.</td>
+                <td>Failing TDD test first; empirical proof via tests and Playwright DOM assertions.</td>
+              </tr>
+              <tr>
+                <td><strong>Safety</strong></td>
+                <td>Can launch hanging dev servers, run <code>rm -rf</code>, or force push <code>main</code>.</td>
+                <td>Lifecycle hooks block dev servers, destructive commands, secrets, and protected force pushes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="hooks">
+        <h2>Event-Driven Lifecycle Hooks</h2>
+        <p>Zero-dependency runtime guardrails declared in <code>hooks/hooks.json</code> and executed by <code>hooks/heimdall-hook.cjs</code>, plus a universal native Git pre-push hook.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Event / File</th>
+                <th>Matcher</th>
+                <th>Enforced Behavior</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>UserPromptSubmit</code></td>
+                <td><code>.*</code></td>
+                <td>Injects compact BLUF + ASD-STE100 reminder (verdict first, imperative verb, &le;20 words/step, zero banned words).</td>
+              </tr>
+              <tr>
+                <td><code>PreToolUse</code></td>
+                <td><code>Bash|PowerShell</code></td>
+                <td>Blocks destructive root commands (exit 2), blocks dev servers (Strict Zero Dev-Server Policy), blocks force-push on protected branches, blocks staging <code>.env</code>/<code>id_rsa</code>/<code>*.pem</code>, and runs Context Sentinel (75% / 40-turn warning).</td>
+              </tr>
+              <tr>
+                <td><code>PreToolUse</code></td>
+                <td><code>Write</code></td>
+                <td>Emits Karpathy 800-line advisory (exempting HTML/SVG/OpenDesign <code>data-od-id</code> artifacts) and updates Context Sentinel tracking.</td>
+              </tr>
+              <tr>
+                <td><code>PreCompact</code></td>
+                <td><code>.*</code></td>
+                <td>Clears temporary session state and reminds the agent to persist active tasks, rulings, and ledgers to disk.</td>
+              </tr>
+              <tr>
+                <td><code>hooks/git/pre-push</code></td>
+                <td>Git push</td>
+                <td>Universal shell hook blocking non-fast-forward pushes to <code>main</code>/<code>master</code> across all harnesses and terminal sessions.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="profiles">
+        <h2>Installation Profiles &amp; Supported Runtimes</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Profile</th>
+                <th>Skills</th>
+                <th>Agents</th>
+                <th>Scope</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>full</code> (Default)</td>
+                <td>69</td>
+                <td>10</td>
+                <td>Complete engineering suite: planning, design, security, database, modernization, infra, hygiene.</td>
+              </tr>
+              <tr>
+                <td><code>minimal</code></td>
+                <td>16</td>
+                <td>4</td>
+                <td>Lean core: <code>orchestrator</code>, <code>tester</code>, <code>code-sentinel</code>, <code>reviewer</code>.</td>
+              </tr>
+              <tr>
+                <td><code>security</code></td>
+                <td>12</td>
+                <td>4</td>
+                <td>AppSec suite: <code>orchestrator</code>, <code>security-auditor</code>, <code>tester</code>, <code>reviewer</code>.</td>
+              </tr>
+              <tr>
+                <td><code>design</code></td>
+                <td>13</td>
+                <td>4</td>
+                <td>Frontend &amp; mobile: <code>orchestrator</code>, <code>frontend-designer</code>, <code>mobile-designer</code>, <code>code-sentinel</code> (includes <code>modern-web-guidance</code>).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="agents">
+        <h2>10 Predefined Agent Personas</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Persona</th>
+                <th>Capability Tier</th>
+                <th>Role</th>
+                <th>Bound Skills</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>orchestrator</code></td>
+                <td><code>deep_reasoning</code></td>
+                <td>Planning gatekeeper, task decomposition, Playwright E2E enforcement, subagent coordination.</td>
+                <td><code>grill-me</code>, <code>brainstorming</code>, <code>writing-plans</code>, <code>to-spec</code>, <code>to-tickets</code>, <code>wayfinder</code>, <code>domain-modeling</code>, <code>handoff</code>, <code>pstack-discipline</code>, <code>subagent-driven-development</code>, <code>dispatching-parallel-agents</code>, <code>using-git-worktrees</code>, <code>writing-skills</code>, <code>executing-plans</code>, <code>herdr</code>, <code>upstream-skill-sync</code></td>
+              </tr>
+              <tr>
+                <td><code>frontend-designer</code></td>
+                <td><code>high_polish_vision</code></td>
+                <td>Design reads, typography, tokens, Baseline web APIs, anti-slop UI.</td>
+                <td><code>taste-skill</code>, <code>brandkit</code>, <code>minimalist-skill</code>, <code>brutalist-skill</code>, <code>soft-skill</code>, <code>antislop-ui</code>, <code>antislop-human</code>, <code>stitch-skill</code>, <code>image-to-code-skill</code>, <code>imagegen-frontend-web</code>, <code>redesign-skill</code>, <code>modern-web-guidance</code></td>
+              </tr>
+              <tr>
+                <td><code>mobile-designer</code></td>
+                <td><code>responsive_flex_safety</code></td>
+                <td>320px–430px viewport safety, 48px touch targets, zero overflow clipping.</td>
+                <td><code>antislop-layoutmobile</code>, <code>antislop-human</code>, <code>antislop-ui</code>, <code>imagegen-frontend-mobile</code>, <code>taste-skill</code></td>
+              </tr>
+              <tr>
+                <td><code>tester</code></td>
+                <td><code>fast_verification</code></td>
+                <td>Strict TDD and browser verification; rejects pseudo-verification.</td>
+                <td><code>test-driven-development</code>, <code>verification-before-completion</code>, <code>systematic-debugging</code>, <code>executing-plans</code></td>
+              </tr>
+              <tr>
+                <td><code>security-auditor</code></td>
+                <td><code>deep_assurance_audit</code></td>
+                <td>Differential HTTP probing, OWASP Top 10, Trail of Bits insecure defaults.</td>
+                <td><code>strix-security</code>, <code>security-audit-sweep</code>, <code>owasp-security</code>, <code>cloudflare-security-audit</code>, <code>snyk-agent-scan</code>, <code>trailofbits-audit-context</code>, <code>trailofbits-insecure-defaults</code>, <code>trailofbits-triage-brocards</code></td>
+              </tr>
+              <tr>
+                <td><code>database-architect</code></td>
+                <td><code>schema_migration_safety</code></td>
+                <td>Non-destructive migrations, normalization, <code>EXPLAIN ANALYZE</code>, pooling.</td>
+                <td><code>postgres-best-practices</code>, <code>systematic-debugging</code>, <code>karpathy-guidelines</code></td>
+              </tr>
+              <tr>
+                <td><code>code-sentinel</code></td>
+                <td><code>surgical_restraint</code></td>
+                <td>Minimal surgical diffs, deep modules, anti-slop code &amp; copy, BLUF/STE.</td>
+                <td><code>communication-doctrine</code>, <code>karpathy-guidelines</code>, <code>clean-code</code>, <code>codebase-design</code>, <code>ponytail</code>, <code>antislop</code>, <code>antislop-code</code>, <code>antislop-copywriting</code>, <code>antislop-human</code>, <code>finishing-a-development-branch</code></td>
+              </tr>
+              <tr>
+                <td><code>reviewer</code></td>
+                <td><code>adversarial_diff_eval</code></td>
+                <td>Blinded diff audits, <code>thermo</code> maintainability reviews, cross-model validation.</td>
+                <td><code>communication-doctrine</code>, <code>thermo</code>, <code>codebase-design</code>, <code>requesting-code-review</code>, <code>receiving-code-review</code>, <code>claude-collaborator</code>, <code>gemini-collaborator</code>, <code>codex-collaborator</code>, <code>using-superpowers</code>, <code>diagnosing-superpowers</code>, <code>output-skill</code></td>
+              </tr>
+              <tr>
+                <td><code>modernizer</code></td>
+                <td><code>legacy_migration_safety</code></td>
+                <td>Runtime upgrades, Strangler Fig migrations, <code>legacy-scan</code> web modernization, Golden Master tests.</td>
+                <td><code>test-driven-development</code>, <code>verification-before-completion</code>, <code>systematic-debugging</code>, <code>improve-codebase-architecture</code>, <code>codebase-design</code>, <code>karpathy-guidelines</code>, <code>project-hygiene</code>, <code>output-skill</code>, <code>modern-web-guidance</code>, <code>upstream-skill-sync</code></td>
+              </tr>
+              <tr>
+                <td><code>cloud-engineer</code></td>
+                <td><code>infra_container_safety</code></td>
+                <td>Docker, Kubernetes, Terraform, Caddy/Nginx, CI/CD, terminating verification.</td>
+                <td><code>communication-doctrine</code>, <code>karpathy-guidelines</code>, <code>clean-code</code>, <code>systematic-debugging</code>, <code>project-hygiene</code>, <code>progressive-disclosure</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="skills">
+        <h2>69 Modular Skills Across 30 Toolkits</h2>
+        <div class="filter-bar" role="search">
+          <input id="skillSearch" class="filter-input" type="search" placeholder="Filter skills by name or capability (e.g. ruminate, ponytail, security)..." aria-label="Filter skills" />
+          <button class="filter-btn" data-suite="all" aria-pressed="true">All (69)</button>
+          <button class="filter-btn" data-suite="superpowers" aria-pressed="false">Superpowers (15)</button>
+          <button class="filter-btn" data-suite="taste" aria-pressed="false">Taste UI (10)</button>
+          <button class="filter-btn" data-suite="antislop" aria-pressed="false">Anti-Slop (6)</button>
+          <button class="filter-btn" data-suite="standalone" aria-pressed="false">Standalone (24)</button>
+        </div>
+        <div class="skill-list" id="skillList">
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>upstream-skill-sync</code><a href="skills/upstream-skill-sync/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">Audit upstream skill repos in config/skills.json and classify updates into Safe 1:1, Selective Merge, or Reject.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>communication-doctrine</code><a href="skills/communication-doctrine/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">BLUF conclusions and ASD-STE100 imperative syntax for plans, reviews, and handoffs.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>pstack-discipline</code><a href="https://github.com/cursor/plugins" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · poteto · adapted</span></div><p class="skill-desc">Prove It Works, Fix Root Causes, Test Behavior Not Implementation, Subtract Before You Add.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>ruminate</code><a href="https://github.com/poteto/brainmaxxing" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">brainmaxxing &nearr;</a></span><span class="skill-suite">Standalone · brainmaxxing · native</span></div><p class="skill-desc">Mines Claude and Gemini session transcripts for corrections, trigger failures, and doctrine drift.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>thermo</code><a href="https://github.com/cursor/plugins" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · adapted</span></div><p class="skill-desc">Code Judo architectural and maintainability review eliminating spaghetti conditionals.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>ponytail</code><a href="https://github.com/DietrichGebert/ponytail" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · adapted</span></div><p class="skill-desc">Lazy senior dev mode: smallest complete diff and concise reply via 6-step Decision Ladder.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>karpathy-guidelines</code><a href="https://github.com/multica-ai/andrej-karpathy-skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Minimal surgical edits, zero speculative options, preserve adjacent working code.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>clean-code</code><a href="https://github.com/unclebob/ub-mode" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Uncle Bob TDD cycles, premise interrogation, CRAP &lt; 10, DRY similarity &lt; 0.8.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>modern-web-guidance</code><a href="https://github.com/GoogleChrome/modern-web-guidance" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · Chrome · adapted</span></div><p class="skill-desc">Baseline-safe HTML/CSS/JS APIs, Core Web Vitals, and legacy-scan modernization.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>caveman</code><a href="https://github.com/JuliusBrussee/caveman" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · adapted</span></div><p class="skill-desc">Token-reduction protocol cutting conversational ceremony while keeping code and diffs intact.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>herdr</code><a href="https://herdr.dev" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Control Herdr terminal workspaces, panes, and peer agents natively.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>threat-modeling</code><a href="skills/threat-modeling/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">STRIDE threat modeling, trust boundary mapping, and mitigation verification.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>mcp-engineering</code><a href="skills/mcp-engineering/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">JSON-RPC 2.0 compliance, schema validation, and stdio/SSE transport for MCP servers.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>mcp-sync</code><a href="skills/mcp-sync/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">Resolves Heimdall MCP template to direct node.exe paths across installed harnesses.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>mcp-cleanup</code><a href="skills/mcp-cleanup/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">Kills orphaned MCP server processes left behind by crashed sessions.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>strix-security</code><a href="https://github.com/usestrix/strix" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Dynamic HTTP differential probing across anonymous, user, and admin contexts.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>security-audit-sweep</code><a href="https://github.com/blencorp/security-sweep" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">4-phase audit covering route gates, IAM least-privilege, dependencies, and secrets.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>owasp-security</code><a href="https://github.com/agamm/claude-code-owasp" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Hardens apps against OWASP Top 10:2025, ASVS 5.0, and LLM/Agentic risks.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>cloudflare-security-audit</code><a href="https://github.com/cloudflare/security-audit-skill" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Edge security, WAF configuration, and CORS boundary checks.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>snyk-agent-scan</code><a href="https://github.com/snyk/agent-scan" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Scans AI skills and MCP configs for prompt injection and credential leaks.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>postgres-best-practices</code><a href="https://github.com/neondatabase/postgres-skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">PostgreSQL schema design, indexing, connection pooling, and RLS policies.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>progressive-disclosure</code><a href="skills/progressive-disclosure/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">3-layer on-demand context loading cutting prompt overhead and subagent sprawl.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>project-hygiene</code><a href="skills/project-hygiene/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Standalone · native</span></div><p class="skill-desc">Sweeps dead code, unused exports, circular dependencies, and stale caches.</p></article>
+          <article class="skill-item" data-suite="standalone"><div class="skill-head"><span><code>output-skill</code><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Standalone · mirror</span></div><p class="skill-desc">Prevents ellipses, truncated blocks, and incomplete code output.</p></article>
+
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>brainstorming</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Surfaces implicit assumptions and explores alternatives before design lock.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>writing-plans</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · adapted</span></div><p class="skill-desc">Modular bite-sized tasks with spec-coverage completeness gate (from /ruminate).</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>executing-plans</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Step-by-step verification that halts on unexpected failures.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>test-driven-development</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Mandates failing automated tests before writing implementation code.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>systematic-debugging</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Isolates root causes via hypothesis testing and build triage heuristics.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>verification-before-completion</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Requires passing tests and live verification before claiming done.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>subagent-driven-development</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Decomposes large tasks into isolated subagents with specialized briefs.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>dispatching-parallel-agents</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Coordinates concurrent subagent workers on independent branches.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>using-git-worktrees</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Manages parallel execution branches without dirtying working trees.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>finishing-a-development-branch</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Verifies branch hygiene, tests, and documentation before merge.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>requesting-code-review</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Formats structured diff context for adversarial peer review.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>receiving-code-review</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Parses peer critiques objectively and applies verified fixes.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>using-superpowers</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Multi-agent operational playbook for complex software development.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>diagnosing-superpowers</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Health check and triage harness for agent tooling and skill resolution.</p></article>
+          <article class="skill-item" data-suite="superpowers"><div class="skill-head"><span><code>writing-skills</code><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Superpowers · mirror</span></div><p class="skill-desc">Authors modular skills adhering to frontmatter and trigger contracts.</p></article>
+
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>taste-skill</code><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Cohesive design reads, purpose-driven typography, and brand-first color logic.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>brandkit</code><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Design tokens, invariant brand assets, and multi-palette themes.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>minimalist-skill</code><a href="https://github.com/Leonxlnx/taste-skill-classics" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Editorial layouts emphasizing typography, whitespace, and restraint.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>brutalist-skill</code><a href="https://github.com/Leonxlnx/taste-skill-classics" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">High-contrast typographic layouts with deliberate structural tension.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>soft-skill</code><a href="https://github.com/Leonxlnx/taste-skill-classics" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Tactile micro-interactions, subtle elevation, and organic surface transitions.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>redesign-skill</code><a href="https://github.com/Leonxlnx/taste-skill-classics" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Visual elevation of legacy interfaces without breaking existing logic.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>image-to-code-skill</code><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Translates wireframes and mockups into component code.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>stitch-skill</code><a href="https://github.com/Leonxlnx/taste-skill-classics" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Cross-component layout integration and responsive flow alignment.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>imagegen-frontend-web</code><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Web-optimized visual asset generation and placeholder authoring.</p></article>
+          <article class="skill-item" data-suite="taste"><div class="skill-head"><span><code>imagegen-frontend-mobile</code><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Taste UI · mirror</span></div><p class="skill-desc">Mobile-native aspect ratio and resolution image scaffolding.</p></article>
+
+          <article class="skill-item" data-suite="antislop"><div class="skill-head"><span><code>antislop</code><a href="https://github.com/miqdadbadjuber/anti-slop" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Anti-Slop · mirror</span></div><p class="skill-desc">Core guardrail banning generic AI filler, fake buzzwords, and decorative bloat.</p></article>
+          <article class="skill-item" data-suite="antislop"><div class="skill-head"><span><code>antislop-code</code><a href="https://github.com/miqdadbadjuber/anti-slop" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Anti-Slop · mirror</span></div><p class="skill-desc">Bans redundant comments, defensive dead code, and speculative abstractions.</p></article>
+          <article class="skill-item" data-suite="antislop"><div class="skill-head"><span><code>antislop-copywriting</code><a href="https://github.com/miqdadbadjuber/anti-slop" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Anti-Slop · mirror</span></div><p class="skill-desc">Bans AI buzzwords, signposting, and fake authority tropes in prose.</p></article>
+          <article class="skill-item" data-suite="antislop"><div class="skill-head"><span><code>antislop-ui</code><a href="https://github.com/miqdadbadjuber/anti-slop" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Anti-Slop · mirror</span></div><p class="skill-desc">Rejects generic purple gradients, uniform pill radius, and unmotivated dark modes.</p></article>
+          <article class="skill-item" data-suite="antislop"><div class="skill-head"><span><code>antislop-human</code><a href="https://github.com/miqdadbadjuber/anti-slop" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Anti-Slop · mirror</span></div><p class="skill-desc">Enforces WCAG AAA contrast, semantic HTML, and accessible targets.</p></article>
+          <article class="skill-item" data-suite="antislop"><div class="skill-head"><span><code>antislop-layoutmobile</code><a href="https://github.com/miqdadbadjuber/anti-slop" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Anti-Slop · mirror</span></div><p class="skill-desc">Guarantees responsive flex safety, zero clipping, and touch-target padding.</p></article>
+
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>grill-me</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Planning · mirror</span></div><p class="skill-desc">Interactive Turn 1 requirement interrogation and trade-off alignment.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>handoff</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Continuity · adapted</span></div><p class="skill-desc">Auto-triggers on coherence degradation (from /ruminate) to transfer clean state.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>to-spec</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Planning · mirror</span></div><p class="skill-desc">Converts approved exploration into bounded technical specifications.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>to-tickets</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Planning · mirror</span></div><p class="skill-desc">Splits specifications into ordered, verifiable implementation tickets.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>wayfinder</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Architecture · mirror</span></div><p class="skill-desc">Maps repository structure and dependency boundaries before edits.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>domain-modeling</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Architecture · mirror</span></div><p class="skill-desc">Defines domain invariants, aggregates, and state transitions.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>codebase-design</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Architecture · mirror</span></div><p class="skill-desc">Evaluates module depth and prevents shallow leaky abstractions.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>improve-codebase-architecture</code><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Architecture · mirror</span></div><p class="skill-desc">Detects circular imports, coupled modules, and structural knots.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>claude-collaborator</code><a href="skills/claude-collaborator/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Cross-Model · native</span></div><p class="skill-desc">Delegates blinded architectural review to Claude Opus / Sonnet.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>gemini-collaborator</code><a href="skills/gemini-collaborator/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Cross-Model · native</span></div><p class="skill-desc">Delegates high-velocity scans to Google Antigravity / Gemini.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>codex-collaborator</code><a href="skills/codex-collaborator/SKILL.md" style="font-size:11.5px;margin-left:6px;">SKILL.md</a></span><span class="skill-suite">Cross-Model · native</span></div><p class="skill-desc">Delegates adversarial peer review to OpenAI Codex CLI.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>trailofbits-audit-context</code><a href="https://github.com/trailofbits/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Trail of Bits · mirror</span></div><p class="skill-desc">Maps code assumptions, guarantees, and trust dependencies.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>trailofbits-insecure-defaults</code><a href="https://github.com/trailofbits/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Trail of Bits · mirror</span></div><p class="skill-desc">Detects fail-open patterns and permissive default configurations.</p></article>
+          <article class="skill-item" data-suite="other"><div class="skill-head"><span><code>trailofbits-triage-brocards</code><a href="https://github.com/trailofbits/skills" target="_blank" rel="noopener" style="font-size:11.5px;margin-left:6px;">Upstream &nearr;</a></span><span class="skill-suite">Trail of Bits · mirror</span></div><p class="skill-desc">Evaluates vulnerability reports against 7 principled brocards.</p></article>
+        </div>
+      </section>
+
+      <section id="cli">
+        <h2>Install, CLI &amp; MCP Commands</h2>
+        <pre><code># Bootstrap full ecosystem with live junctions
+git clone https://github.com/bepaldes/heimdall-agent.git
+cd heimdall-agent
+node setup.mjs --clean --link --yes
+
+# Daily CLI
+heimdall sync          # Sync junctions across installed tools
+heimdall audit         # Audit installed tools, endpoints, and skill counts
+heimdall sync-models   # Refresh dynamic model catalog and cross-family routing
+heimdall update-skill all
+
+# MCP management (direct node.exe invocation, zero npx spawning)
+/mcp-sync              # Resolve config/mcp.template.json and sync harnesses
+/mcp-cleanup           # Terminate orphaned MCP processes</code></pre>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const searchInput = document.getElementById('skillSearch');
+      const buttons = document.querySelectorAll('.filter-btn');
+      const items = document.querySelectorAll('.skill-item');
+      let activeSuite = 'all';
+
+      function applyFilters() {
+        const query = (searchInput.value || '').trim().toLowerCase();
+        items.forEach((item) => {
+          const suiteMatch = activeSuite === 'all' || item.dataset.suite === activeSuite;
+          const textMatch = !query || item.textContent.toLowerCase().includes(query);
+          item.hidden = !(suiteMatch && textMatch);
+        });
+      }
+
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activeSuite = btn.dataset.suite;
+          buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+          applyFilters();
+        });
+      });
+
+      searchInput.addEventListener('input', applyFilters);
+    })();
+  </script>
+</body>
+</html>

@@ -10,8 +10,8 @@ Models are partitioned into two architectural access channels:
 
 - **Channel 1: GhostCLI Unified Gateway (`https://ghostcli.cloud`)**
   - Powers **Claude Code CLI**, **OpenAI Codex CLI**, and **Hermes Agent**.
-  - Serves all Anthropic models (`claude-*`), OpenAI models (`gpt-6-astra`), and Zhipu AI models (`z-ai/glm-5.3`, `z-ai/glm-5.3-flash`).
-  - Because GhostCLI exposes multi-protocol translation (`/v1/messages`, `/v1/responses`, `/v1/chat/completions`), Claude Code can run GPT-6 Astra or GLM directly (`claude --model gpt-6-astra`), and Codex can run Claude Sonnet directly (`codex --model claude-sonnet-5`).
+  - Serves all GhostCLI-proxied model families (Anthropic `claude-*`, OpenAI `gpt-*`, Zhipu `z-ai/glm-*`, Tencent `tencent/Hy4-*`, Xiaomi `XiaomiMiMo/*`, and any newly discovered models in `config/models.json`).
+  - Because GhostCLI exposes multi-protocol translation (`/v1/messages`, `/v1/responses`, `/v1/chat/completions`), any CLI harness can run any GhostCLI model directly (e.g. `claude --model z-ai/glm-5.3`, `claude --model tencent/Hy4-preview`, `codex --model claude-sonnet-5-5`).
   - When coordinating between harnesses in Herdr (`HERDR_ENV=1`), use native Herdr multiplexing (`herdr agent start/prompt`) directly.
 
 - **Channel 2: Google Gemini Direct API (`gemini.googleapis.com`)**
@@ -22,19 +22,25 @@ Models are partitioned into two architectural access channels:
 
 ## 2. GhostCLI Models (via `https://ghostcli.cloud`)
 
-All GhostCLI models support text and image input:
+<!-- heimdall:ghostcli-models:start -->
+All GhostCLI models are discovered dynamically via `heimdall sync` / `heimdall sync-models` and stored in `config/models.json`:
 
-| Model Name | Canonical Flag | Context Window | Max Output | Parallel Tools | Search | Allowed Effort Levels | Optimal Specialization |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Claude Opus 5.5** | `claude-opus-5-5` | 256K / 1M extended | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | Deepest architectural reasoning, complex multi-system debugging, critical security audits, knotty algorithms. |
-| **Claude Sonnet 5** | `claude-sonnet-5` | 256K / 1M extended | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | Primary full-stack coding driver, type-safe API schemas, database mutation logic, Playwright E2E test authoring. |
-| **Claude Fable 5.1** | `claude-fable-5.1` | 256K / 1M extended | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | Visual storytelling, high-polish frontend design, copycrafting, UI aesthetic alignment, interaction flows. |
-| **GLM 5.3** | `z-ai/glm-5.3` | 1M | 128K | ❌ | ❌ | `low`, `medium`, `high`, `xhigh` | Massive context analysis, long-document processing, Zhipu AI reasoning (upstream may experience upstream queue delays). |
-| **GLM 5.3 Flash** | `z-ai/glm-5.3-flash` | 1M | 128K | ❌ | ❌ | `low`, `medium`, `high` | Fast responses for code tasks, rapid reasoning, lightweight context queries. |
-| **GPT-6 Astra** | `gpt-6-astra` | 1M | 128K | ✅ | ✅ | `low`, `medium`, `high`, `xhigh` | OpenAI reasoning, broad general-purpose tasks, alternative perspective for cross-validation. |
+| Model Name | Canonical Flag | Family | Context Window | Allowed Effort Levels | Specialization / Description |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Claude Opus 5.5** | `claude-opus-5-5` | anthropic | 1M | `low`, `medium`, `high`, `xhigh` | Melhor equilíbrio entre capacidade e custo |
+| **Claude Sonnet 5** | `claude-sonnet-5` | anthropic | 1M | `low`, `medium`, `high` | O mais rápido sem abrir mão de qualidade |
+| **Claude Sonnet 5.5** | `claude-sonnet-5-5` | anthropic | 1M | `low`, `medium`, `high` | Rápido e mais capaz que o Sonnet 5 |
+| **Claude Fable 5.2** | `claude-fable-5.2` | anthropic | 1M | `low`, `medium`, `high`, `xhigh` | Máxima capacidade disponível |
+| **GLM 5.3** | `z-ai/glm-5.3` | z-ai | 1M | `low`, `medium`, `high`, `xhigh` | Código agêntico com contexto de 1M |
+| **GLM 5.3 Flash** | `z-ai/glm-5.3-flash` | z-ai | 1M | `low`, `medium`, `high` | Respostas rápidas para código |
+| **Hunyuan Hy4 Preview** | `tencent/Hy4-preview` | tencent | 1M | `low`, `medium`, `high`, `xhigh` | Raciocínio e código |
+| **DeepSeek V4.1 Flash** | `deepseek-ai/DeepSeek-V4.1-Flash-1017` | deepseek-ai | 1M | `low`, `medium`, `high` | Respostas rápidas para código |
+| **MiMo V2.6 Pro** | `XiaomiMiMo/MiMo-V2.6-Pro` | xiaomi | 1M | `low`, `medium`, `high`, `xhigh` | Código e raciocínio |
+| **GPT-6 Astra** | `gpt-6-astra` | openai | 1M | `low`, `medium`, `high`, `xhigh` | Trabalho agêntico longo com janela de 1M |
 
-> [!WARNING]
-> **Naming Asymmetry Guardrail**: Opus is version **5.5** (`claude-opus-5-5`), while Sonnet is strictly version **5** (`claude-sonnet-5`). Do NOT hallucinate `claude-sonnet-5-5` or `sonnet-5-5`. There is no 5.5 release for Sonnet.
+> [!NOTE]
+> **Dynamic Model Registry**: Always resolve live model IDs from `config/models.json` or this table after `heimdall sync` / `heimdall sync-models`. Route tasks by **capability tier** across all available families (Anthropic, Google, OpenAI, GLM, Hunyuan, MiMo, etc.), not only Claude/Gemini/Codex.
+<!-- heimdall:ghostcli-models:end -->
 
 ---
 

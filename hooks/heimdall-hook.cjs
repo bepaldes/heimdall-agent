@@ -10,6 +10,7 @@ const { execSync } = require('child_process');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
+const { lookupModelContextFromCatalog } = require('../lib/model-context.cjs');
 
 const MAX_STDIN = 1024 * 1024; // 1 MiB
 
@@ -46,6 +47,15 @@ function getActiveContextLimit() {
   if (process.env.HEIMDALL_ACTIVE_CONTEXT_LIMIT) {
     const parsed = parseInt(process.env.HEIMDALL_ACTIVE_CONTEXT_LIMIT, 10);
     if (parsed > 0) return parsed;
+  }
+  const activeModel =
+    process.env.HEIMDALL_ACTIVE_MODEL ||
+    process.env.ANTHROPIC_MODEL ||
+    process.env.OPENAI_MODEL ||
+    process.env.GEMINI_MODEL;
+  if (activeModel) {
+    const resolved = lookupModelContextFromCatalog(activeModel, path.join(__dirname, '..'));
+    if (resolved && resolved.tokens > 0) return resolved.tokens;
   }
   return 1000000; // 1M default maximum
 }
@@ -211,9 +221,14 @@ async function main() {
       break;
     }
 
+    case 'user-prompt': {
+      process.stdout.write('[Heimdall Communication Doctrine] Lead with BLUF (conclusion in first 1-2 sentences). Use ASD-STE100 for procedural steps: active imperative verb first, <=20 words/step, zero banned words (ensure, properly, appropriately, gracefully, as needed, etc.).\n');
+      break;
+    }
+
     case 'pre-compact': {
       clearSessionState();
-      process.stderr.write('[Heimdall Lifecycle Sentinel] Context compaction occurring. Ensure active tasks, rulings, and pending ledger items are preserved on disk.\n');
+      process.stderr.write('[Heimdall Lifecycle Sentinel] Context compaction occurring. Verify active tasks, rulings, and pending ledger items are preserved on disk.\n');
       break;
     }
 

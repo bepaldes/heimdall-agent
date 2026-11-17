@@ -1,8 +1,8 @@
 {
   "version": "1.3.0",
   "description": "Heimdall Canonical Skill Registry & 18-Suite Hierarchy",
-  "totalSuites": 28,
-  "totalModules": 67,
+  "totalSuites": 30,
+  "totalModules": 69,
   "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
   "suites": {
     "superpowers": {
@@ -267,6 +267,22 @@
       "modules": [
         "mcp-sync"
       ]
+    },
+    "ruminate": {
+      "name": "Ruminate Session Transcript Mining",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "ruminate"
+      ]
+    },
+    "upstream-skill-sync": {
+      "name": "Upstream Skill Sync & Triage",
+      "type": "Standalone Toolkit",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "modules": [
+        "upstream-skill-sync"
+      ]
     }
   },
   "skills": {
@@ -275,48 +291,54 @@
       "category": "Anti-Slop & Token Efficiency",
       "description": "\"Anti Slop: Rules for AI Coding Agents. The core filter. Load always to stop generic AI slop.\"",
       "upstream": "https://github.com/miqdadbadjuber/anti-slop",
-      "sourceRevision": "4520786",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "35b54dc",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "antislop-code": {
       "name": "antislop-code",
       "category": "Anti-Slop & Token Efficiency",
       "description": "\"Code comment hygiene for AI coding agents: remove generic AI-slop comments, keep the valuable ones, never touch the code.\"",
       "upstream": "https://github.com/miqdadbadjuber/anti-slop",
-      "sourceRevision": "4520786",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "35b54dc",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "antislop-copywriting": {
       "name": "antislop-copywriting",
       "category": "Anti-Slop & Token Efficiency",
       "description": "\"Copy and text skill for antislop. Use when writing or editing prose: headlines, tone, CTAs, and anti-AI-writing patterns. Load with the core.\"",
       "upstream": "https://github.com/miqdadbadjuber/anti-slop",
-      "sourceRevision": "4520786",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "35b54dc",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "antislop-human": {
       "name": "antislop-human",
       "category": "Anti-Slop & Token Efficiency",
       "description": "\"Human and accessibility skill for antislop. Contrast, keyboard, focus, and states for real people. Includes the contrast checker.\"",
       "upstream": "https://github.com/miqdadbadjuber/anti-slop",
-      "sourceRevision": "4520786",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "35b54dc",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "antislop-layoutmobile": {
       "name": "antislop-layoutmobile",
       "category": "Anti-Slop & Token Efficiency",
       "description": "\"Mobile layout skill for antislop. Use for layouts that reflow across screen sizes, phone to desktop: grids, overflow, tap targets. Load with the core.\"",
       "upstream": "https://github.com/miqdadbadjuber/anti-slop",
-      "sourceRevision": "4520786",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "35b54dc",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "antislop-ui": {
       "name": "antislop-ui",
       "category": "Anti-Slop & Token Efficiency",
       "description": "\"UI and visual skill for antislop. Use when building or editing any interface: color, layout, components, motion. Load with the core.\"",
       "upstream": "https://github.com/miqdadbadjuber/anti-slop",
-      "sourceRevision": "4520786",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "35b54dc",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "brainstorming": {
       "name": "brainstorming",
@@ -324,15 +346,17 @@
       "description": "\"You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.\"",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "brandkit": {
       "name": "brandkit",
       "category": "Design & Aesthetics",
       "description": "Premium brand-kit image generation skill for creating high-end brand-guidelines boards, logo systems, identity decks, and visual-world presentations. Trained for minimalist, cinematic, editorial, dark-tech, luxury, cultural, security, gaming, developer-tool, and consumer-app brand systems. Optimized for intentional logo concepting, refined composition, sparse typography, strong symbolic meaning, premium mockups, art-directed imagery, and flexible grid layouts.",
       "upstream": "https://github.com/Leonxlnx/taste-skill",
-      "sourceRevision": "12af471",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "f6b7657",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "brutalist-skill": {
       "name": "brutalist-skill",
@@ -340,15 +364,17 @@
       "description": "Raw mechanical interfaces fusing Swiss typographic print with military terminal aesthetics. Rigid grids, extreme type scale contrast, utilitarian color, analog degradation effects. For data-heavy dashboards, portfolios, or editorial sites that need to feel like declassified blueprints.",
       "upstream": "https://github.com/Leonxlnx/taste-skill-classics",
       "sourceRevision": "5e08c93",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "caveman": {
       "name": "caveman",
       "category": "Anti-Slop & Token Efficiency",
       "description": "Slashes chat token consumption by dropping conversational filler, pleasantries, and polite ceremony.",
       "upstream": "https://github.com/JuliusBrussee/caveman",
-      "sourceRevision": "2e068f7",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "9b24366",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "adapted"
     },
     "claude-collaborator": {
       "name": "claude-collaborator",
@@ -356,7 +382,8 @@
       "description": "Coordinate with Claude Code CLI (claude.exe) to cross-validate changes, request second-opinion reviews on git diffs, or validate test runs.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "cloudflare-security-audit": {
       "name": "cloudflare-security-audit",
@@ -364,7 +391,8 @@
       "description": "Security guidance and vulnerability review for codebases, APIs, services, CLI tools, libraries, and daemons. Use for security questions, focused reviews, vulnerability research, security audits, or pen tests. Run the complete workflow only for explicit codebase audit or pen-test requests, full/comprehensive/end-to-end reviews, or requested report artifacts.",
       "upstream": "https://github.com/cloudflare/security-audit-skill",
       "sourceRevision": "c1c8a8c",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "diagnosing-superpowers": {
       "name": "diagnosing-superpowers",
@@ -372,7 +400,8 @@
       "description": "Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, \"it took too long\", \"why is it so expensive\", \"what is it doing\" — or wants to build a bug report for the superpowers maintainers, for the current session or a past one identified by id or path, on any harness.",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "dispatching-parallel-agents": {
       "name": "dispatching-parallel-agents",
@@ -380,7 +409,8 @@
       "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "executing-plans": {
       "name": "executing-plans",
@@ -388,7 +418,8 @@
       "description": "Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or no subagent tool is available",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "finishing-a-development-branch": {
       "name": "finishing-a-development-branch",
@@ -396,7 +427,8 @@
       "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "gemini-collaborator": {
       "name": "gemini-collaborator",
@@ -404,31 +436,35 @@
       "description": "Coordinate with Google Antigravity / Gemini CLI (agy.exe) to cross-validate changes, request second opinions on architecture/diffs, or execute adversarial code reviews.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "image-to-code-skill": {
       "name": "image-to-code-skill",
       "category": "Design & Aesthetics",
       "description": "Elite website image-to-code skill for Codex. For visually important web tasks, it must first generate the design image(s) itself, deeply analyze them, then implement the website to match them as closely as possible. In Codex, it must prefer large, readable, section-specific images instead of tiny compressed boards, generate fresh standalone images for sections or detail views instead of cropping old ones, avoid lazy under-generation, avoid cards-inside-cards-inside-cards UI, and keep the hero clean, spacious, readable, and visible on a small laptop.",
       "upstream": "https://github.com/Leonxlnx/taste-skill",
-      "sourceRevision": "12af471",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "f6b7657",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "imagegen-frontend-mobile": {
       "name": "imagegen-frontend-mobile",
       "category": "Design & Aesthetics",
       "description": "Elite mobile app image-generation skill for creating premium, app-native screen concepts and flows. Designed for iOS, Android, and cross-platform mobile products. Prioritizes clean hierarchy, comfortably readable text, strong multi-screen consistency, controlled color palettes, non-generic creative direction, textured surfaces, image-led composition, tasteful custom iconography, and clean phone mockup framing. By default, screens should be shown inside a subtle premium iPhone or similar phone mockup with a visible frame, while the main focus stays on the app content itself. This skill generates images only. It does not write code.",
       "upstream": "https://github.com/Leonxlnx/taste-skill",
-      "sourceRevision": "12af471",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "f6b7657",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "imagegen-frontend-web": {
       "name": "imagegen-frontend-web",
       "category": "Design & Aesthetics",
       "description": "Elite frontend image-direction skill for generating premium, conversion-aware website design references. CRITICAL OUTPUT RULE — generate ONE separate horizontal image FOR EVERY section. A landing page with 8 sections produces 8 images. Never compress multiple sections into one image. Enforces composition variety (not always left-text / right-image), background-image freedom, varied CTAs, varied hero scales (giant / mid / mini minimalist), narrative concept spine, second-read moments, and a single consistent palette across all images. Optimized for landing pages, marketing sites, and product comps that developers or coding models can accurately recreate.",
       "upstream": "https://github.com/Leonxlnx/taste-skill",
-      "sourceRevision": "12af471",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "f6b7657",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "karpathy-guidelines": {
       "name": "karpathy-guidelines",
@@ -436,7 +472,8 @@
       "description": "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria.",
       "upstream": "https://github.com/multica-ai/andrej-karpathy-skills",
       "sourceRevision": "2c60614",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "minimalist-skill": {
       "name": "minimalist-skill",
@@ -444,15 +481,17 @@
       "description": "Clean editorial-style interfaces. Warm monochrome palette, typographic contrast, flat bento grids, muted pastels. No gradients, no heavy shadows.",
       "upstream": "https://github.com/Leonxlnx/taste-skill-classics",
       "sourceRevision": "5e08c93",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "output-skill": {
       "name": "output-skill",
       "category": "Architecture & Database",
       "description": "Overrides default LLM truncation behavior. Enforces complete code generation, bans placeholder patterns, and handles token-limit splits cleanly. Apply to any task requiring exhaustive, unabridged output.",
       "upstream": "https://github.com/Leonxlnx/taste-skill",
-      "sourceRevision": "12af471",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "f6b7657",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "owasp-security": {
       "name": "owasp-security",
@@ -460,7 +499,8 @@
       "description": "Reviews code for security vulnerabilities and guides secure implementation using OWASP Top 10:2025, ASVS 5.0, the OWASP Top 10 for LLM Applications (2026), and the OWASP Top 10 for Agentic Applications (2026). Use when reviewing code or a diff for security issues, implementing authentication, authorization, sessions, or cryptography, handling untrusted input, files, or URLs, hardening config, dependencies, or CI, or building LLM and AI agent features.",
       "upstream": "https://github.com/agamm/claude-code-owasp",
       "sourceRevision": "1ae29cb",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "ponytail": {
       "name": "ponytail",
@@ -468,7 +508,8 @@
       "description": "Forces AI coding agents to think like a pragmatic, lazy senior developer. Enforces the Decision Ladder: YAGNI checks, codebase reuse, standard library first, native platform features, and zero premature abstractions while strictly preserving security and error handling.",
       "upstream": "https://github.com/DietrichGebert/ponytail",
       "sourceRevision": "96608e0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "adapted"
     },
     "postgres-best-practices": {
       "name": "postgres-best-practices",
@@ -476,7 +517,8 @@
       "description": "\"Postgres best practices maintained by Supabase, for Postgres running anywhere. Load this skill BEFORE writing or changing anything that lives in a Postgres database: creating or altering tables and columns (including choosing column types), schema design, migrations and declarative schema files, RLS policies and the tests that verify them, indexes, triggers, database functions, queues and scheduled jobs (pg_cron, pgmq), vector/semantic search (pgvector), and restoring dumps (pg_restore) or importing data. Also load it when diagnosing slow queries, high CPU, timeouts, EXPLAIN plans, connection exhaustion, locking, bloat, or rows visible to the wrong user or tenant. This is not just a performance guide — schema, migration, security, and SQL authoring tasks need these rules too, even for a one-column change or a single query.\"",
       "upstream": "https://github.com/neondatabase/postgres-skills",
       "sourceRevision": "27fe45e",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "project-hygiene": {
       "name": "project-hygiene",
@@ -484,7 +526,8 @@
       "description": "Audit and enforce codebase hygiene across any project: eliminate dead code, purge unused dependencies and exports, enforce architectural module boundaries, clear stale build caches, and verify type safety.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "receiving-code-review": {
       "name": "receiving-code-review",
@@ -492,7 +535,8 @@
       "description": "Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "redesign-skill": {
       "name": "redesign-skill",
@@ -500,7 +544,8 @@
       "description": "Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Works with any CSS framework or vanilla CSS.",
       "upstream": "https://github.com/Leonxlnx/taste-skill-classics",
       "sourceRevision": "5e08c93",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "requesting-code-review": {
       "name": "requesting-code-review",
@@ -508,7 +553,8 @@
       "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "security-audit-sweep": {
       "name": "security-audit-sweep",
@@ -516,15 +562,17 @@
       "description": "Generic security audit sweep for web applications, APIs, and microservices: performs dynamic differential HTTP probing, validates IAM role entitlements, scans dependency vulnerabilities, and checks for secret leakage.",
       "upstream": "https://github.com/blencorp/security-sweep",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "snyk-agent-scan": {
       "name": "snyk-agent-scan",
       "category": "Security & Probing",
       "description": "Scans AI agent skills, MCP configurations, prompts, and tooling environments for prompt injections, secret leakage, tool poisoning, and security vulnerabilities using Snyk Agent Scan CLI. Use when reviewing installed skills, testing agent security, auditing MCP servers, or auditing agent supply chain risks.",
       "upstream": "https://github.com/snyk/agent-scan",
-      "sourceRevision": "a69e1c3",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "fea1d4f",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "soft-skill": {
       "name": "soft-skill",
@@ -532,7 +580,8 @@
       "description": "Teaches the AI to design like a high-end agency. Defines the exact fonts, spacing, shadows, card structures, and animations that make a website feel expensive. Blocks all the common defaults that make AI designs look cheap or generic.",
       "upstream": "https://github.com/Leonxlnx/taste-skill-classics",
       "sourceRevision": "5e08c93",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "stitch-skill": {
       "name": "stitch-skill",
@@ -540,15 +589,17 @@
       "description": "Semantic Design System Skill for Google Stitch. Generates agent-friendly DESIGN.md files that enforce premium, anti-generic UI standards — strict typography, calibrated color, asymmetric layouts, perpetual micro-motion, and hardware-accelerated performance.",
       "upstream": "https://github.com/Leonxlnx/taste-skill-classics",
       "sourceRevision": "5e08c93",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "strix-security": {
       "name": "strix-security",
       "category": "Security & Probing",
       "description": "Autonomous AI penetration testing and dynamic HTTP differential probing methodology (based on usestrix/strix). Never trust code comments alone; verify every mounted route, static asset prefix, reverse-proxy rule, and Host-header boundary with concrete Proof-of-Concept (PoC) HTTP probes across Anonymous, Unprivileged, Cross-Tenant/Venue, and Authorized principals.",
       "upstream": "https://github.com/usestrix/strix",
-      "sourceRevision": "6b7ae2e",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "1152d53",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "subagent-driven-development": {
       "name": "subagent-driven-development",
@@ -556,7 +607,8 @@
       "description": "Use when executing implementation plans with independent tasks in the current session",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "systematic-debugging": {
       "name": "systematic-debugging",
@@ -564,15 +616,17 @@
       "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "taste-skill": {
       "name": "taste-skill",
       "category": "Design & Aesthetics",
       "description": "Frontend craft, anti-slop, and high-taste design skill for UI adjustments, interactive interfaces, new features, components, redesigns, landing pages, and web apps. The agent infers the right design direction, eliminates generic AI defaults, enforces design tokens and design systems, and ships polished, intentional interfaces.",
       "upstream": "https://github.com/Leonxlnx/taste-skill",
-      "sourceRevision": "12af471",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "f6b7657",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "adapted"
     },
     "test-driven-development": {
       "name": "test-driven-development",
@@ -580,31 +634,35 @@
       "description": "Use when implementing any feature or bugfix, before writing implementation code",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "trailofbits-audit-context": {
       "name": "trailofbits-audit-context",
       "category": "Security & Probing",
       "description": "Understand a codebase before looking for bugs in it - what each function assumes, what it guarantees, and what it depends on elsewhere. Use when starting an audit, threat model, or architecture review on unfamiliar code, and before any vulnerability-hunting pass.",
       "upstream": "https://github.com/trailofbits/skills",
-      "sourceRevision": "2be6433",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "149d7b2",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "trailofbits-insecure-defaults": {
       "name": "trailofbits-insecure-defaults",
       "category": "Security & Probing",
       "description": "Audits codebases for insecure defaults, fail-open patterns, fallback credentials, permissive access control, debug endpoints, and weak cryptography using Trail of Bits vulnerability patterns. Use when reviewing configuration, authentication, encryption, authorization bypasses, or security controls.",
       "upstream": "https://github.com/trailofbits/skills",
-      "sourceRevision": "2be6433",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "149d7b2",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "trailofbits-triage-brocards": {
       "name": "trailofbits-triage-brocards",
       "category": "Security & Probing",
       "description": "Systematically evaluates incoming vulnerability reports against 7 principled brocards to accept, dismiss, or request clarification before committing engineering resources.",
       "upstream": "https://github.com/trailofbits/skills",
-      "sourceRevision": "2be6433",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "149d7b2",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "using-git-worktrees": {
       "name": "using-git-worktrees",
@@ -612,7 +670,8 @@
       "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "using-superpowers": {
       "name": "using-superpowers",
@@ -620,7 +679,8 @@
       "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "verification-before-completion": {
       "name": "verification-before-completion",
@@ -628,7 +688,8 @@
       "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "writing-plans": {
       "name": "writing-plans",
@@ -636,7 +697,8 @@
       "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "adapted"
     },
     "writing-skills": {
       "name": "writing-skills",
@@ -644,7 +706,8 @@
       "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
       "upstream": "https://github.com/obra/superpowers",
       "sourceRevision": "22f0b46",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "codex-collaborator": {
       "name": "codex-collaborator",
@@ -652,15 +715,17 @@
       "description": "Coordinate with OpenAI Codex CLI (codex.exe) to cross-validate changes, request second-opinion reviews on git diffs, or validate test runs.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "clean-code": {
       "name": "clean-code",
       "category": "Code Quality & Refactoring",
       "description": "Enforce Uncle Bob's Clean Code discipline, TDD cycles, laziness protocol, and mathematical quality gates (CRAP < 10, DRY similarity < 0.8, mutant-killing test design).",
       "upstream": "https://github.com/unclebob/ub-mode",
-      "sourceRevision": "57a8bdd",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "3da62bf",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "progressive-disclosure": {
       "name": "progressive-disclosure",
@@ -668,7 +733,8 @@
       "description": "Structuring modular agent skills and toolsets with progressive disclosure to eliminate prompt bloat and avoid multi-agent sprawl.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "communication-doctrine": {
       "name": "communication-doctrine",
@@ -676,7 +742,8 @@
       "description": "Enforce Bottom Line Up Front (BLUF) headers and Simplified Technical English (STE) imperative syntax, eliminating AI verbosity and ambiguous qualifiers.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "threat-modeling": {
       "name": "threat-modeling",
@@ -684,7 +751,8 @@
       "description": "Systematic STRIDE threat modeling, trust boundary mapping, and mitigation verification for architecture, API, and cloud infrastructure changes.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "mcp-engineering": {
       "name": "mcp-engineering",
@@ -692,7 +760,8 @@
       "description": "Standards, JSON-RPC 2.0 protocol compliance, schema validation, and stdio/SSE transport discipline for authoring Model Context Protocol (MCP) servers and tools.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "v1.0.0",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "herdr": {
       "name": "herdr",
@@ -700,7 +769,8 @@
       "description": "Control Herdr, a terminal workspace manager for coding agents. Inspect or control panes, tabs, workspaces, commands, or coordinate with peer agents (claude, codex, gemini/agy, etc.) in persistent terminal sessions.",
       "upstream": "https://herdr.dev",
       "sourceRevision": "v0.1.0",
-      "updateProtocol": "Run herdr update and herdr --skill to refresh the skill instructions from the local binary."
+      "updateProtocol": "Run herdr update and herdr --skill to refresh the skill instructions from the local binary.",
+      "integrationMode": "mirror"
     },
     "thermo": {
       "name": "thermo",
@@ -708,7 +778,8 @@
       "description": "Unusually strict architectural and maintainability review focusing on Code Judo structural simplification, spaghetti conditional elimination, and modularity health.",
       "upstream": "https://github.com/cursor/plugins",
       "sourceRevision": "main",
-      "updateProtocol": "Review upstream cursor-team-kit/skills/thermo-nuclear-code-quality-review/SKILL.md and sync."
+      "updateProtocol": "Review upstream cursor-team-kit/skills/thermo-nuclear-code-quality-review/SKILL.md and sync.",
+      "integrationMode": "adapted"
     },
     "pstack-discipline": {
       "name": "pstack-discipline",
@@ -716,7 +787,8 @@
       "description": "High-rigor engineering discipline from the pstack / poteto framework: Prove It Works, Fix Root Causes, Test Behavior Not Implementation, and Subtract Before You Add.",
       "upstream": "https://github.com/cursor/plugins",
       "sourceRevision": "main",
-      "updateProtocol": "Review upstream plugins/pstack and sync."
+      "updateProtocol": "Review upstream plugins/pstack and sync.",
+      "integrationMode": "adapted"
     },
     "codebase-design": {
       "name": "codebase-design",
@@ -724,7 +796,8 @@
       "description": "Shared vocabulary for designing deep modules. Use when designing interfaces, finding deepening opportunities, deciding where a seam goes, and making code more testable.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "domain-modeling": {
       "name": "domain-modeling",
@@ -732,7 +805,8 @@
       "description": "Build and sharpen a project domain model. Use when discussing codebase terminology, writing or editing GLOSSARY.md, or recording ADRs.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "improve-codebase-architecture": {
       "name": "improve-codebase-architecture",
@@ -740,7 +814,8 @@
       "description": "Scan a codebase for deepening opportunities, detect coupling and cycles, present visual HTML reports, and systematically refactor modules.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "to-spec": {
       "name": "to-spec",
@@ -748,7 +823,8 @@
       "description": "Turn conversation and requirements into a formal specification with invariants, user journeys, and error handling matrices.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "to-tickets": {
       "name": "to-tickets",
@@ -756,7 +832,8 @@
       "description": "Break a specification into atomic, dependency-ordered tracer-bullet task tickets formatted for subagent task queues.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "wayfinder": {
       "name": "wayfinder",
@@ -764,7 +841,8 @@
       "description": "Map complex feature frontiers across large codebases, tracking settled decisions, active frontier tickets, and unexplored fog.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "grill-me": {
       "name": "grill-me",
@@ -772,7 +850,8 @@
       "description": "Relentlessly interview the user using the Design Tree Frontier, autonomous fact-finding, and Yes-to-Approve format before implementation.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "mirror"
     },
     "handoff": {
       "name": "handoff",
@@ -780,15 +859,17 @@
       "description": "Compact session context into pointer-first handoff documents in temp directory with mandatory Suggested Skills contracts to prevent drift.",
       "upstream": "https://github.com/mattpocock/skills",
       "sourceRevision": "5863806",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "adapted"
     },
     "modern-web-guidance": {
       "name": "modern-web-guidance",
       "category": "Frontend & Web Platform",
       "description": "Search and retrieve Google Chrome Modern Web Guidance (Baseline-safe native HTML/CSS/JS APIs, Core Web Vitals, accessibility, and legacy-scan modernization).",
       "upstream": "https://github.com/GoogleChrome/modern-web-guidance",
-      "sourceRevision": "4dd9683",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "sourceRevision": "64a6d70",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "adapted"
     },
     "mcp-cleanup": {
       "name": "mcp-cleanup",
@@ -796,7 +877,8 @@
       "description": "Kill orphaned MCP server processes left behind by crashed or closed agent sessions.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "local",
-      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
     },
     "mcp-sync": {
       "name": "mcp-sync",
@@ -804,6 +886,25 @@
       "description": "Resolve Heimdall MCP template to local paths and sync to agent harness configs.",
       "upstream": "https://github.com/bepaldes/heimdall-agent",
       "sourceRevision": "local",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
+    },
+    "ruminate": {
+      "name": "ruminate",
+      "category": "Collaboration & Process",
+      "description": "Mine historical Claude and Gemini session transcripts for correction patterns, repeated preferences, skill trigger failures, and doctrine violations.",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "local",
+      "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report.",
+      "integrationMode": "native"
+    },
+    "upstream-skill-sync": {
+      "name": "upstream-skill-sync",
+      "category": "Collaboration & Process",
+      "description": "Audit upstream skill repositories and classify updates via the 3-tier triage rubric (Safe 1:1, Defer/Selective Merge, Reject).",
+      "upstream": "https://github.com/bepaldes/heimdall-agent",
+      "sourceRevision": "local",
+      "integrationMode": "native",
       "updateProtocol": "Update the selected skill or plugin through its supported mechanism. Review changed instructions/references and repeat a bounded review after material updates. Record source revision, reviewed range, actual tests and remaining validation in the private report."
     }
   }

@@ -21,6 +21,7 @@ skills:
   - writing-skills
   - executing-plans
   - herdr
+  - upstream-skill-sync
 ---
 
 # Heimdall Orchestrator & Architecture Sentinel
@@ -70,7 +71,7 @@ You are the **Orchestrator**. Your mandate is to lead software engineering tasks
      - Save a lean handoff document to `$env:TEMP` containing only pointers (plan/ADR links, branch name, commit hash) with zero duplicate code dumps.
      - Mandate a `### Suggested Skills for Next Agent` section to direct the child agent's initial execution.
    - When routing tasks to peer review or pre-commit gates:
-     - **Cross-Model Path (Herdr Multiplexing)**: When `$env:HERDR_ENV = "1"`, orchestrate peer models (Claude, Codex, Gemini) natively using the `herdr` skill. Re-use existing idle agents first (`herdr agent list`). When spawning new agents, batch pane creation and agent startup in a single script block rather than multi-turn polling.
+     - **Cross-Model Path (Herdr Multiplexing)**: When `$env:HERDR_ENV = "1"`, orchestrate peer models across distinct families (Claude, Codex/GPT, Gemini, GLM, Hunyuan, MiMo, or any live model in `config/models.json` / `config/agents.json`) natively using the `herdr` skill. Re-use existing idle agents first (`herdr agent list`). When spawning new agents, batch pane creation and agent startup in a single script block rather than multi-turn polling.
      - **Graceful Fallback (Stateless Goldfish Subagent)**: If outside Herdr or peer agents are unavailable, spawn a fresh child subagent on the **same native harness and model** (e.g. `invoke_subagent` in Antigravity, Agent tool in Claude Code) with zero conversation history. The Goldfish isolation invariant is strictly preserved.
 
 6. **Modular Plan Decomposition & Specification**:

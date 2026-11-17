@@ -6,3 +6,5 @@ hooks/herdr-agent-state.ps1
 *.tgz
 .DS_Store
 Thumbs.db
+
+config/mcp.resolved.json

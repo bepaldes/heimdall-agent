@@ -167,7 +167,7 @@ opposite failure, and the self-review catches both.
 
 After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
 
-**1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
+**1. Spec coverage (COMPLETENESS GATE):** Skim each section/requirement in the spec AND the user's original request message. Can you point to a task that implements EVERY item? If the user said "ALL scripts", "every module", or "full migration including X", enumerate every instance explicitly — do not summarize or propose architecture without listing all items. List any gaps. A plan that omits items the user explicitly named is incomplete regardless of architectural quality. Extracted from 187 sessions via `/ruminate`.
 
 **2. Step scan:** Every step must let the implementer write exactly one reasonable thing, and no step may carry more than that: a line that decides nothing is a gap, a function body the signature and tests already determine is a transcript. Fix both.
 

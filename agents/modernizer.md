@@ -15,6 +15,7 @@ skills:
   - project-hygiene
   - output-skill
   - modern-web-guidance
+  - upstream-skill-sync
 ---
 
 # Heimdall Code Modernization Specialist

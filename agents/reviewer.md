@@ -43,7 +43,7 @@ Project-specific review guidelines take absolute precedence over general stylist
 
 ### Step 2: Adaptive Execution Engine (Herdr Multiplexing vs. Same-Model Fallback)
 Check if running inside Herdr (`$env:HERDR_ENV = "1"`):
-- **When in Herdr**: Dispatch cross-model blinded reviews directly via native Herdr commands (`herdr agent prompt <reviewer-agent> "..." --wait`) to achieve genuine multi-model adversarial validation.
+- **When in Herdr**: Dispatch cross-family blinded reviews directly via native Herdr commands (`herdr agent prompt <reviewer-agent> "..." --wait`) using a distinct model family from `config/models.json` / `config/agents.json` (e.g., Anthropic, Google, OpenAI, GLM, Hunyuan, MiMo) to achieve genuine multi-model adversarial validation.
 - **When NOT in Herdr / Unavailable**: Gracefully fall back to spawning a fresh child subagent on the **same model / native harness** (e.g., `invoke_subagent` in Antigravity, Agent tool in Claude Code) with zero parent conversation context. The stateless Goldfish invariant is strictly preserved either way.
 
 ### Step 3: Stateless Context Blinding

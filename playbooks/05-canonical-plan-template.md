@@ -43,17 +43,10 @@
 ### Phase 3: Integration & Playwright E2E Verification
 ### Phase 4: Review, Purge & Handoff
 
-## 5. Symmetric & Tri-Directional Cross-Model Validation Loop
-- In Herdr (`HERDR_ENV=1`), validate tasks directly via peer agent prompts:
-  - Tasks executed by Claude -> Validate with Gemini or Codex:
-    `herdr agent prompt gemini-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
-    `herdr agent prompt codex-reviewer "Review git diff for security regressions and boundary conditions." --wait --timeout 120000`
-  - Tasks executed by Gemini -> Validate with Claude or Codex:
-    `herdr agent prompt claude-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
-    `herdr agent prompt codex-reviewer "Review git diff for security regressions and boundary conditions." --wait --timeout 120000`
-  - Tasks executed by Codex -> Validate with Claude or Gemini:
-    `herdr agent prompt claude-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
-    `herdr agent prompt gemini-reviewer "Review git diff for security regressions and type errors." --wait --timeout 120000`
+## 5. Symmetric Cross-Family Validation Loop
+- In Herdr (`HERDR_ENV=1`), validate tasks using a **different model family** from the authoring model (e.g., Anthropic ↔ Google ↔ OpenAI/Codex ↔ Zhipu/GLM ↔ Tencent/Hunyuan ↔ Xiaomi/MiMo) selected from `config/models.json` / `playbooks/06-model-registry-matrix.md`:
+  - `herdr agent prompt <cross-family-reviewer> "Review git diff for security regressions, boundary conditions, and type errors." --wait --timeout 120000`
+- Select any live reviewer agent/model from a distinct family rather than restricting validation to Claude/Gemini/Codex alone.
 
 ## 6. Orchestrator Heartbeat
 - Orchestrator monitors progress every 3 minutes.

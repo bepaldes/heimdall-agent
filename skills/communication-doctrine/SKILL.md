@@ -1,8 +1,8 @@
 ---
 name: communication-doctrine
 description: >
-  Bottom Line Up Front (BLUF) and Simplified Technical English (STE) communication doctrine.
-  Enforces zero-latency verdicts in reports and unambiguous, imperative step definitions in plans.
+  Mandatory communication standard for ALL responses, status reports, code reviews, and implementation plans.
+  Use on every turn to enforce Bottom Line Up Front (BLUF) and ASD-STE100 Simplified Technical English (STE).
 ---
 
 # Communication Doctrine: BLUF & Simplified Technical English (STE)

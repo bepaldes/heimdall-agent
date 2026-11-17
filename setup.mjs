@@ -18,7 +18,8 @@ import os from 'node:os';
 import readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
-import { resolveModelMaxContext, resolveCustomModelsEndpoint } from './lib/model-context.cjs';
+import { CANONICAL_MODEL_CONTEXTS, resolveModelMaxContext, resolveCustomModelsEndpoint } from './lib/model-context.cjs';
+import { syncAgentsWithModels, syncModelRegistryPlaybook } from './lib/model-router.cjs';
 import { updateHermesConfigContext } from './lib/hermes-context.cjs';
 import { detectPathCandidates } from './lib/path-discovery.cjs';
 import { syncCatalogCounts } from './lib/catalog-sync.cjs';
@@ -385,124 +386,143 @@ function resolveOpenDesignMcpConfig() {
 }
 
 /**
- * Synchronizes curated and dynamic MCP servers (including OpenDesign and Context7)
- * across Antigravity, Claude Desktop, and Claude Code.
+ * Installs required MCP npm packages globally so configs use direct node.exe calls
+ * instead of npx (which spawns 4-5 orphan-prone processes per server on Windows).
  */
-function syncMcpServers(detected, options = {}) {
-  let syncedAny = false;
-  let mcpRegistry = {};
-  if (fs.existsSync(mcpConfigPath)) {
-    try {
-      mcpRegistry = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf8')).mcpServers || {};
-    } catch {}
+function installMcpPackages(options = {}) {
+  const requiredPackages = ['@upstash/context7-mcp', 'chrome-devtools-mcp'];
+  const missing = [];
+
+  try {
+    const npmRoot = execSync('npm root -g', { encoding: 'utf8' }).replace(/\r/g, '').trim();
+    for (const pkg of requiredPackages) {
+      const pkgDir = path.join(npmRoot, pkg);
+      if (!fs.existsSync(pkgDir)) missing.push(pkg);
+    }
+  } catch {
+    missing.push(...requiredPackages);
   }
 
-  const odConfig = resolveOpenDesignMcpConfig();
-
-  // 1. Antigravity (AGY)
-  const agyMcpFile = path.join(userHome, '.gemini', 'config', 'mcp_config.json');
-  if (fs.existsSync(path.dirname(agyMcpFile))) {
-    let agyConfig = { mcpServers: {} };
-    try {
-      if (fs.existsSync(agyMcpFile)) {
-        agyConfig = JSON.parse(fs.readFileSync(agyMcpFile, 'utf8'));
-      }
-    } catch {}
-    if (!agyConfig.mcpServers) agyConfig.mcpServers = {};
-
-    let agyUpdated = false;
-    if (odConfig && JSON.stringify(agyConfig.mcpServers['open-design']) !== JSON.stringify(odConfig)) {
-      agyConfig.mcpServers['open-design'] = odConfig;
-      agyUpdated = true;
-    }
-    if (mcpRegistry.context7?.config && !agyConfig.mcpServers['context7']) {
-      agyConfig.mcpServers['context7'] = mcpRegistry.context7.config;
-      agyUpdated = true;
-    }
-
-    if (agyUpdated && !options.dryRun) {
-      fs.writeFileSync(agyMcpFile, JSON.stringify(agyConfig, null, 2), 'utf8');
-      console.log(`  ${colors.green}✔${colors.reset} Synchronized OpenDesign MCP for Google Antigravity`);
-      syncedAny = true;
-    }
+  if (missing.length === 0) {
+    console.log(`  ${colors.green}✔${colors.reset} MCP packages already installed globally (${requiredPackages.join(', ')})`);
+    return true;
   }
 
-  // 2. Claude Desktop
-  const claudeDesktopDir = getClaudeDesktopDir();
-  const claudeDesktopFile = path.join(claudeDesktopDir, 'claude_desktop_config.json');
-  if (fs.existsSync(claudeDesktopFile)) {
-    let deskConfig = { mcpServers: {} };
-    try { deskConfig = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8')); } catch {}
-    if (!deskConfig.mcpServers) deskConfig.mcpServers = {};
-
-    let deskUpdated = false;
-    if (odConfig && JSON.stringify(deskConfig.mcpServers['open-design']) !== JSON.stringify(odConfig)) {
-      deskConfig.mcpServers['open-design'] = odConfig;
-      deskUpdated = true;
-    }
-    if (mcpRegistry.context7?.config && !deskConfig.mcpServers['context7']) {
-      deskConfig.mcpServers['context7'] = mcpRegistry.context7.config;
-      deskUpdated = true;
-    }
-
-    if (deskUpdated && !options.dryRun) {
-      fs.writeFileSync(claudeDesktopFile, JSON.stringify(deskConfig, null, 2), 'utf8');
-      console.log(`  ${colors.green}✔${colors.reset} Synchronized OpenDesign & Context7 MCP for Claude Desktop`);
-      syncedAny = true;
-    }
+  console.log(`  ${colors.cyan}→${colors.reset} Installing MCP packages globally: ${missing.join(', ')}`);
+  if (options.dryRun) {
+    console.log(`  ${colors.yellow}(dry run — would run: npm install -g ${missing.join(' ')})${colors.reset}`);
+    return true;
   }
 
-  // 3. Claude Code CLI
-  const claudeConfigFile = path.join(userHome, '.claude.json');
-  if (fs.existsSync(claudeConfigFile)) {
-    let claudeConfig = {};
-    try { claudeConfig = JSON.parse(fs.readFileSync(claudeConfigFile, 'utf8')); } catch {}
-    if (!claudeConfig.mcpServers) claudeConfig.mcpServers = {};
-
-    let claudeUpdated = false;
-    if (odConfig && JSON.stringify(claudeConfig.mcpServers['open-design']) !== JSON.stringify(odConfig)) {
-      claudeConfig.mcpServers['open-design'] = odConfig;
-      claudeUpdated = true;
-    }
-
-    if (claudeUpdated && !options.dryRun) {
-      fs.writeFileSync(claudeConfigFile, JSON.stringify(claudeConfig, null, 2), 'utf8');
-      console.log(`  ${colors.green}✔${colors.reset} Synchronized OpenDesign MCP for Claude Code`);
-      syncedAny = true;
-    }
+  try {
+    execSync(`npm install -g ${missing.join(' ')}`, { stdio: ['pipe', 'pipe', 'pipe'], timeout: 120000 });
+    console.log(`  ${colors.green}✔${colors.reset} Installed ${missing.join(', ')} globally`);
+    return true;
+  } catch (err) {
+    console.log(`  ${colors.red}✘${colors.reset} Failed to install MCP packages: ${err.message}`);
+    console.log(`  ${colors.yellow}  Run manually: npm install -g ${missing.join(' ')}${colors.reset}`);
+    return false;
   }
-
-  return syncedAny;
 }
 
 /**
- * Audits registered and configured MCP servers across harnesses.
+ * Synchronizes MCP servers across all harnesses (Gemini, Claude, Codex, Hermes)
+ * using the template-based resolver. Replaces legacy per-harness sync logic.
+ * Uses direct node.exe paths to avoid Windows npx process multiplication.
+ */
+function syncMcpServers(detected, options = {}) {
+  // Step 1: Ensure MCP packages are installed globally
+  installMcpPackages(options);
+
+  // Step 2: Run the resolver to generate resolved config and sync to all harnesses
+  const resolverScript = path.join(__dirname, 'scripts', 'resolve-mcp.mjs');
+  if (!fs.existsSync(resolverScript)) {
+    console.log(`  ${colors.red}✘${colors.reset} MCP resolver not found at ${resolverScript}`);
+    return false;
+  }
+
+  if (options.dryRun) {
+    console.log(`  ${colors.yellow}(dry run — would run: node scripts/resolve-mcp.mjs --sync)${colors.reset}`);
+    return true;
+  }
+
+  try {
+    const output = execSync(`node "${resolverScript}" --sync`, {
+      encoding: 'utf8',
+      cwd: __dirname,
+      timeout: 60000
+    });
+    // Print resolver output lines prefixed with checkmarks
+    for (const line of output.split('\n')) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('✓')) {
+        console.log(`  ${colors.green}✔${colors.reset} ${trimmed.slice(2).trim()}`);
+      } else if (trimmed.startsWith('⚠')) {
+        console.log(`  ${colors.yellow}⚠${colors.reset} ${trimmed.slice(2).trim()}`);
+      } else if (trimmed) {
+        console.log(`  ${colors.dim}${trimmed}${colors.reset}`);
+      }
+    }
+    return true;
+  } catch (err) {
+    console.log(`  ${colors.red}✘${colors.reset} MCP resolver failed: ${err.message}`);
+    return false;
+  }
+}
+
+/**
+ * Audits registered and configured MCP servers across all harnesses.
+ * Checks Gemini, Claude Code (settings.json), Codex (config.toml), and Hermes (config.yaml).
  */
 function auditMcpServers() {
   const results = [];
+  const serverNames = ['context7', 'chrome-devtools', 'open-design', 'rea', 'mobbin'];
+
+  // Gemini
   const agyMcpFile = path.join(userHome, '.gemini', 'config', 'mcp_config.json');
   if (fs.existsSync(agyMcpFile)) {
     try {
       const cfg = JSON.parse(fs.readFileSync(agyMcpFile, 'utf8'));
-      results.push({ harness: 'Google Antigravity', server: 'open-design', configured: Boolean(cfg.mcpServers?.['open-design']) });
-      results.push({ harness: 'Google Antigravity', server: 'context7', configured: Boolean(cfg.mcpServers?.['context7']) });
+      for (const s of serverNames) {
+        results.push({ harness: 'Google Antigravity', server: s, configured: Boolean(cfg.mcpServers?.[s]) });
+      }
     } catch {}
   }
-  const claudeDesktopFile = path.join(getClaudeDesktopDir(), 'claude_desktop_config.json');
-  if (fs.existsSync(claudeDesktopFile)) {
+
+  // Claude Code (settings.json — correct location for MCP servers)
+  const claudeSettingsFile = path.join(userHome, '.claude', 'settings.json');
+  if (fs.existsSync(claudeSettingsFile)) {
     try {
-      const cfg = JSON.parse(fs.readFileSync(claudeDesktopFile, 'utf8'));
-      results.push({ harness: 'Claude Desktop', server: 'open-design', configured: Boolean(cfg.mcpServers?.['open-design']) });
-      results.push({ harness: 'Claude Desktop', server: 'context7', configured: Boolean(cfg.mcpServers?.['context7']) });
+      const cfg = JSON.parse(fs.readFileSync(claudeSettingsFile, 'utf8'));
+      for (const s of serverNames) {
+        results.push({ harness: 'Claude Code', server: s, configured: Boolean(cfg.mcpServers?.[s]) });
+      }
     } catch {}
   }
-  const claudeConfigFile = path.join(userHome, '.claude.json');
-  if (fs.existsSync(claudeConfigFile)) {
+
+  // Codex CLI (config.toml)
+  const codexConfigFile = path.join(userHome, '.codex', 'config.toml');
+  if (fs.existsSync(codexConfigFile)) {
     try {
-      const cfg = JSON.parse(fs.readFileSync(claudeConfigFile, 'utf8'));
-      results.push({ harness: 'Claude Code', server: 'open-design', configured: Boolean(cfg.mcpServers?.['open-design']) });
+      const content = fs.readFileSync(codexConfigFile, 'utf8');
+      for (const s of serverNames) {
+        results.push({ harness: 'Codex CLI', server: s, configured: content.includes(`[mcp_servers.${s}]`) });
+      }
     } catch {}
   }
+
+  // Hermes (config.yaml)
+  const hermesConfigFile = path.join(getHermesDir(), 'config.yaml');
+  if (fs.existsSync(hermesConfigFile)) {
+    try {
+      const content = fs.readFileSync(hermesConfigFile, 'utf8');
+      const mcpSection = content.match(/^mcp_servers:[\s\S]*?(?=^[a-z_]+:|\s*$)/m);
+      for (const s of serverNames) {
+        results.push({ harness: 'Hermes', server: s, configured: Boolean(mcpSection && mcpSection[0].includes(`  ${s}:`)) });
+      }
+    } catch {}
+  }
+
   return results;
 }
 
@@ -653,13 +673,10 @@ function configureHermesContextLimit(hermesDir, modelsList = null, dryRun = fals
     }
   }
 
-  // Ensure default fallbacks for common models
-  if (!contextMap['claude-opus-5-5']) contextMap['claude-opus-5-5'] = 1000000;
-  if (!contextMap['claude-sonnet-5']) contextMap['claude-sonnet-5'] = 1000000;
-  if (!contextMap['claude-fable-5.1']) contextMap['claude-fable-5.1'] = 1000000;
-  if (!contextMap['gpt-6-astra']) contextMap['gpt-6-astra'] = 1000000;
-  if (!contextMap['z-ai/glm-5.3']) contextMap['z-ai/glm-5.3'] = 1000000;
-  if (!contextMap['z-ai/glm-5.3-flash']) contextMap['z-ai/glm-5.3-flash'] = 1000000;
+  // Ensure default fallbacks from canonical model context registry
+  for (const [id, tokens] of Object.entries(CANONICAL_MODEL_CONTEXTS)) {
+    if (!contextMap[id]) contextMap[id] = tokens;
+  }
 
   return updateHermesConfigContext(hermesDir, contextMap, dryRun);
 }
@@ -823,7 +840,7 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
-  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (64), minimal (16), security (12), design (14) [default: full]
+  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (69), minimal (16), security (12), design (14) [default: full]
   ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, desktop, all [default: all]
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
@@ -1085,109 +1102,191 @@ function deployGlobalShims(targetToolsDir, dryRun = false) {
   }
 }
 
-async function syncModelsFromEndpoint() {
-  console.log(`${colors.cyan}${colors.bold}=== Live Model Synchronization ===${colors.reset}\n`);
+/**
+ * Probes a single model on /v1/messages with a 20s timeout and 1 retry on transient errors.
+ * Definitive 4xx errors (except 408/429) or repeated 5xx mark the model 'dead'.
+ * Timeouts / network hiccups after retry are marked 'slow' and preserved.
+ */
+async function probeModelHealth(messagesUrl, apiKey, modelId, timeoutMs = 20000) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(messagesUrl, {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'Authorization': `Bearer ${apiKey}`,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: modelId,
+          max_tokens: 5,
+          messages: [{ role: 'user', content: 'hi' }]
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      if (res.ok) return 'alive';
+      const isRetryable = res.status === 408 || res.status === 429 || res.status >= 500;
+      if (!isRetryable || attempt === 1) return 'dead';
+    } catch {
+      clearTimeout(timeout);
+      if (attempt === 1) return 'slow';
+    }
+  }
+  return 'slow';
+}
+
+/**
+ * Normalizes model IDs (stripping [1m] suffixes) and deduplicates entries,
+ * retaining the highest context window for each canonical model ID.
+ */
+function deduplicateModelsByMaxContext(modelsList = []) {
+  const byId = new Map();
+  for (const m of modelsList) {
+    if (!m || typeof m !== 'object') continue;
+    const rawId = m.id || m.slug;
+    if (!rawId || typeof rawId !== 'string') continue;
+
+    const id = rawId.replace(/\[1m\]$/i, '');
+    const resolved = resolveModelMaxContext(m, { prioritizeMax: true });
+    const displayName = (m.display_name || id).replace(/\s*\(1M\)$/i, '');
+    const description = m.description || '';
+    const isVariant = /\[1m\]$/i.test(rawId);
+
+    const existing = byId.get(id);
+    if (!existing) {
+      byId.set(id, {
+        id,
+        displayName,
+        context: resolved.label,
+        context_window_tokens: resolved.tokens,
+        description
+      });
+    } else {
+      if (resolved.tokens > existing.context_window_tokens) {
+        existing.context_window_tokens = resolved.tokens;
+        existing.context = resolved.label;
+      }
+      if (!isVariant && description) {
+        existing.description = description;
+        existing.displayName = displayName;
+      } else if (!existing.description && description) {
+        existing.description = description;
+      }
+    }
+  }
+  return Array.from(byId.values());
+}
+
+async function syncModelsFromEndpoint({ quiet = false } = {}) {
+  if (!quiet) console.log(`${colors.cyan}${colors.bold}=== Live Model Synchronization ===${colors.reset}\n`);
   const detected = detectEnvironment();
   const targetUrl = resolveCustomModelsEndpoint(detected.endpoints);
 
   if (targetUrl) {
-    console.log(`Probing Proxy / Vendor Models API: ${colors.yellow}${targetUrl}${colors.reset}...`);
+    if (!quiet) console.log(`Probing Proxy / Vendor Models API: ${colors.yellow}${targetUrl}${colors.reset}...`);
+    const rawApiKey = detected.endpoints.claude_key || detected.endpoints.codex_key || process.env.ANTHROPIC_API_KEY || process.env.GHOSTCLI_API_KEY || '';
+    const apiKey = typeof rawApiKey === 'string' ? rawApiKey.trim() : '';
+    const getHeaders = { Accept: 'application/json' };
+    if (apiKey) {
+      getHeaders['Authorization'] = `Bearer ${apiKey}`;
+      getHeaders['x-api-key'] = apiKey;
+    }
+
     try {
-      const res = await fetch(targetUrl);
+      const probeController = new AbortController();
+      const probeTimeout = setTimeout(() => probeController.abort(), 10000);
+      const res = await fetch(targetUrl, { headers: getHeaders, signal: probeController.signal });
+      clearTimeout(probeTimeout);
       if (res.ok) {
         const data = await res.json();
-        const modelsList = data.data || data.models || [];
-        console.log(`${colors.green}✔ Successfully discovered ${modelsList.length} live models from endpoint!${colors.reset}\n`);
+        const rawModelsList = data.data || data.models || [];
+        const modelsList = deduplicateModelsByMaxContext(rawModelsList);
+        if (!quiet) console.log(`${colors.green}✔ Successfully discovered ${modelsList.length} unique live models from endpoint!${colors.reset}\n`);
 
         let currentModels = {};
         if (fs.existsSync(modelsPath)) {
           currentModels = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
         }
 
-        console.log(`Checking live health of discovered models...`);
-        const apiKey = detected.endpoints.claude_key || detected.endpoints.codex_key || process.env.ANTHROPIC_API_KEY || process.env.GHOSTCLI_API_KEY || '';
+        if (!quiet) console.log(`Checking live health of discovered models...`);
         const baseUrl = targetUrl.replace(/\/v1\/models\/?$/, '');
 
+        const messagesUrl = `${baseUrl}/v1/messages`;
+
         const testedModels = await Promise.all(modelsList.map(async m => {
-          const modelId = m.id || m.slug;
-          let isAlive = true;
-
-          if (apiKey) {
-            try {
-              const controller = new AbortController();
-              const timeout = setTimeout(() => controller.abort(), 8000);
-              const testRes = await fetch(`${baseUrl}/v1/messages`, {
-                method: 'POST',
-                headers: {
-                  'x-api-key': apiKey,
-                  'anthropic-version': '2023-06-01',
-                  'content-type': 'application/json'
-                },
-                body: JSON.stringify({
-                  model: modelId,
-                  max_tokens: 5,
-                  messages: [{ role: 'user', content: 'hi' }]
-                }),
-                signal: controller.signal
-              });
-              clearTimeout(timeout);
-              isAlive = testRes.ok;
-            } catch {
-              isAlive = false;
-            }
-          }
-
-          return { raw: m, modelId, isAlive };
+          const status = apiKey ? await probeModelHealth(messagesUrl, apiKey, m.id, 20000) : 'alive';
+          return { spec: m, modelId: m.id, status };
         }));
 
-        const liveModels = testedModels.filter(t => t.isAlive);
-        const deadModels = testedModels.filter(t => !t.isAlive);
+        const liveModels = testedModels.filter(t => t.status !== 'dead');
+        const deadModels = testedModels.filter(t => t.status === 'dead');
+        const slowModels = testedModels.filter(t => t.status === 'slow');
 
-        if (deadModels.length > 0) {
+        if (deadModels.length > 0 && !quiet) {
           console.log(`${colors.yellow}⚠ Filtered out ${deadModels.length} unresponsive model(s): ${deadModels.map(d => d.modelId).join(', ')}${colors.reset}\n`);
         }
+        if (slowModels.length > 0 && !quiet) {
+          console.log(`${colors.yellow}⚠ Slow / timed-out model(s) preserved: ${slowModels.map(s => s.modelId).join(', ')}${colors.reset}\n`);
+        }
 
-        const mapped = liveModels.map(({ raw: m }) => {
-          const resolved = resolveModelMaxContext(m, { prioritizeMax: true });
-          return {
-            id: m.id || m.slug,
-            displayName: m.display_name || m.id,
-            context: resolved.label,
-            context_window_tokens: resolved.tokens,
-            description: m.description || ''
-          };
-        });
+        const mapped = liveModels.map(({ spec }) => spec);
 
         currentModels.custom_proxies = mapped;
         currentModels.ghostcli = mapped;
 
         fs.writeFileSync(modelsPath, JSON.stringify(currentModels, null, 2));
-        console.log(`${colors.green}✔ Synchronized models catalog to config/models.json${colors.reset}\n`);
+        if (!quiet) {
+          console.log(`${colors.green}✔ Synchronized models catalog to config/models.json${colors.reset}\n`);
+          console.log(`${colors.bold}Available Models Catalog (${mapped.length} models):${colors.reset}`);
+          mapped.forEach(m => {
+            const idStr = `${colors.cyan}${m.id.padEnd(24)}${colors.reset}`;
+            const ctxStr = `${colors.yellow}[${m.context}]${colors.reset}`;
+            const descStr = m.description ? `${colors.dim}— ${m.description}${colors.reset}` : '';
+            console.log(`  • ${idStr} ${ctxStr} ${descStr}`);
+          });
+          console.log('');
+        }
 
-        console.log(`${colors.bold}Available Models Catalog (${mapped.length} models):${colors.reset}`);
-        mapped.forEach(m => {
-          const idStr = `${colors.cyan}${m.id.padEnd(24)}${colors.reset}`;
-          const ctxStr = `${colors.yellow}[${m.context}]${colors.reset}`;
-          const descStr = m.description ? `${colors.dim}— ${m.description}${colors.reset}` : '';
-          console.log(`  • ${idStr} ${ctxStr} ${descStr}`);
-        });
-        console.log('');
+        syncAgentsWithModels(__dirname, false);
+        syncModelRegistryPlaybook(__dirname, false);
 
         const hermesDir = getHermesDir();
         if (fs.existsSync(hermesDir)) {
           const hermesContextUpdated = configureHermesContextLimit(hermesDir, mapped);
-          if (hermesContextUpdated) {
+          if (hermesContextUpdated && !quiet) {
             console.log(`${colors.green}✔ Enforced maximum context limits in Hermes config.yaml${colors.reset}\n`);
           }
         }
-      } else {
+      } else if (!quiet) {
         console.log(`${colors.yellow}Notice: Endpoint returned HTTP ${res.status}. Preserving cached models.json.${colors.reset}\n`);
       }
     } catch (err) {
-      console.log(`${colors.yellow}Notice: Could not reach remote models API (${err.message}). Using local models.json.${colors.reset}\n`);
+      if (!quiet) console.log(`${colors.yellow}Notice: Could not reach remote models API (${err.message}). Using local models.json.${colors.reset}\n`);
     }
-  } else {
+  } else if (!quiet) {
     console.log(`Using configured models from ${modelsPath}.\n`);
+  }
+}
+
+/**
+ * Ensures config/agents.json and playbooks/06-model-registry-matrix.md converge
+ * with live models from config/models.json during install or resync.
+ */
+async function convergeModelAwareArtifacts(options, detected) {
+  if (!options.dryRun && resolveCustomModelsEndpoint(detected.endpoints)) {
+    await syncModelsFromEndpoint({ quiet: true });
+  }
+  const agentsSync = syncAgentsWithModels(__dirname, options.dryRun);
+  const playbookSync = syncModelRegistryPlaybook(__dirname, options.dryRun);
+  if (agentsSync?.modified) {
+    console.log(`   ${colors.green}✔ Synchronized capability-based model routing in config/agents.json (${agentsSync.agentCount} agents)${colors.reset}`);
+  }
+  if (playbookSync?.modified) {
+    console.log(`   ${colors.green}✔ Synchronized live model matrix in playbooks/06-model-registry-matrix.md${colors.reset}`);
   }
 }
 
@@ -1198,6 +1297,8 @@ async function runSync(options, detected) {
   if (countSyncResult && countSyncResult.modified) {
     console.log(`   ${colors.green}✔ Synchronized documentation & catalog counts (${countSyncResult.suiteCount} suites / ${countSyncResult.skillCount} modules)${colors.reset}\n`);
   }
+
+  await convergeModelAwareArtifacts(options, detected);
 
   console.log(`Scanning for newly installed AI tools on PATH...\n`);
 
@@ -1478,11 +1579,11 @@ function isHeimdallInstalled(detected) {
   };
 }
 
-async function runUninstall(options, detected) {
+async function runUninstall(options, detected, existingRl = null) {
   console.log(`${colors.bold}${colors.cyan}=== Heimdall Uninstallation ===${colors.reset}\n`);
 
   if (!options.yes) {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const rl = existingRl || readline.createInterface({ input: process.stdin, output: process.stdout });
     try {
       const confirm = await rl.question(`Are you sure you want to remove Heimdall skills and agents from all harnesses? (y/N): `);
       const answer = confirm.trim().toLowerCase();
@@ -1491,7 +1592,7 @@ async function runUninstall(options, detected) {
         return;
       }
     } finally {
-      rl.close();
+      if (!existingRl) rl.close();
     }
   }
 
@@ -1605,54 +1706,62 @@ async function runUninstall(options, detected) {
 
 async function runPostInstallMenu(options, detected) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  const hasCustomApi = Boolean(resolveCustomModelsEndpoint(detected.endpoints));
+  let currentDetected = detected;
   try {
-    console.log(`${colors.bold}${colors.cyan}=== Heimdall Management Hub ===${colors.reset}`);
-    console.log(`Heimdall is currently installed and active across your environment.\n`);
-    console.log(`What would you like to do?`);
+    while (true) {
+      const hasCustomApi = Boolean(resolveCustomModelsEndpoint(currentDetected.endpoints));
+      console.log(`${colors.bold}${colors.cyan}=== Heimdall Management Hub ===${colors.reset}`);
+      console.log(`Heimdall is currently installed and active across your environment.\n`);
+      console.log(`What would you like to do?`);
 
-    const menuItems = [
-      { label: 'Audit Environment & Health Check', action: 'audit' },
-      { label: 'Fast Sync Skills & Agents (1-sec zero-drift)', action: 'sync' },
-      ...(hasCustomApi ? [{ label: 'Refresh Dynamic Models (sync-models)', action: 'sync-models' }] : []),
-      { label: 'Uninstall Heimdall', action: 'uninstall' },
-      { label: 'Reinstall / Reconfigure Profile & Targets', action: 'reinstall' },
-      { label: 'Exit', action: 'exit' }
-    ];
+      const menuItems = [
+        { label: 'Audit Environment & Health Check', action: 'audit' },
+        { label: 'Fast Sync Skills & Agents (1-sec zero-drift)', action: 'sync' },
+        ...(hasCustomApi ? [{ label: 'Refresh Dynamic Models (sync-models)', action: 'sync-models' }] : []),
+        { label: 'Uninstall Heimdall', action: 'uninstall' },
+        { label: 'Reinstall / Reconfigure Profile & Targets', action: 'reinstall' },
+        { label: 'Exit', action: 'exit' }
+      ];
 
-    menuItems.forEach((item, idx) => {
-      console.log(`  ${idx + 1}. ${item.label}`);
-    });
-    console.log('');
+      menuItems.forEach((item, idx) => {
+        console.log(`  ${idx + 1}. ${item.label}`);
+      });
+      console.log('');
 
-    const answer = await rl.question(`Choose an option [1-${menuItems.length}, default: 1]: `);
-    const choice = answer.trim().toLowerCase();
+      const answer = await rl.question(`Choose an option [1-${menuItems.length}, default: 1]: `);
+      const choice = answer.trim().toLowerCase();
 
-    if (choice === 'q' || choice === 'exit') {
-      console.log('Goodbye!');
-      process.exit(0);
-    }
+      if (choice === 'q' || choice === 'exit') {
+        console.log('Goodbye!');
+        process.exit(0);
+      }
 
-    const idx = choice === '' ? 0 : parseInt(choice, 10) - 1;
-    const selected = menuItems[idx] ? menuItems[idx].action : 'audit';
+      const idx = choice === '' ? 0 : parseInt(choice, 10) - 1;
+      const selected = menuItems[idx] ? menuItems[idx].action : 'audit';
 
-    if (selected === 'audit') {
-      runAudit(options);
-      process.exit(0);
-    } else if (selected === 'sync') {
-      await runSync(options, detected);
-      process.exit(0);
-    } else if (selected === 'sync-models') {
-      await syncModelsFromEndpoint();
-      process.exit(0);
-    } else if (selected === 'uninstall') {
-      await runUninstall(options, detected);
-      process.exit(0);
-    } else if (selected === 'reinstall') {
-      return 'reinstall';
-    } else if (selected === 'exit') {
-      console.log('Goodbye!');
-      process.exit(0);
+      if (selected === 'audit') {
+        runAudit(options);
+      } else if (selected === 'sync') {
+        await runSync(options, currentDetected);
+      } else if (selected === 'sync-models') {
+        await syncModelsFromEndpoint();
+      } else if (selected === 'uninstall') {
+        await runUninstall(options, currentDetected, rl);
+      } else if (selected === 'reinstall') {
+        return 'reinstall';
+      } else if (selected === 'exit') {
+        console.log('Goodbye!');
+        process.exit(0);
+      }
+
+      const next = await rl.question(`\nReturn to main menu? (y/n, default: y): `);
+      const nextChoice = next.trim().toLowerCase();
+      if (nextChoice === 'n' || nextChoice === 'no' || nextChoice === 'q' || nextChoice === 'exit') {
+        console.log('Goodbye!');
+        process.exit(0);
+      }
+      console.log('');
+      currentDetected = detectEnvironment();
     }
   } finally {
     rl.close();
@@ -1702,7 +1811,7 @@ async function runInteractive(options, detected) {
     }
 
     console.log(`\n${colors.yellow}Select Installation Profile Tier:${colors.reset}`);
-    console.log(`  1. full     - All 64 curated skills (Complete Powerhouse)`);
+    console.log(`  1. full     - All 69 curated skills (Complete Powerhouse)`);
     console.log(`  2. minimal  - 16 core skills (Planning, TDD, Anti-Slop, Taste, Hygiene)`);
     console.log(`  3. security - 12 security skills (Differential HTTP probing, OWASP, Trail of Bits)`);
     console.log(`  4. design   - 14 frontend skills (Taste, GSAP motion, Brandkit, Tokens)`);
@@ -1969,6 +2078,8 @@ async function main() {
 
   console.log(`\n${colors.bold}${colors.cyan}=== Executing Heimdall Installation ===${colors.reset}`);
   console.log(`Profile:   ${colors.bold}${selectedProfile.name}${colors.reset} (${options.profile})`);
+
+  await convergeModelAwareArtifacts(options, detected);
   console.log(`Mode:      ${options.link ? colors.cyan + 'Live Junctions (Single Source of Truth)' + colors.reset : 'Physical Copies'}`);
   console.log(`Cleanup:   ${options.clean ? colors.yellow + 'Wiping legacy skills before install' + colors.reset : 'Incremental update'}`);
   console.log(`Targets:   ${options.agents.join(', ')}`);

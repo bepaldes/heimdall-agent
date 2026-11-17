@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#10-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-10%20predefined-orange.svg?style=flat-square" alt="Agents: 10 Predefined" /></a>
-  <a href="#skill-inventory-67-modules-across-28-toolkits"><img src="https://img.shields.io/badge/skills-28%20toolkits%20%2867%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 28 Toolkits (67 Modules)" /></a>
+  <a href="#skill-inventory-69-modules-across-30-toolkits"><img src="https://img.shields.io/badge/skills-30%20toolkits%20%2869%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 30 Toolkits (69 Modules)" /></a>
   <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Language / Idioma:** **English** | [Português (Brasil)](README.pt-BR.md)
 
-Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **67 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **69 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
 
 ---
 
@@ -31,10 +31,10 @@ Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent so
 <a id="1-what-is-heimdall"></a>
 ## 1. What is Heimdall?
 
-**Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. 
+**Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. More than a skill aggregator, it installs a complete, opinionated **way of working and coding**—combining structured communication, empirical verification, surgical code restraint, and runtime safety hooks into a deterministic, verified engineering environment.
 
 Instead of manually maintaining scattered custom instructions, system prompts, and configuration files across different AI clients, Heimdall provides a single source of truth:
-* **Modular Skills**: 67 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
+* **Modular Skills**: 69 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
 * **Specialized Agent Personas**: 10 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Universal Doctrine**: Central rules (`AGENTS.md`) synchronized across all harnesses, enforcing planning gates, test-driven development (TDD), and minimal surgical code edits.
 
@@ -56,16 +56,44 @@ Heimdall transforms unconstrained AI coding assistants into disciplined, multi-a
 5. **Adversarial Peer Review**: Dispatches context-blinded reviewers to inspect git diffs for edge cases, silent regressions, and unhandled failure branches.
 6. **Intercepts Dangerous Operations**: Evaluates shell commands and file mutations via lifecycle hooks to block destructive root wiping and force-pushes to protected branches.
 
+### The Heimdall Way of Working (Beyond a Skill Aggregator)
+
+Skills alone do not build reliable software—**engineering discipline does**. Heimdall bakes an end-to-end operating methodology directly into every session:
+
+1. **BLUF Communication Architecture (Bottom Line Up Front)** (`communication-doctrine`):
+   - Eliminates AI throat-clearing and buried conclusions. Every status report, implementation plan, code review verdict, and subagent handoff opens with the decision, verdict, and blast radius in the **first 1–2 sentences**.
+   - Standardized BLUF headers (`Subagent BLUF`, `Review Verdict`, `Plan BLUF`) let coordinators and human engineers parse outcomes in seconds.
+2. **ASD-STE100 Simplified Technical English**:
+   - Procedural steps use **active imperative verbs first** (`Create`, `Modify`, `Assert`, `Verify`, `Run`), strict sentence limits (**≤ 20 words per step**), and explicit object naming (no ambiguous pronouns like *"it"* or *"this"*).
+   - Enforces a **Zero-Vagueness Lexicon** that bans subjective qualifiers (*"ensure"*, *"properly"*, *"appropriately"*, *"gracefully"*, *"as needed"*, *"robustly"*, *"etc."*)—replacing them with exact, testable conditions.
+3. **Poteto (`pstack` / `brainmaxxing`) & High-Rigor Craftsmanship**:
+   - **`pstack-discipline`** (from Lauren Tan / `@poteto`): Enforces *"Prove It Works"* (empirical proof before claiming done), *"Fix Root Causes"* (no symptom-masking guards), *"Test Behavior, Not Implementation"*, *"Subtract Before You Add"*, and *"Sequence Work into Verifiable Units"*.
+   - **`ruminate`** (inspired by `poteto/brainmaxxing`): Mines historical Claude and Gemini session transcripts for user corrections, repeated instructions, skill trigger failures, and doctrine drift—turning past friction into permanent memory files and skill amendments.
+   - Paired with **`thermo`** ("Code Judo" maintainability audits), **`karpathy-guidelines`** (minimal surgical edits), **`clean-code`** (`ub-mode`), **`ponytail`** (Dietrich Gebert's Decision Ladder), and **`modern-web-guidance`** (`GoogleChrome/modern-web-guidance`).
+4. **Self-Healing Sessions & Context Continuity (`ruminate` + `handoff` + Context Sentinel)**:
+   - Heimdall learns from its own history: rules in `handoff` (auto-handoff on coherence degradation) and `writing-plans` (spec-coverage completeness gate) were extracted directly from **187 historical sessions via `/ruminate`**.
+   - During active sessions, the **Context Sentinel** ([`hooks/heimdall-hook.cjs`](hooks/heimdall-hook.cjs)) tracks turns and estimated token usage against the active model's window (warning at 75% or 40 turns) so `handoff` can persist clean state before context rot sets in.
+5. **Dynamic Cross-Family Model Routing (`lib/model-router.cjs` + `heimdall sync-models`)**:
+   - Personas use `model: inherit` with zero vendor lock-in. `heimdall sync-models` and [`lib/model-router.cjs`](lib/model-router.cjs) dynamically classify model capabilities, map personas to capability tiers (`deep_reasoning`, `surgical_restraint`, `adversarial_diff_eval`), and select **cross-family reviewers** (e.g., Gemini audited by Claude, Codex, GLM, Hunyuan, or MiMo).
+6. **Token, Ceremony & Diff Restraint (`progressive-disclosure` + `caveman` + `ponytail`)**:
+   - `progressive-disclosure` loads skills on demand to cut prompt overhead, `caveman` strips conversational ceremony, and `ponytail` (*Lazy Senior Dev Mode*, `lite` / `full` / `ultra`) enforces the smallest complete diff and a concise reply a busy engineer understands in one read.
+7. **Matt Pocock Real Engineering Pipeline ([`mattpocock/skills`](https://github.com/mattpocock/skills)) & Karpathy 4 Pillars (`karpathy-guidelines`)**:
+   - **Pre-code → Architecture → Tickets**: `grill-me` (Design Tree Frontier) → `wayfinder` (settled vs. frontier vs. fog) → `domain-modeling` (`GLOSSARY.md` & ADRs) → `to-spec` (invariants) → `to-tickets` (tracer-bullet tickets) → `codebase-design` / `improve-codebase-architecture` (deep modules) → `handoff`.
+   - **Karpathy 4 Pillars**: *Think Before Coding* (surface assumptions), *Simplicity First* (no speculative helpers), *Surgical Changes* (touch only task lines), and *Goal-Driven Execution* (verifiable pass criteria first), backed by the 800-line `PreToolUse (Write)` hook.
+8. **Controlled Upstream Skill Sync (`upstream-skill-sync`)**:
+   - Classifies every skill in `config/skills.json` as `mirror`, `adapted`, or `native` and triages upstream changes into **Tier 1 (Safe 1:1)**, **Tier 2 (Selective Merge)**, or **Tier 3 (Reject)** after `snyk-agent-scan` security checks.
+
 ### Comparison: Vanilla AI Coding vs. Heimdall
 
 | Area | Vanilla AI Coding | With Heimdall |
 | :--- | :--- | :--- |
 | **Initial Prompt** | AI immediately generates 300 lines of unverified code. | **Interactive Gate**: AI pauses, interrogates edge cases, and presents 2 architectural options. |
-| **Code Review** | AI rubber-stamps its own code with conversational praise. | **Context-Blinded Review**: Stateless reviewer inspects diffs without conversational bias. |
-| **Code Restraint** | Bloated wrappers, defensive boilerplate, speculative options. | **Karpathy Simplicity**: Minimum code, surgical edits, zero unprompted refactoring. |
-| **Verification** | AI claims "done!" without testing or relies on shallow checks. | **TDD & Playwright**: Failing test first; active browser DOM assertions for UI. |
-| **Safety** | AI can execute destructive commands or force push to main. | **Lifecycle Hooks**: Blocks `rm -rf /` and force pushes to `main`/`master` at runtime and Git level. |
-| **Configuration** | Scattered, drifting prompt files across multiple tools. | **Single Source of Truth**: Linked via native junctions/symlinks in 1 second. |
+| **Communication** | Verbose prose, buried verdicts, and vague *"ensure it works properly"* steps. | **BLUF + ASD-STE100**: Verdict in lines 1–2; imperative, ≤20-word testable steps. |
+| **Code Review** | AI rubber-stamps its own code with conversational praise. | **Context-Blinded Review**: Stateless Goldfish reviewer inspects diffs without conversational bias. |
+| **Code Restraint** | Bloated wrappers, defensive boilerplate, speculative options. | **Karpathy & `pstack` Discipline**: Subtract before adding, fix root causes, surgical edits only. |
+| **Verification** | AI claims "done!" without testing or relies on shallow checks. | **TDD & Playwright**: Failing test first; empirical proof via tests and browser DOM assertions. |
+| **Safety** | AI can launch hanging dev servers, run `rm -rf`, or force push `main`. | **Lifecycle Hooks**: Blocks dev servers, destructive commands, secrets, and force pushes at runtime and Git level. |
+| **Configuration** | Scattered, drifting prompt files across multiple tools. | **Single Source of Truth**: Linked via native junctions/symlinks in 1 second; self-audited via `ruminate`. |
 
 [↑ Back to top](#table-of-contents)
 
@@ -82,7 +110,7 @@ When Heimdall bootstraps, it establishes live junctions (Windows) or symlinks (P
 
 | Source in Heimdall | Deployed Location | Purpose |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<tool>/skills/` | 67 domain toolkits loaded progressively on demand. |
+| `skills/` | `~/.<tool>/skills/` | 69 domain toolkits loaded progressively on demand. |
 | `agents/` | `~/.<tool>/agents/` | 10 specialized agent persona definitions. |
 | `hooks/` | `~/.claude/hooks/` | Event-driven lifecycle hooks for Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (optional) | Universal native Git pre-push hook for all tools. |
@@ -107,18 +135,20 @@ Heimdall adopts the core division of labor from [`google/elephant-goldfish-model
 
 ### 3. Event-Driven Lifecycle Hooks
 
-Heimdall includes zero-dependency runtime hooks ([`hooks/heimdall-hook.cjs`](hooks/heimdall-hook.cjs)) registered in `~/.claude/settings.json`:
+Heimdall includes zero-dependency runtime hooks ([`hooks/heimdall-hook.cjs`](hooks/heimdall-hook.cjs)) declared in [`hooks/hooks.json`](hooks/hooks.json) and registered in `~/.claude/settings.json`:
 
+* **`UserPromptSubmit`**:
+  - **Communication Doctrine Injection**: Reinforces BLUF (conclusion in first 1–2 sentences) and ASD-STE100 rules (imperative verb first, ≤20 words/step, zero banned qualifiers) on every prompt.
 * **`PreToolUse` (Bash/PowerShell)**:
   - **Blocks Destructive Commands**: Halts operations like `rm -rf /` or `rmdir /s /q C:\` (exit code 2).
+  - **Strict Zero Dev-Server Policy**: Blocks hanging dev server commands (`npm run dev`, `vite`, `next dev`, `uvicorn`, `python manage.py runserver`) and enforces non-interactive terminating checks.
   - **Branch-Aware Force Push Protection**: Blocks `git push --force` targeting `main`, `master`, `release`, or `production` (explicitly or while checked out on those branches). Force pushes to feature branches (`feature/*`, `bugfix/*`) are permitted with an advisory.
   - **Blocks Secret Commits**: Halts staging unencrypted `.env`, `id_rsa`, or `*.pem` files.
+  - **Context Sentinel**: Tracks session turns and estimated token usage against the active model's context limit, warning at 75% capacity or 40 turns.
 * **`PreToolUse` (Write)**:
-  - **Karpathy Restraint Warning**: Emits an advisory if an AI attempts to generate a single file exceeding 800 lines.
-* **`PostToolUse` (Edit/Write)**:
-  - **Verification Reminder**: Emits a reminder to run automated tests or browser verification before concluding.
+  - **Karpathy Restraint Warning**: Emits an advisory if an AI attempts to generate a single file exceeding 800 lines (exempting HTML/SVG/OpenDesign canvas artifacts) and updates Context Sentinel tracking.
 * **`PreCompact`**:
-  - **Compaction State Reminder**: Reminds the agent to persist unresolved decisions and active task ledgers to disk before context compression.
+  - **Compaction State Reset & Reminder**: Clears temporary session tracking state and reminds the agent to persist active tasks, rulings, and pending ledger items to disk before context compression.
 * **Universal Native Git Pre-Push Hook** ([`hooks/git/pre-push`](hooks/git/pre-push)):
   - Shell hook installable into any repository (`.git/hooks/pre-push`) that blocks non-fast-forward pushes to `main`/`master` universally across all AI harnesses and terminal users.
 
@@ -152,10 +182,10 @@ Select a profile tier based on your machine and workflow needs:
 
 | Profile | Skills | Predefined Agents | Description | Best For |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Default)* | 67 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
+| **`full`** *(Default)* | 69 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
 | **`minimal`** | 16 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Lightweight laptops, smaller context windows |
 | **`security`** | 12 | 4 | AppSec suite: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Penetration testing & pre-deployment audits |
-| **`design`** | 12 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
+| **`design`** | 13 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
 
 To deploy a specific profile:
 ```powershell
@@ -179,7 +209,7 @@ Heimdall automatically discovers and configures installed AI tools:
 
 ### MCP Server Architecture
 
-Heimdall manages Model Context Protocol (MCP) servers through a **template-based resolver** that eliminates Windows `npx` process multiplication and ensures consistent configuration across all installed harnesses.
+Heimdall manages Model Context Protocol (MCP) servers through a **template-based resolver** that eliminates Windows `npx` process multiplication and keeps configuration consistent across all installed harnesses.
 
 #### How It Works
 
@@ -324,28 +354,28 @@ All personas declare `model: inherit` to run on whichever active model or vendor
 
 | Persona | Capability Tier | Role & Responsibilities | Bound Skills |
 | :--- | :--- | :--- | :--- |
-| **`orchestrator`** | `deep_reasoning` | Planning gatekeeper (`/grill-me`), requirements interrogation, modular task decomposition, Playwright E2E verification enforcement, and subagent coordination. | `grill-me`, `brainstorming`, `writing-plans`, `to-spec`, `to-tickets`, `wayfinder`, `domain-modeling`, `handoff`, `pstack-discipline`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills`, `executing-plans`, `herdr` |
-| **`frontend-designer`** | `high_polish_vision` | Enforces design read, typography hierarchy, token mappings, and anti-slop UI aesthetics for web surfaces. | `taste-skill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill` |
+| **`orchestrator`** | `deep_reasoning` | Planning gatekeeper (`/grill-me`), requirements interrogation, modular task decomposition, Playwright E2E verification enforcement, and subagent coordination. | `grill-me`, `brainstorming`, `writing-plans`, `to-spec`, `to-tickets`, `wayfinder`, `domain-modeling`, `handoff`, `pstack-discipline`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-skills`, `executing-plans`, `herdr`, `upstream-skill-sync` |
+| **`frontend-designer`** | `high_polish_vision` | Enforces design read, typography hierarchy, token mappings, and anti-slop UI aesthetics for web surfaces. | `taste-skill`, `brandkit`, `minimalist-skill`, `brutalist-skill`, `soft-skill`, `antislop-ui`, `antislop-human`, `stitch-skill`, `image-to-code-skill`, `imagegen-frontend-web`, `redesign-skill`, `modern-web-guidance` |
 | **`mobile-designer`** | `responsive_flex_safety` | Mobile viewport safety (320px–430px), 48px touch targets, zero-clipping overflow flex containers, and responsive assets. | `antislop-layoutmobile`, `antislop-human`, `antislop-ui`, `imagegen-frontend-mobile`, `taste-skill` |
 | **`tester`** | `fast_verification` | Enforces strict Test-Driven Development (TDD) and browser verification (Playwright). Rejects pseudo-verification (`curl`, `grep`, `tsc`). | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `executing-plans` |
 | **`security-auditor`** | `deep_assurance_audit` | Dynamic differential HTTP probing across auth levels, OWASP Top 10 defenses, and Trail of Bits insecure defaults detection. | `strix-security`, `security-audit-sweep`, `owasp-security`, `cloudflare-security-audit`, `snyk-agent-scan`, `trailofbits-audit-context`, `trailofbits-insecure-defaults`, `trailofbits-triage-brocards` |
 | **`database-architect`** | `schema_migration_safety` | Governs non-destructive migrations, normalization, query plan audits (`EXPLAIN ANALYZE`), and connection pooling (Postgres/Supabase, SQLite, MySQL). | `postgres-best-practices`, `systematic-debugging`, `karpathy-guidelines` |
-| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments, purges defensive dead code, enforces deep modules, and applies anti-slop standards. | `karpathy-guidelines`, `clean-code`, `codebase-design`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
+| **`code-sentinel`** | `surgical_restraint` | Karpathy simplicity: writes minimal surgical code, strips boilerplate comments, purges defensive dead code, enforces deep modules, and applies anti-slop standards. | `communication-doctrine`, `karpathy-guidelines`, `clean-code`, `codebase-design`, `ponytail`, `antislop`, `antislop-code`, `antislop-copywriting`, `antislop-human`, `finishing-a-development-branch` |
 | **`reviewer`** | `adversarial_diff_eval` | Performs adversarial diff analysis, audits module depth and leaky abstractions, catches silent regressions, executes thermo maintainability reviews, and coordinates cross-model validation reviews. | `communication-doctrine`, `thermo`, `codebase-design`, `requesting-code-review`, `receiving-code-review`, `claude-collaborator`, `gemini-collaborator`, `codex-collaborator`, `using-superpowers`, `diagnosing-superpowers`, `output-skill` |
-| **`modernizer`** | `legacy_migration_safety` | Executes legacy codebase transformations, runtime upgrades, dependency uncoupling, and Strangler Fig migrations guarded by Golden Master characterization tests. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `improve-codebase-architecture`, `codebase-design`, `karpathy-guidelines`, `project-hygiene`, `output-skill` |
+| **`modernizer`** | `legacy_migration_safety` | Executes legacy codebase transformations, runtime upgrades, dependency uncoupling, and Strangler Fig migrations guarded by Golden Master characterization tests. | `test-driven-development`, `verification-before-completion`, `systematic-debugging`, `improve-codebase-architecture`, `codebase-design`, `karpathy-guidelines`, `project-hygiene`, `output-skill`, `modern-web-guidance`, `upstream-skill-sync` |
 | **`cloud-engineer`** | `infra_container_safety` | Governs containerization (Docker, Compose), Kubernetes manifests, Infrastructure as Code (Terraform), reverse proxies (Caddy, Nginx), CI/CD automation, and terminating verification. | `communication-doctrine`, `karpathy-guidelines`, `clean-code`, `systematic-debugging`, `project-hygiene`, `progressive-disclosure` |
 
 ---
 
-<a id="skill-inventory-67-modules-across-28-toolkits"></a>
-### Skill Inventory (67 Modules Across 28 Toolkits)
+<a id="skill-inventory-69-modules-across-30-toolkits"></a>
+### Skill Inventory (69 Modules Across 30 Toolkits)
 
-Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** and **22 Standalone Toolkits (22 modules)**:
+Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** and **24 Standalone Toolkits (24 modules)**:
 
 #### Core Multi-Skill Suites (6 Suites / 45 Modules)
 
 <details open>
-<summary><b>1. Superpowers Engineering Suite (15 modules) — Jesse Vincent / obra</b></summary>
+<summary><b>1. Superpowers Engineering Suite (15 modules) — <a href="https://github.com/obra/superpowers">obra/superpowers</a></b></summary>
 
 - `brainstorming`: Surfaces implicit assumptions and explores alternatives before design lock.
 - `writing-plans`: Structures modular, bite-sized tasks with verifiable completion criteria.
@@ -366,7 +396,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 </details>
 
 <details>
-<summary><b>2. Taste Design & Aesthetic Studio (10 modules)</b></summary>
+<summary><b>2. Taste Design & Aesthetic Studio (10 modules) — <a href="https://github.com/Leonxlnx/taste-skill">Leonxlnx/taste-skill</a></b></summary>
 
 - `taste-skill`: Enforces cohesive design reads, purpose-driven typography, and brand-first color logic.
 - `brandkit`: Manages design tokens, invariant brand assets, and multi-palette themes.
@@ -382,7 +412,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 </details>
 
 <details>
-<summary><b>3. Anti-Slop Quality Suite (6 modules) — Jesse Vincent / obra</b></summary>
+<summary><b>3. Anti-Slop Quality Suite (6 modules) — <a href="https://github.com/miqdadbadjuber/anti-slop">miqdadbadjuber/anti-slop</a></b></summary>
 
 - `antislop`: Core guardrail prohibiting generic AI filler, fake buzzwords, and decorative bloat.
 - `antislop-code`: Prohibits redundant comments, defensive dead code, and speculative abstractions.
@@ -403,7 +433,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 </details>
 
 <details>
-<summary><b>5. Trail of Bits High-Assurance AppSec Suite (3 modules) — Trail of Bits</b></summary>
+<summary><b>5. Trail of Bits High-Assurance AppSec Suite (3 modules) — <a href="https://github.com/trailofbits/skills">trailofbits/skills</a></b></summary>
 
 - `trailofbits-audit-context`: High-assurance code assumption, guarantee, and architectural dependency mapping.
 - `trailofbits-insecure-defaults`: Detection of insecure default configurations, fail-open patterns, and permissive access.
@@ -411,7 +441,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 
 </details>
 
-#### Standalone Toolkits (22 Curated Toolkits / 22 Modules)
+#### Standalone Toolkits (24 Curated Toolkits / 24 Modules)
 
 <details open>
 <summary><b>Browse Standalone Toolkits</b></summary>
@@ -439,6 +469,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 - **`modern-web-guidance`**: Google Chrome's official modern web platform skill pack (`GoogleChrome/modern-web-guidance`). Steers agents toward Baseline-safe native HTML/CSS/JS APIs, Core Web Vitals (LCP/INP/CLS) best practices, and `legacy-scan` frontend modernization.
 - **`mcp-cleanup`**: Kills orphaned MCP server processes left behind by crashed or closed agent sessions.
 - **`mcp-sync`**: Resolves the Heimdall MCP template to local paths and syncs across installed agent harnesses.
+- **`upstream-skill-sync`**: Audits upstream skill repositories in `config/skills.json` and classifies updates into Safe 1:1, Selective Merge, or Reject.
 
 </details>
 

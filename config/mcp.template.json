@@ -1,0 +1,85 @@
+{
+  "version": "2.0.0",
+  "description": "Heimdall MCP Server Registry Template — Portable definitions with resolve hints. Run scripts/resolve-mcp.mjs to generate mcp.resolved.json for your machine.",
+  "mcpServers": {
+    "open-design": {
+      "name": "OpenDesign MCP",
+      "category": "design",
+      "description": "Direct bridge to OpenDesign canvas, styles, components, and project context for coding agents.",
+      "disabled": false,
+      "autoDetect": {
+        "platform": "win32",
+        "appDataSubdir": "Open Design"
+      },
+      "config": {
+        "command": "{{OPEN_DESIGN_EXE}}",
+        "args": ["{{OPEN_DESIGN_DAEMON_CLI}}", "mcp"],
+        "env": {
+          "OD_DATA_DIR": "{{OPEN_DESIGN_DATA_DIR}}",
+          "OD_SIDECAR_CLIENT_ENDPOINT": "{{OPEN_DESIGN_PIPE}}",
+          "OD_MCP_BOOTSTRAP_COMMAND": "{{OPEN_DESIGN_BOOTSTRAP_EXE}}",
+          "OD_MCP_BOOTSTRAP_ARGS": "[\"--headless\"]",
+          "ELECTRON_RUN_AS_NODE": "1"
+        }
+      }
+    },
+    "context7": {
+      "name": "Context7 Documentation MCP",
+      "category": "documentation",
+      "description": "Up-to-date documentation and library query engine for AI coding assistants.",
+      "disabled": false,
+      "resolve": {
+        "type": "npm-global",
+        "package": "@upstash/context7-mcp",
+        "entrypoint": "dist/index.js"
+      },
+      "config": {
+        "command": "{{NODE_EXE}}",
+        "args": ["{{CONTEXT7_ENTRYPOINT}}"]
+      }
+    },
+    "rea": {
+      "name": "Reverse Engineer Anything (REA)",
+      "category": "reverse-engineering",
+      "description": "Native, managed, Electron/JS, firmware, and WebMCP binary inspection suite.",
+      "disabled": true,
+      "resolve": {
+        "type": "npm-global",
+        "package": "rea-agents",
+        "entrypoint": "scripts/rea.mjs"
+      },
+      "config": {
+        "command": "{{NODE_EXE}}",
+        "args": ["{{REA_ENTRYPOINT}}", "mcp"]
+      }
+    },
+    "chrome-devtools": {
+      "name": "Chrome DevTools MCP",
+      "category": "browser-inspection",
+      "description": "Browser automation, performance profiling, DOM snapshotting, and console monitoring.",
+      "disabled": true,
+      "resolve": {
+        "type": "npm-global",
+        "package": "chrome-devtools-mcp",
+        "entrypoint": "out/Default/gen/src/bin/chrome-devtools-mcp.js"
+      },
+      "config": {
+        "command": "{{NODE_EXE}}",
+        "args": [
+          "{{CHROME_DEVTOOLS_ENTRYPOINT}}",
+          "--executablePath",
+          "{{CHROME_EXE}}"
+        ]
+      }
+    },
+    "mobbin": {
+      "name": "Mobbin Design UI Patterns",
+      "category": "design-reference",
+      "description": "Curated real-world mobile and web application design patterns and flows.",
+      "disabled": false,
+      "config": {
+        "serverUrl": "https://api.mobbin.com/mcp"
+      }
+    }
+  }
+}

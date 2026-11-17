@@ -22,8 +22,8 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
       1. Persona: Identity, core expertise, and voice traits.
       2. Chronological Rules: Ordered lifecycle steps from initialization to handoff.
       3. Unmistakable Guardrails: Explicit negative constraints and non-negotiable "If X, do Y" boundaries.
-    - CANONICAL MODEL NAMES: Anthropic models are strictly 'claude-opus-5-5' (Opus 5.5) and 'claude-sonnet-5' (Sonnet 5). There is NO 'sonnet-5-5' or 'sonnet 5.5' (hallucination trap). Never emit, invoke, or allocate 'claude-sonnet-5-5'.
-    - COMMUNICATION DISCIPLINE (BLUF & STE): Communication must prioritize zero-latency triage and testable clarity (skills/communication-doctrine). All status reports, review verdicts, and plan overviews must lead with Bottom Line Up Front (BLUF). All procedural execution steps must follow Simplified Technical English (STE): active imperative verbs, <= 20 words per step, zero banned vague qualifiers ('ensure', 'properly', 'appropriately', 'as needed').
+    - DYNAMIC MODEL REGISTRY: Resolve authorized model IDs, context limits, and specializations dynamically from `config/models.json` and `playbooks/06-model-registry-matrix.md` (refreshed via `heimdall sync` / `heimdall sync-models`). Never invent unlisted model IDs; route tasks by capability tier across any live registered model family (Anthropic, Google, OpenAI, Zhipu/GLM, Tencent/Hunyuan, Xiaomi/MiMo, etc.).
+    - COMMUNICATION DISCIPLINE (BLUF & STE): Apply `skills/communication-doctrine` on EVERY response, status report, review verdict, and plan. Lead with Bottom Line Up Front (BLUF) in the first 1-2 sentences. Write all procedural execution steps in ASD-STE100 Simplified Technical English (STE): active imperative verbs, <= 20 words per step, zero banned vague qualifiers ('ensure', 'properly', 'appropriately', 'gracefully', 'as needed', 'etc.').
   </core_discipline>
 
   <planning_protocol>
@@ -39,7 +39,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
        - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `playbooks/`, `../playbooks/`, or `../heimdall-agent/playbooks/`).
        - PLAN STORAGE & LIFECYCLE: All plans MUST be created in `docs/designs/YYYY-MM-DD <plan name>.md`. Once implemented, verified, and confirmed working, the plan is moved to `docs/designs/old/YYYY-MM-DD <plan name>.md`.
        - The plan MUST specify:
-         a) Multi-Agent Orchestration & Model Allocation Matrix (allocating tasks across Claude, Gemini, and Codex from `06-model-registry-matrix.md` in the same playbooks directory).
+         a) Multi-Agent Orchestration & Model Allocation Matrix (allocating tasks by capability tier across available model families in `06-model-registry-matrix.md` / `config/models.json` — including Claude, Gemini, Codex/GPT, GLM, Hunyuan, MiMo, and newly synced GhostCLI models).
          b) Symmetric Cross-Model Validation Loop (`herdr agent prompt`) and Non-Interactive Verification Harness.
          c) Orchestrator Heartbeat (cadence for monitoring task progress and liveness).
          d) Verification Harness (Non-interactive terminating test suites, static builds, and linters. Playwright E2E strictly against pre-existing human-managed servers or static build previews. NEVER include steps to start a dev server).

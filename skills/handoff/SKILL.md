@@ -9,6 +9,19 @@ When ending a session, switching agent contexts, or spawning a fresh child agent
 
 ---
 
+## 0. Auto-Trigger on Coherence Degradation (MANDATORY)
+
+Invoke this skill **proactively** — without waiting for an explicit user request — when you detect any of the following signals in your own output:
+- Contradictory statements within the same turn or across recent turns
+- Lost task thread: unable to state the current objective without re-reading prior context
+- Repeated self-corrections (3+ corrections to your own output in a single turn)
+- Hallucinated state that contradicts prior tool results or file contents
+- User has said "loop", "stuck", "drip", "hallucinating", or requested a fresh start
+
+When auto-triggered, announce: "Detected coherence degradation. Invoking handoff protocol to preserve context." Then execute the full protocol below. Do NOT continue working after detecting these signals. Extracted from 187 sessions via `/ruminate`.
+
+---
+
 ## 1. Zero-Duplication & Pointer-First Principle
 
 Do **not** dump raw source code, large file bodies, verbose conversational histories, or full plan duplicates into the handoff artifact.
