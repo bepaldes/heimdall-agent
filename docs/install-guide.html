@@ -544,11 +544,11 @@
         </div>
         <div class="meta-item">
           <span>Configurator</span>
-          <strong>GC-Helper (GhostCLI)</strong>
+          <strong>GC-Helper (Optional GhostCLI)</strong>
         </div>
         <div class="meta-item">
-          <span>Skills &amp; IDE</span>
-          <strong>Heimdall &amp; Herdr-App</strong>
+          <span>Workspace &amp; Skills</span>
+          <strong>Herdr &amp; Heimdall</strong>
         </div>
       </div>
     </header>
@@ -561,11 +561,11 @@
       </a>
       <a class="nav-card" href="#step-2">
         <span class="nav-num">STEP 02</span>
-        <span class="nav-title">GC-Helper Setup</span>
+        <span class="nav-title">GC-Helper (Optional)</span>
       </a>
       <a class="nav-card" href="#step-3">
         <span class="nav-num">STEP 03</span>
-        <span class="nav-title">Herdr-App IDE</span>
+        <span class="nav-title">Herdr Workspace</span>
       </a>
       <a class="nav-card" href="#step-4">
         <span class="nav-num">STEP 04</span>
@@ -634,7 +634,16 @@ npm install -g @openai/codex</code></pre>
     <section id="step-2">
       <div class="step-head">
         <span class="step-num">02</span>
-        <h2>GC-Helper Configuration</h2>
+        <h2>GC-Helper Configuration (Optional — GhostCLI High-Reasoning Proxy)</h2>
+      </div>
+
+      <div class="panel panel-accent">
+        <div class="panel-head">&#9432; Optional Step — When to Configure vs When to Skip</div>
+        <p>
+          <strong>Skip this step if:</strong> You use official Claude Code or OpenAI Codex accounts directly! Both CLI harnesses default to their official authentication (Claude Code opens browser OAuth at <code>claude.ai</code>; Codex prompts for your OpenAI login or <code>OPENAI_API_KEY</code>). If you do not plan to use GhostCLI, you can safely <strong>skip straight to Step 3</strong>.
+          <br /><br />
+          <strong>Use this step only if:</strong> You want to route Claude Code and Codex through <strong>GhostCLI</strong> (<code>https://ghostcli.cloud</code>) for high-reasoning models (Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, GLM 5.3) with 1M context windows.
+        </p>
       </div>
 
       <p>
@@ -694,43 +703,83 @@ gc status</code></pre>
     <section id="step-3">
       <div class="step-head">
         <span class="step-num">03</span>
-        <h2>Herdr-App (Terminal Multiplexer &amp; Native IDE)</h2>
+        <h2>Herdr Multi-Agent Workspace (Choose: Herdr-App vs Herdr CLI)</h2>
       </div>
 
       <p>
-        <strong>Install Herdr-App now</strong> before configuring Heimdall. 
-        Herdr-App is a GPU-accelerated desktop application (built in Rust with GPUI and libghostty) designed for managing multiple AI agents side-by-side in persistent spaces, tabs, and split panes.
+        <strong>Install Herdr now</strong> before configuring Heimdall. 
+        Herdr manages persistent sessions, background daemons, and multi-agent split cockpits (authoring agents on the left, peer reviewers on the right). 
+        You can choose either the <strong>desktop GUI app (Herdr-App)</strong> or the <strong>lightweight terminal multiplexer (Herdr CLI)</strong>.
       </p>
 
       <div class="panel panel-green">
-        <div class="panel-head">&#10004; Why Install Herdr-App First?</div>
+        <div class="panel-head">&#10004; Why Install Herdr First?</div>
         <p>
-          Installing Herdr-App first allows <strong>Heimdall (in Step 4)</strong> to auto-detect your Herdr installation. 
+          Installing Herdr first allows <strong>Heimdall (in Step 4)</strong> to auto-detect your installation. 
           Heimdall will automatically configure your shortcuts (enabling <code>Ctrl+V</code> for text paste, <code>Alt+V</code> / <code>Ctrl+Shift+V</code> for screenshot/image paste, enabling <code>Shift+Drag</code> highlight-to-copy, and activating the <code>Herdr-Roundup</code> layout) with zero manual JSON editing!
         </p>
       </div>
 
-      <h3>3.1 Install Herdr-App on Windows</h3>
+      <!-- Experience Chooser Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature / Experience</th>
+              <th>Option A: Herdr-App (Desktop IDE)</th>
+              <th>Option B: Herdr CLI (herdr.exe)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Experience Style</strong></td>
+              <td>Visual desktop window with sidebar and tabs</td>
+              <td>Terminal-native multiplexer in your existing shell</td>
+            </tr>
+            <tr>
+              <td><strong>Best Suited For</strong></td>
+              <td>Users who want a visual cockpit &amp; mouse navigation</td>
+              <td>Terminal purists who love Windows Terminal / PowerShell</td>
+            </tr>
+            <tr>
+              <td><strong>Resource Footprint</strong></td>
+              <td>GPU-accelerated desktop app (GPUI + libghostty)</td>
+              <td>Ultra-lightweight single binary (~15MB RAM)</td>
+            </tr>
+            <tr>
+              <td><strong>Agent Tracking</strong></td>
+              <td>Visual sidebar badges (<code>working</code>, <code>blocked</code>, <code>idle</code>)</td>
+              <td>Terminal statusline &amp; CLI query commands</td>
+            </tr>
+            <tr>
+              <td><strong>"Less Scary" Factor</strong></td>
+              <td>Friendly GUI window (feels like VS Code / Cursor)</td>
+              <td>Familiar terminal window (zero extra app windows)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- OPTION A: Herdr-App -->
+      <h3>3.1 Option A: Herdr-App (GPU Desktop IDE)</h3>
+      <p>Install the desktop application with native window chrome and spaces sidebar:</p>
       <div class="terminal">
-        <div class="terminal-top"><span>Install Herdr-App</span><span>PowerShell</span></div>
+        <div class="terminal-top"><span>Install Herdr-App (Desktop)</span><span>PowerShell</span></div>
         <pre><code>irm https://releases.herdr.dev/app/install.ps1 | iex</code></pre>
       </div>
 
       <div class="panel panel-accent">
-        <div class="panel-head">&#9432; macOS &amp; Linux Compatibility</div>
+        <div class="panel-head">&#9432; macOS &amp; Linux (Herdr-App)</div>
         <p>
-          Herdr-App is fully cross-platform:
-          <br />
           &bull; <strong>macOS:</strong> <code>brew install --cask herdr-app</code> or <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code>
           <br />
           &bull; <strong>Linux:</strong> <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code> (requires desktop session + Vulkan)
         </p>
       </div>
 
-      <h3>3.2 Launch Herdr-App</h3>
-      <p>Launch the app once to initialize your profile (from Start Menu or CLI):</p>
+      <p>Launch Herdr-App to initialize your profile:</p>
       <div class="terminal">
-        <div class="terminal-top"><span>Launch</span><span>CLI</span></div>
+        <div class="terminal-top"><span>Launch Herdr-App</span><span>CLI</span></div>
         <pre><code>herdr-app</code></pre>
       </div>
 
@@ -741,14 +790,14 @@ gc status</code></pre>
             <span class="window-dot yellow"></span>
             <span class="window-dot green"></span>
           </div>
-          <span>Herdr-App — Multi-Agent Engineering Cockpit (Live GPU Session)</span>
+          <span>Herdr-App — Multi-Agent Engineering Cockpit (Live GPU Desktop Session)</span>
         </div>
         <div class="screenshot-frame">
           <img src="assets/herdr-app-cockpit.png" alt="Herdr-App Multi-Agent Cockpit with split panes and real-time agent tracking" loading="lazy" />
         </div>
         <div class="screenshot-caption">
-          <span><strong>Cockpit View:</strong> Simultaneous multi-model split panes, persistent spaces, and background daemon tracking</span>
-          <span class="badge-tag">GPU-Accelerated &bull; GPUI + libghostty</span>
+          <span><strong>Herdr-App Cockpit:</strong> Simultaneous multi-model split panes, persistent spaces sidebar, and agent state tracking</span>
+          <span class="badge-tag">GPU Desktop IDE &bull; GPUI + libghostty</span>
         </div>
       </div>
 
@@ -767,10 +816,67 @@ gc status</code></pre>
         </div>
       </div>
 
+      <!-- OPTION B: Herdr CLI -->
+      <h3>3.2 Option B: Herdr CLI (Lightweight Terminal Multiplexer)</h3>
+      <p>Prefer staying in Windows Terminal, PowerShell, or macOS Terminal without opening a separate desktop application? Install the single-binary Herdr CLI:</p>
+      <div class="terminal">
+        <div class="terminal-top"><span>Install Herdr CLI (herdr.exe)</span><span>PowerShell</span></div>
+        <pre><code>irm https://releases.herdr.dev/install.ps1 | iex</code></pre>
+      </div>
+
+      <div class="panel panel-accent">
+        <div class="panel-head">&#9432; macOS, Linux &amp; Cargo (Herdr CLI)</div>
+        <p>
+          &bull; <strong>macOS / Linux:</strong> <code>curl -fsSL https://releases.herdr.dev/install.sh | sh</code>
+          <br />
+          &bull; <strong>Rust / Cargo:</strong> <code>cargo install herdr</code>
+        </p>
+      </div>
+
+      <p>Launch the multiplexer inside your current terminal:</p>
+      <div class="terminal">
+        <div class="terminal-top"><span>Launch Herdr CLI</span><span>CLI</span></div>
+        <pre><code>herdr</code></pre>
+      </div>
+
+      <div class="screenshot-card">
+        <div class="screenshot-header">
+          <div class="window-dots">
+            <span class="window-dot red"></span>
+            <span class="window-dot yellow"></span>
+            <span class="window-dot green"></span>
+          </div>
+          <span>Herdr CLI (herdr.exe) — Multi-Agent Multiplexer in Windows Terminal</span>
+        </div>
+        <div class="screenshot-frame">
+          <img src="assets/herdr-cli-cockpit.png" alt="Herdr CLI running in Windows Terminal with split panes for authoring and peer review" loading="lazy" />
+        </div>
+        <div class="screenshot-caption">
+          <span><strong>Herdr CLI Cockpit:</strong> Terminal-native split panes, ephemeral peer review panel, and statusline in Windows Terminal</span>
+          <span class="badge-tag">Terminal Native &bull; ~15MB RAM</span>
+        </div>
+      </div>
+
+      <div class="callout-grid">
+        <div class="callout-card">
+          <h4><span>&#128187;</span> Native Shell Integration</h4>
+          <p>Runs directly inside Windows Terminal, PowerShell, or iTerm2 without spawning separate desktop windows.</p>
+        </div>
+        <div class="callout-card">
+          <h4><span>&#128065;&#65039;</span> Ephemeral Peer Reviews</h4>
+          <p>Heimdall splits a side pane for peer review (<code>herdr pane split</code>), streams verdicts, and closes the panel upon completion.</p>
+        </div>
+        <div class="callout-card">
+          <h4><span>&#9889;</span> Zero GUI Overhead</h4>
+          <p>Single lightweight binary with minimal memory footprint, ideal for remote SSH sessions, laptops, and terminal purists.</p>
+        </div>
+      </div>
+
+      <h3>3.3 Feature Summary Across Both Editions</h3>
       <ul class="checklist">
         <li>
           <span class="check-icon">&#10003;</span>
-          <div><strong>Spaces:</strong> Organizes repositories into isolated project workspaces.</div>
+          <div><strong>Spaces / Workspaces:</strong> Organizes repositories into isolated project environments.</div>
         </li>
         <li>
           <span class="check-icon">&#10003;</span>
@@ -778,11 +884,11 @@ gc status</code></pre>
         </li>
         <li>
           <span class="check-icon">&#10003;</span>
-          <div><strong>Agent Tracking:</strong> Real-time status in the sidebar (<code>working</code>, <code>blocked</code>, <code>idle</code>).</div>
+          <div><strong>Agent Tracking:</strong> Real-time status reporting (<code>working</code>, <code>blocked</code>, <code>idle</code>).</div>
         </li>
         <li>
           <span class="check-icon">&#10003;</span>
-          <div><strong>Persistent Sessions:</strong> Background daemon (<code>herdr-core</code>) keeps processes running even when the app window is closed.</div>
+          <div><strong>Persistent Sessions:</strong> Background daemon (<code>herdr-core</code>) keeps processes running continuously.</div>
         </li>
       </ul>
     </section>
@@ -978,32 +1084,32 @@ heimdall herdr</code></pre>
             <tr>
               <td><strong>Claude Code</strong></td>
               <td>CLI Tool</td>
-              <td>GhostCLI (<code>claude-opus-5-5</code>)</td>
+              <td>Official Anthropic OAuth (or GhostCLI)</td>
               <td>Autonomous coding &amp; subagent execution.</td>
             </tr>
             <tr>
               <td><strong>Codex CLI</strong></td>
               <td>CLI Tool</td>
-              <td>GhostCLI (<code>gpt-6-astra</code>)</td>
+              <td>Official OpenAI OAuth (or GhostCLI)</td>
               <td>Reasoning &amp; peer review validation.</td>
             </tr>
             <tr>
               <td><strong>GC-Helper</strong></td>
-              <td>CLI Tool</td>
+              <td>CLI Tool (Optional)</td>
               <td>GhostCLI Gateway</td>
-              <td>One-command config &amp; connection audits.</td>
+              <td>Optional proxy configuration for 1M context models.</td>
             </tr>
             <tr>
               <td><strong>Heimdall</strong></td>
               <td>Repo (git clone)</td>
               <td>Local Workspace</td>
-              <td>Skills, personas, and quality guardrails.</td>
+              <td>Skills, personas, HUD statusline, and quality guardrails.</td>
             </tr>
             <tr>
-              <td><strong>Herdr-App</strong></td>
-              <td>Native IDE</td>
-              <td>Rust / GPUI</td>
-              <td>Multi-pane terminal cockpit &amp; agent manager.</td>
+              <td><strong>Herdr (App or CLI)</strong></td>
+              <td>Desktop IDE or Terminal Multiplexer</td>
+              <td>Rust / GPUI or Native Shell</td>
+              <td>Multi-pane agent cockpit &amp; persistent workspaces.</td>
             </tr>
           </tbody>
         </table>
