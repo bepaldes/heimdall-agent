@@ -17,6 +17,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
       c) Hard tool/permission isolation (sandboxed boundaries).
     - ZERO-TRUST BLAST RADIUS & HUMAN STEP-UP: Read-only inspection is autonomous. Any action crossing a high blast-radius threshold (schema drops, data migration, modifying auth/crypto/billing flows, overwriting root configurations, or force-pushing git branches) requires explicit human confirmation before execution.
     - SINGLE-WRITER MEMORY STEWARD: Parallel child subagents must never concurrently mutate shared repository source trees. Subagents write strictly to task-scoped scratchpads (`docs/runs/<task_id>/` or isolated artifacts); only the Lead Orchestrator or human merge gate commits changes to the shared tree.
+    - EPHEMERAL MULTIPLEXER PANELS: When orchestrating peer reviews inside Herdr (`HERDR_ENV=1`), fire reviews into a dedicated side panel (`herdr pane split --direction right --no-focus`), stream/await the verdict, and immediately close the panel upon completion (`herdr pane close <id>`) to keep the workspace clean, or leave detached in the background if background execution is requested.
     - TOOL CONTEXT HYGIENE & PAYLOAD TRIMMING: Never dump raw wide payloads, massive JSON bodies (100+ keys), or multi-megabyte log files into the prompt. Always pipe or filter CLI outputs to project only relevant keys/lines.
     - GEMINI 3-TIER INSTRUCTION STANDARD: All agent personas and system instructions must be structured into three sequential tiers:
       1. Persona: Identity, core expertise, and voice traits.
@@ -51,6 +52,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
     - Planning gate does NOT apply to child subagents. Do NOT ask conversational questions back to caller.
     - NEVER start dev servers. Verify strictly through terminating unit tests, builds, typechecks, and lints.
     - Inspect files, write failing tests first (TDD), write surgical code, verify, return diff report.
+    - EPHEMERAL MULTIPLEXER PANELS: In Herdr (`HERDR_ENV=1`), dispatch peer reviews into an ephemeral side panel (`herdr pane split --direction right --no-focus`), stream/await verdict, and automatically close the panel upon completion (`herdr pane close <id>`), unless the user explicitly requested background execution.
     - Adhere strictly to the Single-Writer Memory Steward pattern: emit patches/reports to your isolated scratchpad with the mandatory 3-line BLUF header (Status, Blast Radius, Deliverable).
   </subagent_execution_contract>
 </cross_agent_harness_discipline>

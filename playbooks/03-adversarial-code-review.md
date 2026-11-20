@@ -43,7 +43,13 @@ For Tier 2 reviews, all findings must be tracked in an authoritative ledger:
   5. If 5 rounds are reached with open Blockers -> **Halt and Escalate** to the user with the complete ledger. Never commit unverified code.
 
 ## 4. Adaptive Execution Engine (Herdr Multiplexing vs. Same-Model Fallback)
-- **Primary Route in Herdr (Native Herdr Agent)**: When running inside Herdr (`$env:HERDR_ENV = "1"`), orchestrate the Goldfish reviewer directly via the `herdr` skill (`herdr agent start reviewer --kind <claude|codex|agy> --pane <id>` and `herdr agent prompt reviewer "..." --wait`). Re-use live idle agents first.
+- **Primary Route in Herdr (Native Ephemeral Side Panel)**: When running inside Herdr (`$env:HERDR_ENV = "1"`), orchestrate the Goldfish reviewer through an ephemeral side panel:
+  1. **Split Right**: `$p = (herdr pane split --current --direction right --cwd "$pwd" --no-focus | ConvertFrom-Json).result.pane.pane_id`
+  2. **Launch Agent**: `herdr agent start reviewer --kind <claude|codex|agy> --pane $p`
+  3. **Submit Diff & Wait**: `herdr agent prompt reviewer "..." --wait --timeout 120000`
+  4. **Ingest Verdict**: Read report with `herdr agent read reviewer --source recent-unwrapped`
+  5. **Auto-Close**: Close the side panel: `herdr pane close $p` to restore clean single-panel focus.
+  6. **Background Option**: If the user asks to run in the background, omit `--wait` and `pane close` to allow persistent background monitoring.
 - **Graceful Fallback (Same-Model Stateless Goldfish)**: If outside Herdr or peer agents are unavailable, fire a fresh, isolated child subagent on the current harness and model with zero conversational context. The stateless Goldfish discipline is strictly preserved.
 
 ## 5. Adversarial Scrutiny & Silent Failure Hunter Checklist

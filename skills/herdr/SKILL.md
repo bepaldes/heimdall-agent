@@ -111,22 +111,34 @@ Never perform multi-agent setup across multiple separate conversation turns or s
 1. **Hot-Agent Re-use (Check Before Creating):**
    Run `herdr agent list` first. If a target agent (e.g. `claude`, `codex`, `agy`) is already running and `idle` or `done`, re-use it immediately with `herdr agent prompt <name> "..." --wait`. Do not create redundant panes or pay cold-boot startup penalties.
 
-2. **Batch Layout & Startup in a Single Execution:**
-   When new panes/agents are required, execute the entire pipeline (pane creation, agent launching, and initial prompt) in a **single shell execution** instead of separate tool turns:
+2. **Batch Layout & Startup in a Single Execution (Ephemeral Side-Panel Pattern):**
+   When new panes/agents are required for reviews or checks, execute the entire pipeline (side-panel creation, agent launching, prompt submission, report ingestion, and auto-close) in a **single shell execution**:
    ```powershell
-   # PowerShell single-execution fast path
-   $p1 = (herdr pane split --current --direction right --cwd "$pwd" --no-focus | ConvertFrom-Json).result.pane.pane_id
+   # PowerShell single-execution fast path (auto-closes side panel upon completion)
+   $res = herdr pane split --current --direction right --cwd "$pwd" --no-focus | ConvertFrom-Json
+   $p1 = $res.result.pane.pane_id
    herdr agent start reviewer --kind claude --pane $p1 -- --model claude-sonnet-5
    herdr agent prompt reviewer "Review the latest changes." --wait --timeout 120000
+   $verdict = herdr agent read reviewer --source recent-unwrapped
+   herdr pane close $p1
    ```
    Or in bash:
    ```bash
    PANE_ID=$(herdr pane split --current --direction right --cwd "$PWD" --no-focus | jq -r '.result.pane.pane_id')
    herdr agent start reviewer --kind codex --pane "$PANE_ID"
    herdr agent prompt reviewer "Review the latest changes." --wait --timeout 120000
+   VERDICT=$(herdr agent read reviewer --source recent-unwrapped)
+   herdr pane close "$PANE_ID"
    ```
 
-3. **Speed-Tier Model Selection:**
+3. **Background Execution Mode:**
+   When the user asks to run the review in the background (`run in background`), omit `--wait` and `pane close`:
+   ```powershell
+   herdr agent prompt reviewer "Review the latest changes."
+   ```
+   The side panel continues executing asynchronously and stays visible in Herdr-App, or can be detached into a dedicated background workspace (`herdr workspace create --label "audit-review"`).
+
+4. **Speed-Tier Model Selection:**
    Pass lightweight or fast model parameters after `--` for fast checks, unit verification, and simple reviews. Reserve deep-reasoning flagship models (e.g. Opus 5.5 max effort) for complex architectural refactoring:
    ```bash
    # Fast check with Sonnet instead of Opus
