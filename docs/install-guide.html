@@ -431,11 +431,11 @@
       </a>
       <a class="nav-card" href="#step-3">
         <span class="nav-num">STEP 03</span>
-        <span class="nav-title">Heimdall Skills</span>
+        <span class="nav-title">Herdr-App IDE</span>
       </a>
       <a class="nav-card" href="#step-4">
         <span class="nav-num">STEP 04</span>
-        <span class="nav-title">Herdr-App IDE</span>
+        <span class="nav-title">Heimdall &amp; Auto-Fix</span>
       </a>
     </nav>
 
@@ -560,12 +560,76 @@ gc status</code></pre>
     <section id="step-3">
       <div class="step-head">
         <span class="step-num">03</span>
-        <h2>Heimdall Agent Setup (Skills &amp; Personas)</h2>
+        <h2>Herdr-App (Terminal Multiplexer &amp; Native IDE)</h2>
+      </div>
+
+      <p>
+        <strong>Install Herdr-App now</strong> before configuring Heimdall. 
+        Herdr-App is a GPU-accelerated desktop application (built in Rust with GPUI and libghostty) designed for managing multiple AI agents side-by-side in persistent spaces, tabs, and split panes.
+      </p>
+
+      <div class="panel panel-green">
+        <div class="panel-head">&#10004; Why Install Herdr-App First?</div>
+        <p>
+          Installing Herdr-App first allows <strong>Heimdall (in Step 4)</strong> to auto-detect your Herdr installation. 
+          Heimdall will automatically configure your shortcuts (fixing <code>Ctrl+V</code> / <code>Alt+V</code> text paste, enabling <code>Shift+Drag</code> highlight-to-copy, and activating the <code>Herdr-Roundup</code> layout) with zero manual JSON editing!
+        </p>
+      </div>
+
+      <h3>3.1 Install Herdr-App on Windows</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>Install Herdr-App</span><span>PowerShell</span></div>
+        <pre><code>irm https://releases.herdr.dev/app/install.ps1 | iex</code></pre>
+      </div>
+
+      <div class="panel panel-accent">
+        <div class="panel-head">&#9432; macOS &amp; Linux Compatibility</div>
+        <p>
+          Herdr-App is fully cross-platform:
+          <br />
+          &bull; <strong>macOS:</strong> <code>brew install --cask herdr-app</code> or <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code>
+          <br />
+          &bull; <strong>Linux:</strong> <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code> (requires desktop session + Vulkan)
+        </p>
+      </div>
+
+      <h3>3.2 Launch Herdr-App</h3>
+      <p>Launch the app once to initialize your profile (from Start Menu or CLI):</p>
+      <div class="terminal">
+        <div class="terminal-top"><span>Launch</span><span>CLI</span></div>
+        <pre><code>herdr-app</code></pre>
+      </div>
+
+      <ul class="checklist">
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Spaces:</strong> Organizes repositories into isolated project workspaces.</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Split Panes:</strong> Run Claude Code (Opus/Sonnet) on the left, Codex (Astra) on the right, and tests below.</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Agent Tracking:</strong> Real-time status in the sidebar (<code>working</code>, <code>blocked</code>, <code>idle</code>).</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Persistent Sessions:</strong> Background daemon (<code>herdr-core</code>) keeps processes running even when the app window is closed.</div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- STEP 4 -->
+    <section id="step-4">
+      <div class="step-head">
+        <span class="step-num">04</span>
+        <h2>Heimdall Agent Setup (Skills, Personas &amp; Auto-Fix)</h2>
       </div>
 
       <p>
         <strong>Heimdall Agent</strong> installs 10 specialized agent personas (Orchestrator, Reviewer, Code Sentinel, etc.), 
-        69 engineering skills (TDD, clean code, security scans, HUD statusline), and pre-push quality hooks.
+        69 engineering skills (TDD, clean code, security scans, HUD statusline), and pre-push quality hooks across all your AI tools.
       </p>
 
       <div class="panel panel-accent">
@@ -592,7 +656,7 @@ gc status</code></pre>
         </p>
       </div>
 
-      <h3>3.1 Clone Heimdall into Your Chosen Folder</h3>
+      <h3>4.1 Clone Heimdall into Your Chosen Folder</h3>
       <div class="terminal">
         <div class="terminal-top"><span>Git Clone &amp; Dependencies</span><span>PowerShell</span></div>
         <pre><code># 1. Open or create your chosen workspace folder (example: C:\Apps or C:\Projects)
@@ -607,7 +671,8 @@ cd heimdall-agent
 npm install</code></pre>
       </div>
 
-      <h3>3.2 Run the Setup Wizard</h3>
+      <h3>4.2 Run the Setup Wizard</h3>
+      <p>Run the interactive setup wizard. Heimdall will auto-detect Herdr-App, apply the clipboard/paste fixes, and link your skills:</p>
       <div class="terminal">
         <div class="terminal-top"><span>Run Setup</span><span>Node.js</span></div>
         <pre><code>node setup.mjs</code></pre>
@@ -644,71 +709,21 @@ npm install</code></pre>
               <td><code>night-blue</code></td>
               <td>Adds a 2-line token, cost, and context bar in terminal sessions.</td>
             </tr>
+            <tr>
+              <td><strong>Herdr-App Integration</strong></td>
+              <td><code>Automatic</code></td>
+              <td>Auto-configures <code>Ctrl+V</code> text paste, <code>Shift+Drag</code> copy, and <code>Herdr-Roundup</code> layout.</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <h3>3.3 Verify Installation</h3>
+      <h3>4.3 Verify Installation</h3>
       <div class="terminal">
         <div class="terminal-top"><span>Verification</span><span>CLI</span></div>
-        <pre><code>npm test</code></pre>
+        <pre><code>npm test
+node setup.mjs --audit</code></pre>
       </div>
-    </section>
-
-    <!-- STEP 4 -->
-    <section id="step-4">
-      <div class="step-head">
-        <span class="step-num">04</span>
-        <h2>Herdr-App (Terminal Multiplexer &amp; IDE)</h2>
-      </div>
-
-      <p>
-        <strong>Herdr-App</strong> is a fast, native desktop app (written in Rust using GPUI and libghostty) 
-        designed for managing multiple AI coding agents with visual spaces, tabs, and split panes.
-      </p>
-
-      <h3>4.1 Install Herdr-App on Windows</h3>
-      <div class="terminal">
-        <div class="terminal-top"><span>Install Herdr-App</span><span>PowerShell</span></div>
-        <pre><code>irm https://releases.herdr.dev/app/install.ps1 | iex</code></pre>
-      </div>
-
-      <div class="panel panel-accent">
-        <div class="panel-head">&#9432; macOS &amp; Linux Compatibility</div>
-        <p>
-          Herdr-App is fully cross-platform:
-          <br />
-          &bull; <strong>macOS:</strong> <code>brew install --cask herdr-app</code> or <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code>
-          <br />
-          &bull; <strong>Linux:</strong> <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code> (requires desktop session + Vulkan)
-        </p>
-      </div>
-
-      <h3>4.2 Launch &amp; Organize</h3>
-      <p>Open Herdr-App from your Start Menu or command line:</p>
-      <div class="terminal">
-        <div class="terminal-top"><span>Launch</span><span>CLI</span></div>
-        <pre><code>herdr-app</code></pre>
-      </div>
-
-      <ul class="checklist">
-        <li>
-          <span class="check-icon">&#10003;</span>
-          <div><strong>Spaces:</strong> Create a Space for each project in your workspace folder.</div>
-        </li>
-        <li>
-          <span class="check-icon">&#10003;</span>
-          <div><strong>Split Panes:</strong> Run Claude Code (Opus/Sonnet) on the left, Codex (Astra) on the right, and tests below.</div>
-        </li>
-        <li>
-          <span class="check-icon">&#10003;</span>
-          <div><strong>Agent Tracking:</strong> Herdr automatically tracks agent states (<code>working</code>, <code>blocked</code>, <code>idle</code>) in the sidebar.</div>
-        </li>
-        <li>
-          <span class="check-icon">&#10003;</span>
-          <div><strong>Persistent Sessions:</strong> Background daemon (<code>herdr-core</code>) keeps processes running even when the app window is closed.</div>
-        </li>
-      </ul>
     </section>
 
     <!-- Summary -->

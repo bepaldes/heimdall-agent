@@ -757,6 +757,78 @@ function configureHermesContextLimit(hermesDir, modelsList = null, dryRun = fals
 }
 
 /**
+ * Automatically configures Herdr-App for Windows clipboard reliability and Roundup layout.
+ * Ensures Ctrl+V, Alt+V, and Ctrl+Shift+V are bound to terminal.paste (instead of paste_image),
+ * binds Ctrl+C and Ctrl+Shift+C to terminal.copy, sets copy_on_select: true,
+ * and eliminates UTF-8 Byte Order Marks (BOM) in keys.json.
+ */
+function syncHerdrAppConfig(dryRun = false) {
+  const herdrDir = path.join(userHome, '.config', 'herdr-app');
+  if (!fs.existsSync(herdrDir)) return false;
+
+  const keysPath = path.join(herdrDir, 'keys.json');
+  const settingsPath = path.join(herdrDir, 'settings.json');
+  const keysErrPath = path.join(herdrDir, 'keys.error');
+
+  if (dryRun) return true;
+
+  try {
+    // 1. Configure keys.json
+    let keysObj = {};
+    if (fs.existsSync(keysPath)) {
+      try {
+        const raw = fs.readFileSync(keysPath, 'utf8').replace(/^\uFEFF/, '');
+        keysObj = JSON.parse(raw);
+      } catch {}
+    }
+
+    if (!keysObj.terminal) keysObj.terminal = {};
+    if (!keysObj.global) keysObj.global = {};
+
+    keysObj.terminal['ctrl-v'] = 'terminal.paste';
+    keysObj.terminal['alt-v'] = 'terminal.paste';
+    keysObj.terminal['ctrl-shift-v'] = 'terminal.paste';
+    keysObj.terminal['ctrl-shift-c'] = 'terminal.copy';
+    keysObj.terminal['ctrl-c'] = 'terminal.copy';
+
+    keysObj.global['ctrl-v'] = 'terminal.paste';
+    keysObj.global['alt-v'] = 'terminal.paste';
+
+    if (!keysObj['layout:Herdr-Roundup']) {
+      keysObj['layout:Herdr-Roundup'] = {
+        'cmd-w': 'roundup-tabs.close',
+        'cmd-shift-w': 'roundup-tabs.close-pane'
+      };
+    }
+
+    fs.writeFileSync(keysPath, JSON.stringify(keysObj, null, 2) + '\n', 'utf8');
+
+    if (fs.existsSync(keysErrPath)) {
+      try { fs.unlinkSync(keysErrPath); } catch {}
+    }
+
+    // 2. Configure settings.json
+    let settingsObj = { layout: 'Herdr-Roundup', copy_on_select: true };
+    if (fs.existsSync(settingsPath)) {
+      try {
+        const raw = fs.readFileSync(settingsPath, 'utf8').replace(/^\uFEFF/, '');
+        settingsObj = JSON.parse(raw);
+      } catch {}
+    }
+
+    settingsObj.copy_on_select = true;
+    if (!settingsObj.layout) {
+      settingsObj.layout = 'Herdr-Roundup';
+    }
+
+    fs.writeFileSync(settingsPath, JSON.stringify(settingsObj, null, 2) + '\n', 'utf8');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Dynamically discovers candidate paths for universal doctrine AGENTS.md.
  */
 function detectDoctrineCandidates() {
@@ -1636,6 +1708,10 @@ function runAudit(options) {
     console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.vscode}${colors.reset}`);
   }
   console.log(`  Claude Desktop:     ${detected.tools.claudeDesktop ? colors.green + detected.tools.claudeDesktop + colors.reset : colors.dim + 'Not found' + colors.reset}`);
+  const herdrDir = path.join(userHome, '.config', 'herdr-app');
+  if (fs.existsSync(herdrDir) || checkCommand('herdr-app')) {
+    console.log(`  Herdr-App IDE:      ${colors.green}Detected (${herdrDir})${colors.reset}`);
+  }
   console.log('');
 
   const availableSkills = fs.readdirSync(skillsDir, { withFileTypes: true })
@@ -2536,6 +2612,16 @@ async function main() {
   if (options.hudEnabled !== false) {
     console.log(`\n-> Configuring Heimdall HUD Statusline...`);
     syncHud(options.dryRun, { theme: options.hudTheme, lines: options.hudLines });
+  }
+
+  // 8. Configure Herdr-App optimizations (clipboard paste/copy fixes & Roundup layout)
+  const herdrConfigDir = path.join(userHome, '.config', 'herdr-app');
+  if (fs.existsSync(herdrConfigDir) || checkCommand('herdr-app')) {
+    console.log(`\n-> Configuring Herdr-App Integration...`);
+    const herdrUpdated = syncHerdrAppConfig(options.dryRun);
+    if (herdrUpdated) {
+      console.log(`   ${colors.green}✔ Configured Herdr-App clipboard reliability (Ctrl+V/Alt+V text paste, Shift+Drag copy) & Herdr-Roundup layout${colors.reset}`);
+    }
   }
 
   console.log(`\n${colors.bold}${colors.green}=== Heimdall Installation Complete! ===${colors.reset}\n`);
