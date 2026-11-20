@@ -51,8 +51,8 @@ test('Herdr-App CLI Support & Configuration', async (t) => {
     // Parse contents
     const keys = JSON.parse(keysBuf.toString('utf8'));
     assert.equal(keys.terminal?.['ctrl-v'], 'terminal.paste');
-    assert.equal(keys.terminal?.['alt-v'], 'terminal.paste');
-    assert.equal(keys.terminal?.['ctrl-shift-v'], 'terminal.paste');
+    assert.equal(keys.terminal?.['alt-v'], 'terminal.paste_image');
+    assert.equal(keys.terminal?.['ctrl-shift-v'], 'terminal.paste_image');
     assert.equal(keys.terminal?.['ctrl-c'], 'terminal.copy');
     assert.equal(keys.terminal?.['ctrl-shift-c'], 'terminal.copy');
     assert.ok(keys['layout:Herdr-Roundup'], 'Roundup keybindings must exist');

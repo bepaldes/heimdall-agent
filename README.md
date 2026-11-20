@@ -288,7 +288,7 @@ heimdall uninstall
 | :--- | :---: | :--- | :--- |
 | `--profile <name>` | `full` | Skill profile tier: `full`, `minimal`, `security`, or `design`. | `heimdall --profile minimal` |
 | `--agents <targets>` | `all` | Comma-separated list of harnesses: `claude`, `gemini`, `codex`, `hermes`, `openclaw`, `vscode`, `desktop`, `all`. | `heimdall --agents claude,vscode` |
-| `herdr` / `--herdr` | `false` | Configure Herdr-App clipboard reliability (Ctrl+V/Alt+V text paste) and Roundup layout. | `heimdall herdr` |
+| `herdr` / `--herdr` | `false` | Configure Herdr-App clipboard reliability (Ctrl+V text paste, Alt+V image paste) and Roundup layout. | `heimdall herdr` |
 | `--theme <name>` | `night-blue` | HUD color theme: `night-blue`, `heimdall`, `claude-warm`, or `titanium`. | `heimdall hud --theme claude-warm` |
 | `--no-hud` | `false` | Skip configuring the Heimdall HUD statusline during install or sync. | `heimdall --no-hud` |
 | `--link` | `true` (rec.) | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). | `heimdall --link` |

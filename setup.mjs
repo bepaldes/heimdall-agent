@@ -793,13 +793,13 @@ function syncHerdrAppConfig(dryRun = false) {
     if (!keysObj.global) keysObj.global = {};
 
     keysObj.terminal['ctrl-v'] = 'terminal.paste';
-    keysObj.terminal['alt-v'] = 'terminal.paste';
-    keysObj.terminal['ctrl-shift-v'] = 'terminal.paste';
+    keysObj.terminal['alt-v'] = 'terminal.paste_image';
+    keysObj.terminal['ctrl-shift-v'] = 'terminal.paste_image';
     keysObj.terminal['ctrl-shift-c'] = 'terminal.copy';
     keysObj.terminal['ctrl-c'] = 'terminal.copy';
 
     keysObj.global['ctrl-v'] = 'terminal.paste';
-    keysObj.global['alt-v'] = 'terminal.paste';
+    keysObj.global['alt-v'] = 'terminal.paste_image';
 
     if (!keysObj['layout:Herdr-Roundup']) {
       keysObj['layout:Herdr-Roundup'] = {
@@ -847,10 +847,11 @@ function runHerdrApp(options) {
 
   const success = syncHerdrAppConfig(false);
   if (success) {
-    console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Ctrl+V / Alt+V / Ctrl+Shift+V mapped to text paste (terminal.paste, UTF-8 clean)`);
+    console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Ctrl+V mapped to text paste (terminal.paste, UTF-8 clean)`);
+    console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Alt+V & Ctrl+Shift+V mapped to image paste (terminal.paste_image)`);
     console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Ctrl+C / Ctrl+Shift+C mapped to copy (terminal.copy)`);
     console.log(`  ${colors.green}✔ Configured settings.json:${colors.reset} 'copy_on_select: true' and 'layout: Herdr-Roundup' active`);
-    console.log(`\n${colors.dim}Tip: Inside Herdr-App, use Shift + Click/Drag to highlight and copy text within full-screen TUI apps.${colors.reset}\n`);
+    console.log(`\n${colors.dim}Shortcuts: Use Ctrl+V for text paste; use Alt+V or Ctrl+Shift+V to paste screenshots/images into coding agents.${colors.reset}\n`);
     return true;
   } else {
     console.log(`  ${colors.red}✖ Failed to update Herdr-App configuration at ${herdrDir}.${colors.reset}\n`);
@@ -2668,7 +2669,7 @@ async function main() {
     console.log(`\n-> Configuring Herdr-App Integration...`);
     const herdrUpdated = syncHerdrAppConfig(options.dryRun);
     if (herdrUpdated) {
-      console.log(`   ${colors.green}✔ Configured Herdr-App clipboard reliability (Ctrl+V/Alt+V text paste, Shift+Drag copy) & Herdr-Roundup layout${colors.reset}`);
+      console.log(`   ${colors.green}✔ Configured Herdr-App clipboard reliability (Ctrl+V text paste, Alt+V image paste, Shift+Drag copy) & Herdr-Roundup layout${colors.reset}`);
     }
   }
 
