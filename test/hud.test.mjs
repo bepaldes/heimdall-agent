@@ -9,6 +9,8 @@ import {
   renderContextBar,
   formatTokens,
   formatDuration,
+  formatResetTime,
+  formatQuotaSegments,
   resolveHudConfig,
   THEMES
 } from '../tools/heimdall-hud.mjs';
@@ -81,6 +83,83 @@ test('Heimdall HUD Renderer & Harness Sync', async (t) => {
       }, { theme: themeName, lines: 1, skipGit: true }));
       assert.equal(single.includes('\n'), false);
     }
+  });
+
+  await t.test('renders Antigravity (agy) bucket quota and windowed 5h/weekly rate limits when available', () => {
+    const now = Date.UTC(2026, 10, 19, 12, 0, 0);
+    assert.equal(formatResetTime(Math.floor((now + 135 * 60_000) / 1000), now), '2h15m');
+    assert.equal(formatResetTime(new Date(now + 26 * 3600_000).toISOString(), now), '1d2h');
+
+    // Antigravity StatusLineQuotaBucket shape
+    const agyOut = stripAnsi(renderHud({
+      model: 'Gemini 4 Hydrogen (Medium)',
+      workspace: { current_dir: '/tmp/app', branch: 'main' },
+      context_window: { used_percentage: 30, context_window_size: 1048576 },
+      quota: { used_percentage: 64, reset_time: Math.floor((now + 90 * 60_000) / 1000) },
+      terminal: { columns: 120 }
+    }, { skipGit: true, now }));
+    const agyLines = agyOut.split('\n');
+    assert.match(agyLines[1], /quota:64% \(1h30m\)/);
+
+    // Windowed 5h / weekly rate_limits shape (Claude Code or future agy)
+    const rateOut = stripAnsi(renderHud({
+      model: 'Opus 5.5',
+      workspace: { current_dir: '/tmp/app', branch: 'main' },
+      context_window: { used_percentage: 20, size: 200000 },
+      rate_limits: {
+        five_hour: { used_percentage: 42, resets_at: Math.floor((now + 45 * 60_000) / 1000) },
+        seven_day: { used_percentage: 82, resets_at: Math.floor((now + 50 * 3600_000) / 1000) }
+      },
+      terminal: { columns: 120 }
+    }, { skipGit: true, now }));
+    const rateLines = rateOut.split('\n');
+    assert.match(rateLines[1], /5h:42% \(45m\) wk:82% \(2d2h\)/);
+
+    // Threshold coloring on quota segments
+    const colored = formatQuotaSegments({
+      rate_limits: {
+        five_hour: { used_percentage: 20 },
+        seven_day: { used_percentage: 85 }
+      }
+    }, THEMES['night-blue'], { now });
+    assert.match(colored, /\x1b\[38;2;52;211;153m5h:20%/);   // ok < 50%
+    assert.match(colored, /\x1b\[38;2;248;113;113mwk:85%/); // crit >= 75%
+
+    // Array / map quotas with remaining_percentage or remaining_fraction
+    const arrayQuotas = stripAnsi(formatQuotaSegments({
+      quotas: [
+        { display_name: 'gemini', remaining_percentage: 70, reset_time: Math.floor((now + 60 * 60_000) / 1000) },
+        { quota_bucket: 'claude', remaining_fraction: 0.25 }
+      ]
+    }, THEMES['night-blue'], { now }));
+    assert.equal(arrayQuotas, 'gemini:30% (1h) claude:75%');
+
+    // Real agy bucket map payload (gemini-5h / gemini-weekly / 3p-5h / 3p-weekly)
+    const agyMapOut = stripAnsi(renderHud({
+      model: { id: 'Gemini 4 Hydrogen (Medium)', display_name: 'Gemini 4 Hydrogen (Medium)' },
+      workspace: { current_dir: 'C:\\Apps\\heimdall-agent' },
+      context_window: { used_percentage: 7.3, context_window_size: 1048576 },
+      quota: {
+        '3p-5h': { remaining_fraction: 1, reset_in_seconds: 17889 },
+        '3p-weekly': { remaining_fraction: 1, reset_in_seconds: 604689 },
+        'gemini-5h': { remaining_fraction: 0.8643823, reset_time: new Date(now + 11711 * 1000).toISOString(), reset_in_seconds: 11711 },
+        'gemini-weekly': { remaining_fraction: 0.09946935, reset_time: new Date(now + 418013 * 1000).toISOString(), reset_in_seconds: 418013 }
+      },
+      terminal_width: 129
+    }, { skipGit: true, now }));
+    assert.match(agyMapOut.split('\n')[1], /5h:14% \(3h16m\) wk:90% \(4d20h\)/);
+
+    // 3rd-party model inside agy selects 3p-5h / 3p-weekly
+    const agy3pOut = stripAnsi(formatQuotaSegments({
+      model: { id: 'Claude Opus 5.5 (Medium)' },
+      quota: {
+        '3p-5h': { remaining_fraction: 0.6, reset_in_seconds: 3600 },
+        '3p-weekly': { remaining_fraction: 0.8, reset_in_seconds: 86400 },
+        'gemini-5h': { remaining_fraction: 0.1 },
+        'gemini-weekly': { remaining_fraction: 0.1 }
+      }
+    }, THEMES['night-blue'], { now }));
+    assert.equal(agy3pOut, '5h:40% (1h) wk:20% (1d)');
   });
 
   await t.test('HUD sync configures Claude, Antigravity, and Codex idempotently', () => {

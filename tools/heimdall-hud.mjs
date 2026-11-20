@@ -124,6 +124,11 @@ export function resolveHudConfig(options = {}, homeDir = os.homedir()) {
   };
 }
 
+function thresholdColor(pct, theme) {
+  const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
+  return clamped >= 75 ? theme.crit : clamped >= 50 ? theme.warn : theme.ok;
+}
+
 /**
  * Builds an 8-block context saturation bar color-coded to Heimdall's 75% sentinel threshold.
  */
@@ -131,8 +136,145 @@ export function renderContextBar(pct, width = 8, theme = THEMES['night-blue']) {
   const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
   const filled = Math.round((clamped / 100) * width);
   const empty = Math.max(0, width - filled);
-  const color = clamped >= 75 ? theme.crit : clamped >= 50 ? theme.warn : theme.ok;
+  const color = thresholdColor(clamped, theme);
   return `${color}[${'█'.repeat(filled)}${'░'.repeat(empty)}] ${Math.round(clamped)}%${RESET}`;
+}
+
+/**
+ * Formats a quota reset timestamp, epoch seconds/ms, or relative seconds into a compact string.
+ */
+export function formatResetTime(value, now = Date.now()) {
+  if (value === null || value === undefined || value === '') return '';
+  let msRemaining = null;
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const targetMs = value > 1e12 ? value : value > 1e9 ? value * 1000 : now + value * 1000;
+    msRemaining = targetMs - now;
+  } else if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+    if (/^\d+$/.test(trimmed)) {
+      return formatResetTime(Number(trimmed), now);
+    }
+    const parsed = Date.parse(trimmed);
+    if (!Number.isNaN(parsed)) {
+      msRemaining = parsed - now;
+    } else {
+      return trimmed;
+    }
+  }
+  if (msRemaining === null) return '';
+  if (msRemaining <= 0) return 'now';
+  const totalMins = Math.ceil(msRemaining / 60_000);
+  if (totalMins < 60) return `${totalMins}m`;
+  const totalHrs = Math.floor(totalMins / 60);
+  const remMins = totalMins % 60;
+  if (totalHrs < 24) return remMins > 0 ? `${totalHrs}h${remMins}m` : `${totalHrs}h`;
+  const days = Math.floor(totalHrs / 24);
+  const remHrs = totalHrs % 24;
+  return remHrs > 0 ? `${days}d${remHrs}h` : `${days}d`;
+}
+
+function parseQuotaPct(windowObj) {
+  if (!windowObj || typeof windowObj !== 'object') return null;
+  if (typeof windowObj.used_percentage === 'number') return windowObj.used_percentage;
+  if (typeof windowObj.remaining_percentage === 'number') return 100 - windowObj.remaining_percentage;
+  if (typeof windowObj.used_fraction === 'number') return windowObj.used_fraction * 100;
+  if (typeof windowObj.remaining_fraction === 'number') return (1 - windowObj.remaining_fraction) * 100;
+  if (typeof windowObj.quota_remaining === 'number') {
+    return windowObj.quota_remaining <= 1 ? (1 - windowObj.quota_remaining) * 100 : 100 - windowObj.quota_remaining;
+  }
+  return null;
+}
+
+function formatQuotaWindow(label, windowObj, theme, compact, now) {
+  const pct = parseQuotaPct(windowObj);
+  if (!Number.isFinite(pct)) return '';
+  const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+  const color = thresholdColor(clamped, theme);
+  const resetRaw = windowObj.resets_at ?? windowObj.reset_time ?? windowObj.quota_resets ?? windowObj.reset_in_seconds;
+  const resetStr = !compact ? formatResetTime(resetRaw, now) : '';
+  const resetSuffix = resetStr ? ` ${DIM}(${resetStr})${RESET}` : '';
+  return `${color}${label}:${clamped}%${RESET}${resetSuffix}`;
+}
+
+function resolveAgyQuotaPair(quotaObj, modelName = '') {
+  const lower = String(modelName).toLowerCase();
+  const isThirdParty = /claude|opus|sonnet|haiku|gpt|oss|3p/.test(lower);
+  const isArgon = /argon/.test(lower);
+
+  const fiveKey = isThirdParty
+    ? (quotaObj['3p-5h'] ? '3p-5h' : 'gemini-5h')
+    : (quotaObj['gemini-5h'] ? 'gemini-5h' : '3p-5h');
+
+  let weekKey;
+  if (isThirdParty) {
+    weekKey = quotaObj['3p-weekly'] ? '3p-weekly' : 'gemini-weekly';
+  } else if (isArgon && quotaObj['gemini-argon-wtu-weekly']) {
+    weekKey = 'gemini-argon-wtu-weekly';
+  } else {
+    weekKey = quotaObj['gemini-weekly'] ? 'gemini-weekly' : '3p-weekly';
+  }
+
+  return { fiveHour: quotaObj[fiveKey], weekly: quotaObj[weekKey] };
+}
+
+/**
+ * Extracts rate-limit / quota segments from Antigravity (agy) or Claude Code payloads.
+ */
+export function formatQuotaSegments(payload = {}, theme = THEMES['night-blue'], options = {}) {
+  const now = typeof options.now === 'number' ? options.now : Date.now();
+  const compact = Boolean(options.compact);
+  const modelName =
+    (typeof payload.model === 'object' ? payload.model?.display_name || payload.model?.id : payload.model) || '';
+  const parts = [];
+
+  const limits = payload.rate_limits || payload.quotas || payload.limits;
+  if (Array.isArray(limits)) {
+    for (const item of limits) {
+      const label = item?.label || item?.display_name || item?.quota_bucket || item?.name || 'quota';
+      const formatted = formatQuotaWindow(compact ? 'Q' : label, item, theme, compact, now);
+      if (formatted) parts.push(formatted);
+    }
+  } else if (limits && typeof limits === 'object') {
+    const fiveHour = limits.five_hour || limits.fiveHour || limits['5h'];
+    const weekly = limits.seven_day || limits.sevenDay || limits.weekly || limits['7d'];
+    if (fiveHour || weekly) {
+      const fiveStr = formatQuotaWindow('5h', fiveHour, theme, compact, now);
+      const weekStr = formatQuotaWindow('wk', weekly, theme, compact, now);
+      if (fiveStr) parts.push(fiveStr);
+      if (weekStr) parts.push(weekStr);
+    } else {
+      for (const [key, item] of Object.entries(limits)) {
+        const label = item?.label || item?.display_name || item?.quota_bucket || key;
+        const formatted = formatQuotaWindow(compact ? 'Q' : label, item, theme, compact, now);
+        if (formatted) parts.push(formatted);
+      }
+    }
+  }
+
+  if (payload.quota && typeof payload.quota === 'object') {
+    const qFive = payload.quota.five_hour || payload.quota.fiveHour || payload.quota['5h'];
+    const qWeek = payload.quota.seven_day || payload.quota.sevenDay || payload.quota.weekly || payload.quota['7d'];
+    if (qFive || qWeek) {
+      const fiveStr = formatQuotaWindow('5h', qFive, theme, compact, now);
+      const weekStr = formatQuotaWindow('wk', qWeek, theme, compact, now);
+      if (fiveStr && !parts.length) parts.push(fiveStr);
+      if (weekStr) parts.push(weekStr);
+    } else if (parseQuotaPct(payload.quota) !== null) {
+      const label = payload.quota.label || payload.quota.display_name || (compact ? 'Q' : 'quota');
+      const bucketStr = formatQuotaWindow(label, payload.quota, theme, compact, now);
+      if (bucketStr) parts.push(bucketStr);
+    } else {
+      // Antigravity (agy) bucket map: e.g. { "gemini-5h": {...}, "gemini-weekly": {...}, "3p-5h": {...}, "3p-weekly": {...} }
+      const { fiveHour, weekly } = resolveAgyQuotaPair(payload.quota, modelName);
+      const fiveStr = formatQuotaWindow('5h', fiveHour, theme, compact, now);
+      const weekStr = formatQuotaWindow('wk', weekly, theme, compact, now);
+      if (fiveStr) parts.push(fiveStr);
+      if (weekStr) parts.push(weekStr);
+    }
+  }
+
+  return parts.join(' ');
 }
 
 function resolveGitInfo(cwd) {
@@ -200,11 +342,12 @@ export function renderHud(payload = {}, options = {}) {
   const outTok = formatTokens(payload.context_window?.total_output_tokens);
   const duration = formatDuration(payload.cost?.total_duration_ms);
 
-  const columns = payload.terminal?.columns || process.stdout.columns || 120;
+  const columns = payload.terminal?.columns || payload.terminal_width || process.stdout.columns || 120;
   const compact = columns < 80;
 
   const bar = renderContextBar(pct, compact ? 6 : 8, theme);
   const ctxSegment = ctxSizeLabel && !compact ? `${bar} ${DIM}(${ctxSizeLabel})${RESET}` : bar;
+  const quotaSegment = formatQuotaSegments(payload, theme, { compact, now: options.now });
 
   const locParts = [`${theme.dir}${dirName}${RESET}`];
   if (branch) {
@@ -219,6 +362,7 @@ export function renderHud(payload = {}, options = {}) {
     if (typeof payload.cost?.total_cost_usd === 'number' && !compact) {
       single.push(`${theme.cost}$${payload.cost.total_cost_usd.toFixed(2)}${RESET}`);
     }
+    if (quotaSegment && !compact) single.push(quotaSegment);
     if (payload.vim?.mode && !compact) single.push(`${theme.state}[${payload.vim.mode}]${RESET}`);
     return single.join(sep);
   }
@@ -233,13 +377,16 @@ export function renderHud(payload = {}, options = {}) {
     line1.push(`${theme.state}[${payload.vim.mode}]${RESET}`);
   }
 
-  // Line 2: Workspace (branch *dirty) │ Tokens │ Duration
+  // Line 2: Workspace (branch *dirty) │ Tokens │ Duration │ Quota / Rate Limits
   const line2 = [locSegment];
   if (inTok || outTok) {
     line2.push(`${DIM}↑${inTok || '0'} ↓${outTok || '0'}${RESET}`);
   }
   if (duration && !compact) {
     line2.push(`${DIM}⏱ ${duration}${RESET}`);
+  }
+  if (quotaSegment) {
+    line2.push(quotaSegment);
   }
 
   return `${line1.join(sep)}\n${line2.join(sep)}`;
@@ -264,6 +411,7 @@ if (isMain) {
       workspace: { current_dir: process.cwd(), branch: 'main', dirty_count: 2 },
       context_window: { used_percentage: 42, context_window_size: 1048576, total_input_tokens: 45200, total_output_tokens: 3100 },
       cost: { total_cost_usd: 0.14, total_duration_ms: 147000 },
+      quota: { used_percentage: 28, reset_time: '2h15m' },
       terminal: { columns: 120 }
     };
     for (const name of Object.keys(THEMES)) {
