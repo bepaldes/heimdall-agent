@@ -41,15 +41,20 @@ Before inspecting diffs, check if the repository defines custom review criteria 
 - `REVIEW.md` (root)
 Project-specific review guidelines take absolute precedence over general stylistic preferences.
 
-### Step 2: Adaptive Execution Engine (Herdr Ephemeral Side-Panel vs. Same-Model Fallback)
-Check if running inside Herdr (`$env:HERDR_ENV = "1"`):
-- **When in Herdr**:
-  1. **Fire Side Panel**: Split an ephemeral side panel to the right (`$p = (herdr pane split --current --direction right --cwd "$pwd" --no-focus | ConvertFrom-Json).result.pane.pane_id`).
+### Step 2: Adaptive Execution Engine (Herdr Ephemeral Side-Panel vs. Standalone Subagent Fallback)
+Check if running inside Herdr / Herdr-App (`$env:HERDR_ENV = "1"` or `$env:HC_TERMINAL_ID` present):
+- **When in Herdr / Herdr-App**:
+  1. **Fire Side Panel**: Split an ephemeral side panel in the desktop window (`herdr-app do pane.split --direction right --argv '["<reviewer-agent>"]'` or `$p = (herdr pane split --current --direction right --cwd "$pwd" --no-focus | ConvertFrom-Json).result.pane.pane_id`).
   2. **Launch Cross-Family Reviewer**: Start an adversarial reviewer on a distinct model family from `config/models.json` (`herdr agent start reviewer --kind <claude|codex|agy> --pane $p -- <fast-model-args>`).
   3. **Execute & Ingest**: Dispatch the diff (`herdr agent prompt reviewer "Review git diff for security regressions, boundary conditions, and type errors." --wait --timeout 120000`) and capture the findings (`herdr agent read reviewer --source recent-unwrapped`).
-  4. **Auto-Close / Clean Exit**: Immediately close the ephemeral side panel (`herdr pane close $p`) to leave the main workspace clean.
+  4. **Auto-Close / Clean Exit**: Immediately close the ephemeral side panel (`herdr-app do pane.close --pane $p` or `herdr pane close $p`) to leave the main workspace clean.
   *(Exception: If the user explicitly requested background execution, omit `--wait` and `pane close` so the review runs in the background).*
-- **When NOT in Herdr / Unavailable**: Gracefully fall back to spawning a fresh child subagent on the **same model / native harness** (e.g., `invoke_subagent` in Antigravity, Agent tool in Claude Code) with zero parent conversation context. The stateless Goldfish invariant is strictly preserved either way.
+- **When in Standalone Harnesses (Antigravity IDE, Claude Code CLI, Codex CLI, VS Code Copilot)**:
+  - Do NOT call Herdr commands. Dispatch review via harness native subagent / task:
+    - Antigravity: `invoke_subagent` with stateless reviewer prompt.
+    - Claude Code: `Agent` tool with isolated scratchpad.
+    - Codex CLI: child subagent.
+  - The stateless Goldfish invariant is strictly preserved with zero parent conversation context.
 
 ### Step 3: Stateless Context Blinding
 - Never inspect conversational trajectory, thought histories, or author justifications.

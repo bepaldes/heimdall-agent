@@ -44,9 +44,22 @@
 ### Phase 4: Review, Purge & Handoff
 
 ## 5. Symmetric Cross-Family Validation Loop
-- In Herdr (`HERDR_ENV=1`), validate tasks using a **different model family** from the authoring model (e.g., Anthropic ↔ Google ↔ OpenAI/Codex ↔ Zhipu/GLM ↔ Tencent/Hunyuan ↔ Xiaomi/MiMo) selected from `config/models.json` / `playbooks/06-model-registry-matrix.md`:
-  - `herdr agent prompt <cross-family-reviewer> "Review git diff for security regressions, boundary conditions, and type errors." --wait --timeout 120000`
-- Select any live reviewer agent/model from a distinct family rather than restricting validation to Claude/Gemini/Codex alone.
+- **Runtime Harness & Environment Detection**:
+  - Detect if running inside Herdr / Herdr-App (`$env:HERDR_ENV = "1"` or `$env:HC_TERMINAL_ID` present).
+- **Branch A: In Herdr / Herdr-App (Visual Ephemeral Side Panel)**:
+  - Open side panel: `herdr-app do pane.split --direction right --argv '["<cross-family-reviewer>"]' --task "Review Task N"` (or `herdr pane split --current --direction right --cwd "$pwd" --no-focus`).
+  - Execute adversarial review in the visible side panel across distinct model families (e.g., Anthropic ↔ Google ↔ OpenAI/Codex ↔ Zhipu/GLM ↔ Tencent/Hunyuan ↔ Xiaomi/MiMo) selected from `config/models.json` / `playbooks/06-model-registry-matrix.md`.
+  - Await verdict: `herdr agent prompt <cross-family-reviewer> "Review git diff for security regressions, boundary conditions, and type errors." --wait --timeout 120000`.
+  - Ingest findings report and triage ledger.
+  - Close side panel upon completion: `herdr-app do pane.close --pane <id>` (or `herdr pane close <id>`) to keep workspace clean.
+  - *Background Mode*: If background execution is requested, omit `--wait` and `pane close` to allow live asynchronous observation in Herdr-App.
+- **Branch B: In Standalone Harnesses (Antigravity IDE, Claude Code CLI, Codex CLI, VS Code Copilot)**:
+  - Do NOT call Herdr commands. Dispatch review via harness native subagent / task:
+    - In Antigravity: `invoke_subagent` (stateless goldfish review subagent).
+    - In Claude Code: `Agent` tool (`subagent` with prompt and isolated scratchpad).
+    - In Codex CLI: child subagent.
+  - Maintain zero parent conversation context (Stateless Goldfish invariant).
+  - Ingest review findings directly back into the main session thread.
 
 ## 6. Orchestrator Heartbeat
 - Orchestrator monitors progress every 3 minutes.
@@ -82,8 +95,9 @@
    - Strict TDD: failing test first, minimal code, passing test, self-review.
    - Strict STE Step Granularity: Every step begins with an approved imperative verb (`Create`, `Modify`, `Assert`, `Verify`, `Delete`, `Run`), contains <= 20 words, and contains zero banned vague qualifiers (`ensure`, `properly`, `appropriately`, `as needed`).
 5. **Section 5: Symmetric & Tri-Directional Cross-Model Validation Loop**:
-   - Defines validation commands using native Herdr agent commands.
-   - Claude tasks validated by Gemini/Codex; Gemini tasks validated by Claude/Codex; Codex tasks validated by Claude/Gemini.
+   - Defines validation commands with adaptive runtime branching.
+   - In Herdr / Herdr-App: Fires ephemeral visual side panel (`herdr-app do pane.split`), runs cross-family reviewer, auto-closes panel upon completion, or runs in background.
+   - In Standalone Harnesses (Antigravity, Claude Code, Codex, VS Code): Fires stateless child subagent / task via harness native tool (`invoke_subagent`, `Agent` tool, or child process).
 6. **Section 6: Orchestrator Heartbeat**:
    - Cadence for monitoring task progress, status checks, and liveness during subagent runs.
 7. **Section 7: Verification Harness**:
