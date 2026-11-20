@@ -243,14 +243,27 @@ if (SYNC) {
   // ── Codex CLI (config.toml) ──────────────────────────────────────
   const codexConfigPath = path.join(os.homedir(), '.codex', 'config.toml');
   if (fs.existsSync(codexConfigPath)) {
-    let codexToml = fs.readFileSync(codexConfigPath, 'utf8');
-    // Strip existing [mcp_servers.*] sections
-    codexToml = codexToml.replace(/^\[mcp_servers\.[^\]]*\][\s\S]*?(?=^\[|\s*$)/gm, '');
+    const lines = fs.readFileSync(codexConfigPath, 'utf8').split(/\r?\n/);
+    const keptLines = [];
+    let inMcpSection = false;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (/^\[mcp_servers\.[^\]]*\]/.test(trimmed)) {
+        inMcpSection = true;
+        continue;
+      }
+      if (inMcpSection && /^\[/.test(trimmed)) {
+        inMcpSection = false;
+      }
+      if (!inMcpSection) keptLines.push(line);
+    }
+    let codexToml = keptLines.join('\n').trimEnd() + '\n';
+    const escapeToml = (s) => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     // Append new mcp_servers sections for enabled non-URL servers
     for (const [name, server] of Object.entries(resolved.mcpServers)) {
       if (server.disabled || server.config.serverUrl) continue;
-      const argsStr = server.config.args.map(a => ` "${a.replace(/"/g, '\\"')}"`).join(',');
-      codexToml += `\n[mcp_servers.${name}]\ncommand = "${server.config.command.replace(/\\/g, '\\\\')}"\nargs = [${argsStr} ]\nstartup_timeout_sec = 30\ntool_timeout_sec = 450\n`;
+      const argsStr = server.config.args.map(a => ` "${escapeToml(a)}"`).join(',');
+      codexToml += `\n[mcp_servers.${name}]\ncommand = "${escapeToml(server.config.command)}"\nargs = [${argsStr} ]\nstartup_timeout_sec = 30\ntool_timeout_sec = 450\n`;
     }
     fs.writeFileSync(codexConfigPath, codexToml.trimEnd() + '\n');
     console.log(`✓ Synced to ${codexConfigPath}`);
@@ -287,6 +300,66 @@ if (SYNC) {
     hermesYaml = hermesYaml.trimEnd() + '\n\n' + mcpBlock;
     fs.writeFileSync(hermesConfigPath, hermesYaml);
     console.log(`✓ Synced to ${hermesConfigPath}`);
+  }
+
+  // ── VS Code User (mcp.json) ──────────────────────────────────────
+  const vscodeUserDir = process.platform === 'win32'
+    ? path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'Code', 'User')
+    : process.platform === 'darwin'
+      ? path.join(os.homedir(), 'Library', 'Application Support', 'Code', 'User')
+      : path.join(os.homedir(), '.config', 'Code', 'User');
+  if (fs.existsSync(vscodeUserDir)) {
+    const vscodeMcpPath = path.join(vscodeUserDir, 'mcp.json');
+    let vscodeMcp = { servers: {} };
+    if (fs.existsSync(vscodeMcpPath)) {
+      try {
+        vscodeMcp = JSON.parse(fs.readFileSync(vscodeMcpPath, 'utf8'));
+      } catch { vscodeMcp = { servers: {} }; }
+    }
+    if (!vscodeMcp.servers || typeof vscodeMcp.servers !== 'object') vscodeMcp.servers = {};
+    for (const [name, server] of Object.entries(resolved.mcpServers)) {
+      if (server.disabled) continue;
+      if (server.config.serverUrl) {
+        vscodeMcp.servers[name] = { type: 'http', url: server.config.serverUrl };
+      } else {
+        vscodeMcp.servers[name] = {
+          type: 'stdio',
+          command: server.config.command,
+          args: server.config.args,
+          ...(server.config.env && { env: server.config.env }),
+        };
+      }
+    }
+    fs.writeFileSync(vscodeMcpPath, JSON.stringify(vscodeMcp, null, 2) + '\n');
+    console.log(`✓ Synced to ${vscodeMcpPath}`);
+  }
+
+  // ── GitHub Copilot CLI (~/.copilot/mcp-config.json) ──────────────
+  const copilotDir = path.join(os.homedir(), '.copilot');
+  if (fs.existsSync(copilotDir)) {
+    const copilotMcpPath = path.join(copilotDir, 'mcp-config.json');
+    let copilotMcp = { mcpServers: {} };
+    if (fs.existsSync(copilotMcpPath)) {
+      try {
+        copilotMcp = JSON.parse(fs.readFileSync(copilotMcpPath, 'utf8'));
+      } catch { copilotMcp = { mcpServers: {} }; }
+    }
+    if (!copilotMcp.mcpServers || typeof copilotMcp.mcpServers !== 'object') copilotMcp.mcpServers = {};
+    for (const [name, server] of Object.entries(resolved.mcpServers)) {
+      if (server.disabled) continue;
+      if (server.config.serverUrl) {
+        copilotMcp.mcpServers[name] = { type: 'http', url: server.config.serverUrl };
+      } else {
+        copilotMcp.mcpServers[name] = {
+          type: 'stdio',
+          command: server.config.command,
+          args: server.config.args,
+          ...(server.config.env && { env: server.config.env }),
+        };
+      }
+    }
+    fs.writeFileSync(copilotMcpPath, JSON.stringify(copilotMcp, null, 2) + '\n');
+    console.log(`✓ Synced to ${copilotMcpPath}`);
   }
 }
 

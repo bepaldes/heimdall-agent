@@ -263,6 +263,11 @@ heimdall audit
 # Atualizar o catálogo dinâmico de modelos a partir do seu provedor/proxy ativo
 heimdall sync-models
 
+# Ativar, desativar ou escolher o tema da statusline Heimdall HUD (2 linhas)
+heimdall hud
+heimdall hud --on --theme night-blue
+heimdall hud --off
+
 # Navegar pelo catálogo canônico de skills e repositórios upstream
 heimdall skills
 
@@ -279,7 +284,9 @@ heimdall uninstall
 | Flag | Padrão | Descrição | Exemplo |
 | :--- | :---: | :--- | :--- |
 | `--profile <nome>` | `full` | Perfil de skills: `full`, `minimal`, `security` ou `design`. | `heimdall --profile minimal` |
-| `--agents <alvos>` | `all` | Lista de ferramentas separadas por vírgula: `claude`, `gemini`, `codex`, `desktop`, `all`. | `heimdall --agents claude,gemini` |
+| `--agents <alvos>` | `all` | Lista de ferramentas separadas por vírgula: `claude`, `gemini`, `codex`, `hermes`, `openclaw`, `vscode`, `desktop`, `all`. | `heimdall --agents claude,vscode` |
+| `--theme <nome>` | `night-blue` | Tema de cores do HUD: `night-blue`, `heimdall`, `claude-warm` ou `titanium`. | `heimdall hud --theme claude-warm` |
+| `--no-hud` | `false` | Pula a configuração da statusline Heimdall HUD durante a instalação ou sincronização. | `heimdall --no-hud` |
 | `--link` | `true` (rec.) | Implanta skills usando junctions NTFS (Windows) ou symlinks POSIX (macOS/Linux). | `heimdall --link` |
 | `--clean` | `false` | Limpa skills antigas do diretório de destino antes de implantar. | `heimdall --clean` |
 | `--dry-run` | `false` | Simula a execução e exibe as ações sem modificar o sistema de arquivos. | `heimdall --dry-run` |
@@ -500,6 +507,7 @@ Para programação em par entre múltiplos dispositivos, monitoramento mobile e 
 * **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: Cliente mobile (iOS/Android) pareado com sua sessão de terminal. Envia notificações push quando um agente atinge um portão interativo de planejamento e permite aprovação remota.
 * **[Graphify (`github.com/Graphify-Labs/graphify`)](https://github.com/Graphify-Labs/graphify)**: Construtor local de grafos de conhecimento de código. Usa análise AST via Tree-sitter em mais de 40 linguagens para gerar mapas determinísticos de dependência sem custo de API de LLM, exportando diretamente para cofres do Obsidian.
 * **[Obsidian (`obsidian.md`)](https://obsidian.md/)**: Base de conhecimento local em Markdown. Combinado com cofres gerados pelo Graphify (`[[wikilinks]]`), funciona como memória externa persistente para agentes de IA, carregando contexto arquitetural imediato na inicialização sem varreduras pesadas em tokens.
+* **Heimdall HUD ([`tools/heimdall-hud.mjs`](tools/heimdall-hud.mjs))**: Statusline nativa de 2 linhas para terminal no **Claude Code** e **Google Antigravity (`agy`)**, exibindo modelo, barra de contexto colorida, branch Git e arquivos modificados, consumo de tokens, custo e duração da sessão em 4 temas (`night-blue` padrão, `heimdall`, `claude-warm`, `titanium`). No **Codex CLI** (que não executa scripts externos de `statusLine`), o `heimdall hud` configura os itens nativos `[tui] status_line` em `~/.codex/config.toml`.
 
 [↑ Voltar ao topo](#indice)
 

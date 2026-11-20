@@ -23,6 +23,15 @@ import { syncAgentsWithModels, syncModelRegistryPlaybook } from './lib/model-rou
 import { updateHermesConfigContext } from './lib/hermes-context.cjs';
 import { detectPathCandidates } from './lib/path-discovery.cjs';
 import { syncCatalogCounts } from './lib/catalog-sync.cjs';
+import {
+  configureClaudeStatusLine,
+  configureAntigravityStatusLine,
+  configureCodexStatusLine,
+  disableClaudeStatusLine,
+  disableAntigravityStatusLine,
+  disableCodexStatusLine,
+  writeHudConfig
+} from './lib/hud-sync.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -87,13 +96,36 @@ function getOpenClawDir() {
   return homePath;
 }
 
+/**
+ * Resolves the GitHub Copilot / VS Code user skills & agents directory (~/.copilot).
+ */
+function getCopilotDir() {
+  return path.join(userHome, '.copilot');
+}
+
+/**
+ * Resolves the VS Code User configuration directory across Windows, macOS, and Linux.
+ */
+function getVSCodeUserDir() {
+  const platform = os.platform();
+  if (platform === 'win32') {
+    const appData = process.env.APPDATA || path.join(userHome, 'AppData', 'Roaming');
+    return path.join(appData, 'Code', 'User');
+  }
+  if (platform === 'darwin') {
+    return path.join(userHome, 'Library', 'Application Support', 'Code', 'User');
+  }
+  return path.join(userHome, '.config', 'Code', 'User');
+}
+
 const targetPaths = {
   claude: path.join(userHome, '.claude', 'skills'),
   gemini: path.join(userHome, '.gemini', 'skills'),
   codex: path.join(userHome, '.codex', 'skills'),
   agents: path.join(userHome, '.agents', 'skills'),
   hermes: path.join(getHermesDir(), 'skills'),
-  openclaw: path.join(getOpenClawDir(), 'skills')
+  openclaw: path.join(getOpenClawDir(), 'skills'),
+  vscode: path.join(getCopilotDir(), 'skills')
 };
 
 const targetAgentPaths = {
@@ -102,7 +134,8 @@ const targetAgentPaths = {
   codex: path.join(userHome, '.codex', 'agents'),
   agents: path.join(userHome, '.agents', 'agents'),
   hermes: path.join(getHermesDir(), 'agents'),
-  openclaw: path.join(getOpenClawDir(), 'agents')
+  openclaw: path.join(getOpenClawDir(), 'agents'),
+  vscode: path.join(getCopilotDir(), 'agents')
 };
 
 const targetDoctrinePaths = {
@@ -111,7 +144,8 @@ const targetDoctrinePaths = {
   codex: path.join(userHome, '.codex', 'AGENTS.md'),
   agents: path.join(userHome, '.agents', 'AGENTS.md'),
   hermes: path.join(getHermesDir(), 'AGENTS.md'),
-  openclaw: path.join(getOpenClawDir(), 'AGENTS.md')
+  openclaw: path.join(getOpenClawDir(), 'AGENTS.md'),
+  vscode: path.join(getCopilotDir(), 'copilot-instructions.md')
 };
 
 const targetPlaybookPaths = {
@@ -119,7 +153,8 @@ const targetPlaybookPaths = {
   gemini: path.join(userHome, '.gemini', 'playbooks'),
   agents: path.join(userHome, '.agents', 'playbooks'),
   hermes: path.join(getHermesDir(), 'playbooks'),
-  openclaw: path.join(getOpenClawDir(), 'playbooks')
+  openclaw: path.join(getOpenClawDir(), 'playbooks'),
+  vscode: path.join(getCopilotDir(), 'playbooks')
 };
 
 const targetCommandPaths = {
@@ -140,6 +175,7 @@ function getAgentRootDir(agent) {
   if (agent === 'agents') return path.join(userHome, '.agents');
   if (agent === 'hermes') return getHermesDir();
   if (agent === 'openclaw') return getOpenClawDir();
+  if (agent === 'vscode') return getCopilotDir();
   if (agent === 'desktop') return getClaudeDesktopDir();
   return null;
 }
@@ -152,6 +188,9 @@ function isAgentConfigurable(agent) {
   if (agent === 'desktop') {
     const status = detectClaudeDesktop();
     return Boolean(status.configExists);
+  }
+  if (agent === 'vscode') {
+    return Boolean(fs.existsSync(getCopilotDir()) || fs.existsSync(getVSCodeUserDir()) || detectVSCodeBinary());
   }
   const rootDir = getAgentRootDir(agent);
   return Boolean(rootDir && fs.existsSync(rootDir));
@@ -523,6 +562,17 @@ function auditMcpServers() {
     } catch {}
   }
 
+  // VS Code (User/mcp.json)
+  const vscodeMcpFile = path.join(getVSCodeUserDir(), 'mcp.json');
+  if (fs.existsSync(vscodeMcpFile)) {
+    try {
+      const cfg = JSON.parse(fs.readFileSync(vscodeMcpFile, 'utf8'));
+      for (const s of serverNames) {
+        results.push({ harness: 'VS Code', server: s, configured: Boolean(cfg.servers?.[s]) });
+      }
+    } catch {}
+  }
+
   return results;
 }
 
@@ -613,6 +663,31 @@ function detectOpenClawBinary() {
     for (const cand of posixCandidates) {
       if (cand && fs.existsSync(cand)) return cand;
     }
+  }
+  return null;
+}
+
+/**
+ * Resiliently discovers the VS Code CLI binary on PATH and standard Windows/POSIX install paths.
+ */
+function detectVSCodeBinary() {
+  const onPath = checkCommand('code');
+  if (onPath) return onPath;
+
+  if (os.platform() === 'win32') {
+    const candidates = [
+      path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Microsoft VS Code', 'bin', 'code.cmd'),
+      path.join(process.env['ProgramFiles'] || 'C:\\Program Files', 'Microsoft VS Code', 'bin', 'code.cmd')
+    ];
+    for (const cand of candidates) {
+      if (cand && fs.existsSync(cand)) return cand;
+    }
+  } else if (os.platform() === 'darwin') {
+    const macCand = '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code';
+    if (fs.existsSync(macCand)) return macCand;
+  } else {
+    const linuxCand = '/usr/bin/code';
+    if (fs.existsSync(linuxCand)) return linuxCand;
   }
   return null;
 }
@@ -727,6 +802,7 @@ function detectEnvironment() {
   detected.tools.codex = detectCodexBinary();
   detected.tools.hermes = detectHermesBinary();
   detected.tools.openclaw = detectOpenClawBinary();
+  detected.tools.vscode = detectVSCodeBinary();
   detected.tools.cursor = checkCommand('cursor');
   detected.tools.windsurf = checkCommand('windsurf');
 
@@ -816,7 +892,104 @@ function detectEnvironment() {
     detected.endpoints.openclaw = 'Not Installed / Unconfigured';
   }
 
+  // 8. Check VS Code / Copilot endpoint
+  const vscodeSettingsPath = path.join(getVSCodeUserDir(), 'settings.json');
+  if (fs.existsSync(vscodeSettingsPath)) {
+    try {
+      const raw = fs.readFileSync(vscodeSettingsPath, 'utf8');
+      const envMatch = raw.match(/"ANTHROPIC_BASE_URL"\s*:\s*"([^"]+)"/) || raw.match(/"OPENAI_BASE_URL"\s*:\s*"([^"]+)"/);
+      if (envMatch) detected.endpoints.vscode = envMatch[1];
+    } catch {}
+  }
+  if (!detected.endpoints.vscode && (detected.tools.vscode || fs.existsSync(getVSCodeUserDir()) || fs.existsSync(getCopilotDir()))) {
+    detected.endpoints.vscode = 'GitHub Copilot / Local User Config';
+  } else if (!detected.endpoints.vscode) {
+    detected.endpoints.vscode = 'Not Installed / Unconfigured';
+  }
+
   return detected;
+}
+
+function syncHud(dryRun = false, hudOptions = {}) {
+  const hudScript = path.join(toolsDir, 'heimdall-hud.mjs');
+  if (!fs.existsSync(hudScript)) return false;
+  let updated = false;
+
+  if (hudOptions.off) {
+    if (disableClaudeStatusLine(dryRun)) {
+      console.log(`   ${colors.yellow}✔ Disabled Heimdall HUD statusLine in Claude Code (~/.claude/settings.json)${colors.reset}`);
+      updated = true;
+    }
+    if (disableAntigravityStatusLine(dryRun)) {
+      console.log(`   ${colors.yellow}✔ Disabled Heimdall HUD statusLine in Antigravity (~/.gemini/antigravity-cli/settings.json)${colors.reset}`);
+      updated = true;
+    }
+    if (disableCodexStatusLine(dryRun)) {
+      console.log(`   ${colors.yellow}✔ Disabled [tui] status_line in Codex CLI (~/.codex/config.toml)${colors.reset}`);
+      updated = true;
+    }
+    return updated;
+  }
+
+  if (hudOptions.theme || hudOptions.lines) {
+    writeHudConfig({ theme: hudOptions.theme, lines: hudOptions.lines }, dryRun);
+    console.log(`   ${colors.green}✔ Saved HUD preferences (~/.heimdall-hud.json): theme=${hudOptions.theme || 'night-blue'}, lines=${hudOptions.lines || 2}${colors.reset}`);
+    updated = true;
+  }
+
+  if (configureClaudeStatusLine(hudScript, dryRun)) {
+    console.log(`   ${colors.green}✔ Configured Heimdall HUD statusLine in Claude Code (~/.claude/settings.json)${colors.reset}`);
+    updated = true;
+  }
+  if (configureAntigravityStatusLine(hudScript, dryRun)) {
+    console.log(`   ${colors.green}✔ Configured Heimdall HUD statusLine in Antigravity (~/.gemini/antigravity-cli/settings.json)${colors.reset}`);
+    updated = true;
+  }
+  if (configureCodexStatusLine(dryRun)) {
+    console.log(`   ${colors.green}✔ Configured native [tui] status_line in Codex CLI (~/.codex/config.toml)${colors.reset}`);
+    updated = true;
+  }
+  return updated;
+}
+
+const HUD_THEMES = ['night-blue', 'heimdall', 'claude-warm', 'titanium'];
+
+async function runHudInteractive(options, existingRl = null) {
+  const rl = existingRl || readline.createInterface({ input: process.stdin, output: process.stdout });
+  try {
+    console.log(`${colors.bold}${colors.cyan}=== Heimdall HUD Statusline Configuration ===${colors.reset}\n`);
+    console.log(`  1. Enable / Update HUD (Claude Code, Antigravity, Codex)`);
+    console.log(`  2. Disable HUD across all harnesses`);
+    console.log(`  3. Choose HUD Theme only (night-blue, heimdall, claude-warm, titanium)`);
+    const action = (await rl.question(`Choose an option [1-3, default: 1]: `)).trim();
+
+    if (action === '2') {
+      const updated = syncHud(options.dryRun, { off: true });
+      if (!updated) console.log(`  ${colors.dim}HUD was not active in any harness.${colors.reset}`);
+      return;
+    }
+
+    console.log(`\n${colors.yellow}Select HUD Color Theme:${colors.reset}`);
+    console.log(`  1. night-blue  [Default]`);
+    console.log(`  2. heimdall`);
+    console.log(`  3. claude-warm`);
+    console.log(`  4. titanium`);
+    const tChoice = (await rl.question(`Choose theme [1-4, default: 1]: `)).trim();
+    const themeIdx = parseInt(tChoice, 10);
+    const chosenTheme = (themeIdx >= 1 && themeIdx <= HUD_THEMES.length) ? HUD_THEMES[themeIdx - 1] : 'night-blue';
+
+    const lChoice = (await rl.question(`Layout lines? [1 or 2, default: 2]: `)).trim();
+    const chosenLines = lChoice === '1' ? 1 : 2;
+
+    if (action === '3') {
+      writeHudConfig({ theme: chosenTheme, lines: chosenLines }, options.dryRun);
+      console.log(`   ${colors.green}✔ Updated ~/.heimdall-hud.json (theme=${chosenTheme}, lines=${chosenLines})${colors.reset}`);
+    } else {
+      syncHud(options.dryRun, { theme: chosenTheme, lines: chosenLines });
+    }
+  } finally {
+    if (!existingRl) rl.close();
+  }
 }
 
 function printHelp() {
@@ -835,13 +1008,14 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
   ${colors.green}uninstall${colors.reset} (or ${colors.dim}--uninstall${colors.reset})     Safely remove Heimdall skills and agent personas from all harnesses
   ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
+  ${colors.green}hud${colors.reset} (or ${colors.dim}--hud${colors.reset})             Enable, disable, or theme Heimdall HUD (--on | --off | --theme <name> | --lines <1|2>)
   ${colors.green}skills${colors.reset} (or ${colors.dim}--skills${colors.reset})         List all canonical skills, categories, and upstream provenance
   ${colors.green}update-skill <name|all>${colors.reset}     Inspect upstream repository, updates, and bounded review protocol
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
   ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (69), minimal (16), security (12), design (14) [default: full]
-  ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, desktop, all [default: all]
+  ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, vscode, desktop, all [default: all]
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
   ${colors.yellow}-y, --yes${colors.reset}              Non-interactive mode (use defaults or provided CLI arguments)
@@ -850,6 +1024,8 @@ ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
   ${colors.yellow}--doctrine-path <file>${colors.reset} Custom file destination for AGENTS.md universal doctrine
   ${colors.yellow}--no-tools${colors.reset}             Skip deploying bridge tools and CLI shims
   ${colors.yellow}--no-doctrine${colors.reset}          Skip deploying AGENTS.md universal doctrine
+  ${colors.yellow}--no-hud${colors.reset}               Skip configuring Heimdall HUD statusline during install/sync
+  ${colors.yellow}--theme <name>${colors.reset}         HUD color theme: night-blue [default], heimdall, claude-warm, titanium
 
 ${colors.bold}EXAMPLES:${colors.reset}
   heimdall                                  # Interactive management hub (audit, sync, uninstall)
@@ -882,6 +1058,11 @@ function parseArgs() {
     dryRun: false,
     audit: false,
     syncModels: false,
+    hud: false,
+    hudEnabled: true,
+    hudOff: false,
+    hudTheme: null,
+    hudLines: null,
     listSkills: false,
     updateSkill: null,
     help: false,
@@ -899,6 +1080,15 @@ function parseArgs() {
     else if (arg === 'sync-docs' || arg === '--sync-docs' || arg === 'syncdocs') options.syncDocs = true;
     else if (arg === 'uninstall' || arg === '--uninstall') options.uninstall = true;
     else if (arg === 'sync-models' || arg === '--sync-models' || arg === 'syncmodels') options.syncModels = true;
+    else if (arg === 'hud' || arg === '--hud') options.hud = true;
+    else if (arg === '--on') options.hudOff = false;
+    else if (arg === '--off') options.hudOff = true;
+    else if (arg === '--no-hud') options.hudEnabled = false;
+    else if ((arg === '--theme' || arg === '--hud-theme') && args[i + 1]) {
+      options.hudTheme = args[++i].toLowerCase();
+    } else if (arg === '--lines' && args[i + 1]) {
+      options.hudLines = parseInt(args[++i], 10);
+    }
     else if (arg === 'skills' || arg === '--skills') options.listSkills = true;
     else if (arg === 'update-skill' || arg === '--update-skill' || arg === 'updateskill') {
       options.updateSkill = args[i + 1] && !args[i + 1].startsWith('-') ? args[++i] : 'all';
@@ -1394,6 +1584,11 @@ async function runSync(options, detected) {
   const mcpSynced = syncMcpServers(detected, options);
   if (mcpSynced) syncedAny = true;
 
+  // Synchronize Heimdall HUD statusline across Claude Code, Antigravity (agy), and Codex CLI
+  if (options.hudEnabled !== false) {
+    if (syncHud(options.dryRun, { theme: options.hudTheme, lines: options.hudLines })) syncedAny = true;
+  }
+
   // Refresh bridge tools & shims
   const activeToolsDir = options.toolsDir || detected.pathCandidates[0];
   if (activeToolsDir && fs.existsSync(activeToolsDir)) {
@@ -1435,6 +1630,10 @@ function runAudit(options) {
   if (detected.tools.openclaw || fs.existsSync(getOpenClawDir())) {
     console.log(`  OpenClaw Agent:     ${detected.tools.openclaw ? colors.green + detected.tools.openclaw + colors.reset : colors.dim + getOpenClawDir() + colors.reset}`);
     console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.openclaw}${colors.reset}`);
+  }
+  if (detected.tools.vscode || fs.existsSync(getVSCodeUserDir()) || fs.existsSync(getCopilotDir())) {
+    console.log(`  VS Code (Copilot):  ${detected.tools.vscode ? colors.green + detected.tools.vscode + colors.reset : colors.dim + getVSCodeUserDir() + colors.reset}`);
+    console.log(`                      Endpoint: ${colors.cyan}${detected.endpoints.vscode}${colors.reset}`);
   }
   console.log(`  Claude Desktop:     ${detected.tools.claudeDesktop ? colors.green + detected.tools.claudeDesktop + colors.reset : colors.dim + 'Not found' + colors.reset}`);
   console.log('');
@@ -1701,6 +1900,11 @@ async function runUninstall(options, detected, existingRl = null) {
     } catch {}
   }
 
+  // Unregister HUD statuslines if present
+  disableClaudeStatusLine(options.dryRun);
+  disableAntigravityStatusLine(options.dryRun);
+  disableCodexStatusLine(options.dryRun);
+
   console.log(`\n${colors.bold}${colors.green}Uninstallation Complete:${colors.reset} Removed ${totalRemovedSkills} skill bindings and ${totalRemovedAgents} agent personas across harnesses.\n`);
 }
 
@@ -1718,6 +1922,7 @@ async function runPostInstallMenu(options, detected) {
         { label: 'Audit Environment & Health Check', action: 'audit' },
         { label: 'Fast Sync Skills & Agents (1-sec zero-drift)', action: 'sync' },
         ...(hasCustomApi ? [{ label: 'Refresh Dynamic Models (sync-models)', action: 'sync-models' }] : []),
+        { label: 'Configure / Toggle Heimdall HUD Statusline', action: 'hud' },
         { label: 'Uninstall Heimdall', action: 'uninstall' },
         { label: 'Reinstall / Reconfigure Profile & Targets', action: 'reinstall' },
         { label: 'Exit', action: 'exit' }
@@ -1745,6 +1950,8 @@ async function runPostInstallMenu(options, detected) {
         await runSync(options, currentDetected);
       } else if (selected === 'sync-models') {
         await syncModelsFromEndpoint();
+      } else if (selected === 'hud') {
+        await runHudInteractive(options, rl);
       } else if (selected === 'uninstall') {
         await runUninstall(options, currentDetected, rl);
       } else if (selected === 'reinstall') {
@@ -1783,6 +1990,8 @@ async function runInteractive(options, detected) {
     console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.hermes}${colors.reset}`);
     console.log(`  [${detected.tools.openclaw ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] OpenClaw            ${detected.tools.openclaw ? '(' + detected.tools.openclaw + ')' : '(Not found)'}`);
     console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.openclaw}${colors.reset}`);
+    console.log(`  [${detected.tools.vscode ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] VS Code (Copilot)   ${detected.tools.vscode ? '(' + detected.tools.vscode + ')' : '(Not found)'}`);
+    console.log(`       ${colors.dim}Endpoint: ${detected.endpoints.vscode}${colors.reset}`);
     console.log(`  [${detected.tools.claudeDesktop ? colors.green + '✔' : colors.dim + ' '}${colors.reset}] Claude Desktop       ${detected.tools.claudeDesktop ? '(' + detected.tools.claudeDesktop + ')' : '(Not found)'}`);
     console.log('');
 
@@ -1793,18 +2002,20 @@ async function runInteractive(options, detected) {
     console.log(`  4. OpenAI Codex CLI only`);
     console.log(`  5. Hermes Agent only`);
     console.log(`  6. OpenClaw only`);
-    console.log(`  7. Claude Desktop only (MCP & Playbooks)`);
-    console.log(`  8. Custom Multi-Selection (e.g. Claude + Hermes)`);
+    console.log(`  7. VS Code (Copilot) only`);
+    console.log(`  8. Claude Desktop only (MCP & Playbooks)`);
+    console.log(`  9. Custom Multi-Selection (e.g. Claude + VS Code)`);
 
-    const tChoice = await rl.question(`Choose installation targets [1-8, default: 1]: `);
+    const tChoice = await rl.question(`Choose installation targets [1-9, default: 1]: `);
     if (tChoice === '2') options.agents = ['claude'];
     else if (tChoice === '3') options.agents = ['gemini'];
     else if (tChoice === '4') options.agents = ['codex'];
     else if (tChoice === '5') options.agents = ['hermes'];
     else if (tChoice === '6') options.agents = ['openclaw'];
-    else if (tChoice === '7') options.agents = ['desktop'];
-    else if (tChoice === '8') {
-      const custom = await rl.question(`Enter comma-separated targets (claude, gemini, codex, hermes, openclaw, desktop): `);
+    else if (tChoice === '7') options.agents = ['vscode'];
+    else if (tChoice === '8') options.agents = ['desktop'];
+    else if (tChoice === '9') {
+      const custom = await rl.question(`Enter comma-separated targets (claude, gemini, codex, hermes, openclaw, vscode, desktop): `);
       options.agents = custom.split(',').map(s => s.trim().toLowerCase());
     } else {
       options.agents = ['all'];
@@ -1878,6 +2089,17 @@ async function runInteractive(options, detected) {
     } else {
       options.doctrinePath = detected.doctrineCandidates[0];
       options.doctrine = true;
+    }
+
+    // Optional Heimdall HUD statusline prompt
+    console.log(`\n${colors.yellow}Heimdall HUD Statusline (Claude Code, Antigravity, Codex):${colors.reset}`);
+    const hudChoice = (await rl.question(`Enable Heimdall HUD statusline? (y/n, default: y): `)).trim().toLowerCase();
+    options.hudEnabled = hudChoice !== 'n' && hudChoice !== 'no';
+    if (options.hudEnabled) {
+      console.log(`  1. night-blue [Default]  2. heimdall  3. claude-warm  4. titanium`);
+      const htChoice = (await rl.question(`Choose HUD theme [1-4, default: 1]: `)).trim();
+      const htIdx = parseInt(htChoice, 10);
+      options.hudTheme = (htIdx >= 1 && htIdx <= HUD_THEMES.length) ? HUD_THEMES[htIdx - 1] : 'night-blue';
     }
   } finally {
     rl.close();
@@ -2029,6 +2251,23 @@ async function main() {
     process.exit(0);
   }
 
+  if (options.hud) {
+    if (!options.hudOff && !options.hudTheme && !options.hudLines && !options.yes && process.stdin.isTTY && !process.argv.includes('--on')) {
+      await runHudInteractive(options);
+    } else {
+      console.log(`${colors.bold}${colors.cyan}=== Heimdall HUD Statusline Sync ===${colors.reset}\n`);
+      const updated = syncHud(options.dryRun, {
+        off: options.hudOff,
+        theme: options.hudTheme,
+        lines: options.hudLines
+      });
+      if (!updated) {
+        console.log(`  ${colors.green}✔${colors.reset} HUD statusline already up to date across detected harnesses.`);
+      }
+    }
+    process.exit(0);
+  }
+
   if (options.syncDocs) {
     const res = syncCatalogCounts(__dirname, options.dryRun);
     if (res) {
@@ -2118,7 +2357,14 @@ async function main() {
   // 3. Clean and deploy skills
   for (const [agent, targetDir] of activeDestinations) {
     const rootDir = getAgentRootDir(agent);
-    if (!rootDir || !fs.existsSync(rootDir)) continue;
+    if (!rootDir) continue;
+    if (!fs.existsSync(rootDir)) {
+      if (agent === 'vscode' && !options.dryRun) {
+        fs.mkdirSync(rootDir, { recursive: true });
+      } else if (agent !== 'vscode') {
+        continue;
+      }
+    }
 
     console.log(`\n-> Deploying to ${colors.bold}${agent.toUpperCase()}${colors.reset} (${targetDir})...`);
     if (!options.dryRun && !fs.existsSync(targetDir)) {
@@ -2284,6 +2530,12 @@ async function main() {
         }
       }
     }
+  }
+
+  // 7. Configure Heimdall HUD Statusline if enabled
+  if (options.hudEnabled !== false) {
+    console.log(`\n-> Configuring Heimdall HUD Statusline...`);
+    syncHud(options.dryRun, { theme: options.hudTheme, lines: options.hudLines });
   }
 
   console.log(`\n${colors.bold}${colors.green}=== Heimdall Installation Complete! ===${colors.reset}\n`);

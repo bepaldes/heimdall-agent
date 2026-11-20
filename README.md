@@ -263,6 +263,11 @@ heimdall audit
 # Refresh dynamic model catalog from your active provider/proxy
 heimdall sync-models
 
+# Enable, disable, or theme the 2-line Heimdall HUD statusline
+heimdall hud
+heimdall hud --on --theme night-blue
+heimdall hud --off
+
 # Browse canonical skills catalog and upstream repositories
 heimdall skills
 
@@ -279,7 +284,9 @@ heimdall uninstall
 | Flag | Default | Description | Example |
 | :--- | :---: | :--- | :--- |
 | `--profile <name>` | `full` | Skill profile tier: `full`, `minimal`, `security`, or `design`. | `heimdall --profile minimal` |
-| `--agents <targets>` | `all` | Comma-separated list of harnesses: `claude`, `gemini`, `codex`, `desktop`, `all`. | `heimdall --agents claude,gemini` |
+| `--agents <targets>` | `all` | Comma-separated list of harnesses: `claude`, `gemini`, `codex`, `hermes`, `openclaw`, `vscode`, `desktop`, `all`. | `heimdall --agents claude,vscode` |
+| `--theme <name>` | `night-blue` | HUD color theme: `night-blue`, `heimdall`, `claude-warm`, or `titanium`. | `heimdall hud --theme claude-warm` |
+| `--no-hud` | `false` | Skip configuring the Heimdall HUD statusline during install or sync. | `heimdall --no-hud` |
 | `--link` | `true` (rec.) | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). | `heimdall --link` |
 | `--clean` | `false` | Wipe legacy skills from target directory before deploying. | `heimdall --clean` |
 | `--dry-run` | `false` | Simulate execution and display actions without modifying the filesystem. | `heimdall --dry-run` |
@@ -487,6 +494,7 @@ For multi-device pair programming, mobile monitoring, and project memory, Heimda
 * **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: Mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
 * **[Graphify (`github.com/Graphify-Labs/graphify`)](https://github.com/Graphify-Labs/graphify)**: Local-first code knowledge graph builder. Uses Tree-sitter AST parsing across 40+ programming languages to build deterministic dependency maps with zero LLM API costs, exporting directly to Obsidian vaults.
 * **[Obsidian (`obsidian.md`)](https://obsidian.md/)**: Local-first Markdown knowledge base. Paired with Graphify-generated vaults (`[[wikilinks]]`), it serves as persistent external memory for AI coding agents, loading immediate architectural context on startup without token-heavy scanning.
+* **Heimdall HUD ([`tools/heimdall-hud.mjs`](tools/heimdall-hud.mjs))**: Built-in 2-line terminal statusline for **Claude Code** and **Google Antigravity (`agy`)** displaying model, color-coded context bar, git branch/dirty count, token usage, session cost, and duration across 4 themes (`night-blue` default, `heimdall`, `claude-warm`, `titanium`). For **Codex CLI** (which does not execute external `statusLine` scripts), `heimdall hud` configures Codex's native `[tui] status_line` items in `~/.codex/config.toml`.
 
 [↑ Back to top](#table-of-contents)
 
