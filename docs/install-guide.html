@@ -381,6 +381,140 @@
       flex-wrap: wrap;
       gap: 12px;
     }
+
+    /* Screenshot and Visual Cards */
+    .screenshot-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin: 20px 0 24px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    .screenshot-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: var(--surface-raised);
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--ink-dim);
+    }
+    .window-dots {
+      display: inline-flex;
+      gap: 6px;
+    }
+    .window-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      display: inline-block;
+    }
+    .window-dot.red { background: #ef4444; }
+    .window-dot.yellow { background: #f59e0b; }
+    .window-dot.green { background: #10b981; }
+    .screenshot-frame {
+      position: relative;
+      background: #090d16;
+      overflow: hidden;
+    }
+    .screenshot-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+    .screenshot-caption {
+      padding: 10px 16px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--ink-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .badge-tag {
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 10.5px;
+    }
+    .callout-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin: 16px 0 24px;
+    }
+    .callout-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .callout-card h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+    .callout-card p {
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      margin: 0;
+      line-height: 1.45;
+    }
+    /* Visual HUD Mockup */
+    .hud-mockup {
+      background: #0a0f1d;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      margin: 14px 16px 16px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .hud-line-1 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .hud-line-2 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      color: #94a3b8;
+      font-size: 11.5px;
+    }
+    .hud-tag {
+      font-weight: 600;
+    }
+    .hud-model { color: #60a5fa; }
+    .hud-dir { color: #cbd5e1; }
+    .hud-branch { color: #a78bfa; }
+    .hud-state { color: #34d399; }
+    .hud-cost { color: #4ade80; }
+    .hud-bar { color: #38bdf8; }
   </style>
 </head>
 <body>
@@ -600,6 +734,39 @@ gc status</code></pre>
         <pre><code>herdr-app</code></pre>
       </div>
 
+      <div class="screenshot-card">
+        <div class="screenshot-header">
+          <div class="window-dots">
+            <span class="window-dot red"></span>
+            <span class="window-dot yellow"></span>
+            <span class="window-dot green"></span>
+          </div>
+          <span>Herdr-App — Multi-Agent Engineering Cockpit (Live GPU Session)</span>
+        </div>
+        <div class="screenshot-frame">
+          <img src="assets/herdr-app-cockpit.png" alt="Herdr-App Multi-Agent Cockpit with split panes and real-time agent tracking" loading="lazy" />
+        </div>
+        <div class="screenshot-caption">
+          <span><strong>Cockpit View:</strong> Simultaneous multi-model split panes, persistent spaces, and background daemon tracking</span>
+          <span class="badge-tag">GPU-Accelerated &bull; GPUI + libghostty</span>
+        </div>
+      </div>
+
+      <div class="callout-grid">
+        <div class="callout-card">
+          <h4><span>&#9889;</span> Multi-Agent Split Cockpit</h4>
+          <p>Run authoring agents (Claude Code Opus/Sonnet) side-by-side with peer reviewers and test suites in synchronized panes.</p>
+        </div>
+        <div class="callout-card">
+          <h4><span>&#128194;</span> Spaces &amp; Persistent Daemons</h4>
+          <p>Organize repos into isolated workspaces. The <code>herdr-core</code> background daemon keeps sessions alive across window restarts.</p>
+        </div>
+        <div class="callout-card">
+          <h4><span>&#128260;</span> Real-Time State Tracking</h4>
+          <p>Visual badges in the sidebar continuously reflect live agent states: <code>working</code>, <code>blocked</code>, and <code>idle</code>.</p>
+        </div>
+      </div>
+
       <ul class="checklist">
         <li>
           <span class="check-icon">&#10003;</span>
@@ -718,7 +885,59 @@ npm install</code></pre>
         </table>
       </div>
 
-      <h3>4.3 Verify Installation &amp; Management</h3>
+      <h3>4.3 Live HUD Statusline &amp; Real-Time Telemetry</h3>
+      <p>
+        During setup, selecting <code>night-blue</code> (or any HUD preset) equips your CLI sessions with a zero-latency 2-line telemetry bar:
+      </p>
+
+      <div class="screenshot-card">
+        <div class="screenshot-header">
+          <div class="window-dots">
+            <span class="window-dot red"></span>
+            <span class="window-dot yellow"></span>
+            <span class="window-dot green"></span>
+          </div>
+          <span>Terminal HUD Statusline — 2-Line Telemetry &amp; Token Budget Tracker</span>
+        </div>
+        <div class="hud-mockup">
+          <div class="hud-line-1">
+            <span class="hud-tag hud-model">claude-3-7-sonnet</span>
+            <span>&bull;</span>
+            <span class="hud-tag hud-dir">~/heimdall-agent</span>
+            <span>&bull;</span>
+            <span class="hud-tag hud-branch">&#9094; main</span>
+            <span>&bull;</span>
+            <span class="hud-tag hud-state">&#9679; working</span>
+            <span>&bull;</span>
+            <span class="hud-tag hud-cost">$0.042</span>
+          </div>
+          <div class="hud-line-2">
+            <span class="hud-bar">[&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;]</span>
+            <span>38.4k / 200k (19%) Context Window</span>
+            <span>&bull;</span>
+            <span>5h Limit: 12%</span>
+            <span>&bull;</span>
+            <span>Weekly: 24%</span>
+          </div>
+        </div>
+        <div class="screenshot-caption">
+          <span><strong>Heimdall HUD (night-blue preset):</strong> Real-time token usage, context depletion guard, and session cost</span>
+          <span class="badge-tag">Zero-Latency Hook</span>
+        </div>
+      </div>
+
+      <div class="callout-grid">
+        <div class="callout-card">
+          <h4><span>&#128202;</span> Token &amp; Cost Visibility</h4>
+          <p>Per-turn token accounting and context capacity bars guard against abrupt session truncation and unexpected context compaction.</p>
+        </div>
+        <div class="callout-card">
+          <h4><span>&#128737;&#65039;</span> 69 Engineered Skills</h4>
+          <p>Auto-links strict TDD, clean code doctrines, security auditing, and cross-model peer review loops across all harnesses.</p>
+        </div>
+      </div>
+
+      <h3>4.4 Verify Installation &amp; Management</h3>
       <div class="terminal">
         <div class="terminal-top"><span>Verification &amp; Management</span><span>CLI</span></div>
         <pre><code># Run terminating test suites
