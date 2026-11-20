@@ -457,13 +457,34 @@
         <pre><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></pre>
       </div>
 
-      <h3>1.2 Verify Git and Node.js</h3>
-      <p>Ensure Git and Node.js (v18 or higher, v20+ recommended) are installed:</p>
+      <h3>1.2 Check &amp; Install Git and Node.js</h3>
+      <p>Verify if Git and Node.js (v18 or higher, v20+ recommended) are already installed:</p>
       <div class="terminal">
         <div class="terminal-top"><span>Verification</span><span>CLI</span></div>
         <pre><code>git --version
 node -v
 npm -v</code></pre>
+      </div>
+
+      <p><strong>If NOT installed</strong>, install them in one step via Windows Package Manager (<code>winget</code>):</p>
+      <div class="terminal">
+        <div class="terminal-top"><span>Install via winget</span><span>PowerShell</span></div>
+        <pre><code># Install Node.js LTS and Git for Windows
+winget install OpenJS.NodeJS.LTS
+winget install Git.Git</code></pre>
+      </div>
+
+      <div class="panel panel-accent">
+        <div class="panel-head">&#9432; Manual Download Links</div>
+        <p>
+          Prefer standard GUI installers? Download directly:
+          <br />
+          &bull; <strong>Node.js LTS:</strong> <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a> (includes <code>npm</code> and <code>npx</code>)
+          <br />
+          &bull; <strong>Git for Windows:</strong> <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com</a>
+          <br />
+          <em>Tip: Close and reopen your terminal after installing so your system PATH updates.</em>
+        </p>
       </div>
 
       <h3>1.3 Install CLI Coding Agents</h3>
@@ -497,10 +518,17 @@ npm install -g @openai/codex</code></pre>
         </p>
       </div>
 
-      <h3>2.1 Install and Run GC-Helper</h3>
+      <h3>2.1 Run GC-Helper (Zero-Install via npx, or Global)</h3>
+      <p>
+        Because GC-Helper is a lightweight configurator, you can run it directly using <code>npx</code> without installing anything permanently, or install it globally for the shorthand <code>gc</code> command:
+      </p>
       <div class="terminal">
-        <div class="terminal-top"><span>GC-Helper</span><span>CLI</span></div>
-        <pre><code>npm install -g gc-helper
+        <div class="terminal-top"><span>Run GC-Helper</span><span>npx / npm</span></div>
+        <pre><code># Option A: Run directly with zero permanent install (Recommended):
+npx gc-helper
+
+# Option B: Or install globally for shorthand 'gc' command:
+npm install -g gc-helper
 gc</code></pre>
       </div>
 
@@ -541,12 +569,20 @@ gc status</code></pre>
       </p>
 
       <div class="panel panel-accent">
-        <div class="panel-head">&#9432; Workspace Location (You Decide)</div>
+        <div class="panel-head">&#9432; Why Git Clone (Permanent Workspace Hub)</div>
         <p>
-          You choose where Heimdall is cloned. The folder where you clone Heimdall can also serve as the workspace folder 
-          where all your other project repositories will live.
+          Unlike one-shot utilities, <strong>Heimdall must be cloned via Git</strong>. 
+          Heimdall creates live NTFS filesystem junctions (<code>--link</code>) linking its skills and personas directly into Claude Code, Codex, and Claude Desktop.
           <br /><br />
-          <strong>Suggested locations:</strong>
+          Cloning into a permanent workspace folder (rather than running via temporary <code>npx</code> caches) ensures:
+          <br />
+          1. <strong>Persistent links:</strong> Avoids temporary <code>npx</code> cache directories that break on cleanup.
+          <br />
+          2. <strong>Instant updates:</strong> A simple <code>git pull</code> updates all 69 skills across all AI tools in 1 second.
+          <br />
+          3. <strong>Workspace hub:</strong> The parent directory you choose (e.g. <code>C:\Apps</code> or <code>C:\Projects</code>) also becomes where your project codebases live.
+          <br /><br />
+          <strong>Suggested locations (you decide):</strong>
           <br />
           &bull; <code>C:\Apps</code> (e.g., <code>C:\Apps\heimdall-agent</code> alongside your project repos)
           <br />
