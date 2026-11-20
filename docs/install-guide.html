@@ -1,59 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multi-Agent AI Stack Installation Guide</title>
+  <title>Multi-Agent AI Stack Installation Guide — Bernardo Paldes</title>
+  <meta name="description" content="Step-by-step setup guide for Claude Desktop, Claude Code, OpenAI Codex CLI, GC-Helper, Herdr (App & CLI), and Heimdall Agent." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* System theme auto-detection via CSS variables */
+    /* Design Tokens matching https://bepaldes.github.io/ */
     :root {
-      /* Default / Light Theme */
-      --bg: #ffffff;
-      --surface: #f8fafc;
+      /* Light Theme */
+      --bg: #f8fafc;
+      --surface: #ffffff;
       --surface-raised: #f1f5f9;
+      --card: #ffffff;
       --border: #e2e8f0;
       --ink: #0f172a;
       --ink-muted: #475569;
       --ink-dim: #94a3b8;
-      --accent: #0284c7;
-      --accent-soft: rgba(2, 132, 199, 0.08);
-      --green: #16a34a;
-      --green-soft: rgba(22, 163, 74, 0.08);
-      --amber: #d97706;
-      --amber-soft: rgba(217, 119, 6, 0.08);
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.08);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.08);
       --term-bg: #0f172a;
       --term-ink: #f8fafc;
       --term-border: #1e293b;
       --term-header: #1e293b;
-      --mono: "JetBrains Mono", "Cascadia Code", ui-monospace, Menlo, Consolas, monospace;
-      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+      --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --card-glow: 0 0 35px -8px rgba(37, 99, 235, 0.12);
+      --stage-shadow: 0 20px 50px -10px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.06);
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        /* Dark Theme */
-        --bg: #090b0e;
-        --surface: #12151b;
-        --surface-raised: #181c24;
-        --border: #242933;
-        --ink: #f1f5f9;
-        --ink-muted: #94a3b8;
-        --ink-dim: #64748b;
-        --accent: #38bdf8;
-        --accent-soft: rgba(56, 189, 248, 0.08);
-        --green: #34d399;
-        --green-soft: rgba(52, 211, 153, 0.08);
-        --amber: #fbbf24;
-        --amber-soft: rgba(251, 191, 36, 0.08);
-        --term-bg: #06080b;
-        --term-ink: #f8fafc;
-        --term-border: #242933;
-        --term-header: #12151b;
-      }
+    html.dark {
+      /* Dark Theme (matches index.html exact colors) */
+      --bg: #05070c;
+      --surface: #0b101b;
+      --surface-raised: #0f1728;
+      --card: #0f1728;
+      --border: #1c2638;
+      --ink: #f8fafc;
+      --ink-muted: #94a3b8;
+      --ink-dim: #64748b;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.12);
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.12);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.12);
+      --term-bg: #030509;
+      --term-ink: #f8fafc;
+      --term-border: #1c2638;
+      --term-header: #0b101b;
+      --nav-bg: rgba(5, 7, 12, 0.85);
+      --card-glow: 0 0 40px -10px rgba(37, 99, 235, 0.28);
+      --stage-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
     body {
       background: var(--bg);
       color: var(--ink);
@@ -61,60 +75,265 @@
       font-size: 15px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
-      padding: 0 16px;
-      transition: background 0.2s, color 0.2s;
+      padding: 0;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    /* Ambient Hero Grid Background matching https://bepaldes.github.io/ */
+    body.hero-grid-dark {
+      background-color: #05070c;
+      background-image: 
+        radial-gradient(circle at 50% 15%, rgba(37, 99, 235, 0.2) 0%, rgba(14, 165, 233, 0.05) 50%, transparent 75%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 48px 48px, 48px 48px;
+      background-attachment: fixed;
+    }
+
+    body.hero-grid-light {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(circle at 50% 15%, rgba(37, 99, 235, 0.1) 0%, rgba(14, 165, 233, 0.03) 50%, transparent 75%),
+        linear-gradient(to right, rgba(15, 23, 42, 0.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.06) 1px, transparent 1px);
+      background-size: 100% 100%, 48px 48px, 48px 48px;
+      background-attachment: fixed;
+    }
+
+    /* Floating Ambient Halos */
+    .ambient-halo-top {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1200px;
+      height: 520px;
+      background: radial-gradient(circle at 50% 20%, rgba(37, 99, 235, 0.28) 0%, rgba(59, 130, 246, 0.1) 45%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(55px);
+      transition: opacity 0.3s;
+    }
+    html:not(.dark) .ambient-halo-top {
+      background: radial-gradient(circle at 50% 20%, rgba(37, 99, 235, 0.12) 0%, rgba(59, 130, 246, 0.04) 45%, transparent 75%);
+    }
+
+    .border-glow-blue {
+      border-color: rgba(59, 130, 246, 0.35) !important;
+      box-shadow: 0 0 35px -8px rgba(37, 99, 235, 0.25) !important;
+    }
+
+    /* Fixed Top Navigation */
+    .top-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      transition: background-color 0.25s, border-color 0.25s;
+    }
+    .top-nav-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 20px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .brand-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(37, 99, 235, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--accent);
+      transition: transform 0.2s;
+    }
+    .brand-link:hover .brand-badge {
+      transform: scale(1.05);
+    }
+    .brand-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .brand-sub {
+      font-size: 10.5px;
+      font-family: var(--mono);
+      color: var(--ink-dim);
+      margin-top: 2px;
+    }
+    .nav-steps-bar {
+      display: none;
+    }
+    @media (min-width: 820px) {
+      .nav-steps-bar {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .step-chip {
+        padding: 5px 9px;
+        border-radius: 6px;
+        color: var(--ink-muted);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.15s, background 0.15s;
+      }
+      .step-chip:hover {
+        color: var(--ink);
+        background: var(--surface-raised);
+        text-decoration: none;
+      }
+      .chip-dot {
+        width: 6.5px;
+        height: 6.5px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .dot-blue { background: #3b82f6; }
+      .dot-emerald { background: #10b981; }
+      .dot-amber { background: #f59e0b; }
+      .dot-purple { background: #a855f7; }
+    }
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    }
+    .btn-nav:hover {
+      background: var(--surface-raised);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+    .btn-icon-only {
+      padding: 7px;
     }
 
     a {
       color: var(--accent);
       text-decoration: none;
+      transition: color 0.15s;
     }
     a:hover {
       text-decoration: underline;
     }
 
     .wrapper {
-      max-width: 860px;
+      max-width: 900px;
       margin: 0 auto;
-      padding: 56px 0 100px;
+      padding: 104px 20px 100px;
+      position: relative;
+      z-index: 10;
     }
 
-    /* Header */
-    header {
+    /* Hero / Header with architectural perspective */
+    .guide-hero {
+      position: relative;
       margin-bottom: 48px;
-      padding-bottom: 28px;
+      padding: 24px 0 36px;
       border-bottom: 1px solid var(--border);
+    }
+    .hero-blueprint-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      opacity: 0.25;
+      z-index: 0;
+    }
+    html.dark .hero-blueprint-bg {
+      opacity: 0.35;
+    }
+    .blueprint-svg {
+      width: 100%;
+      height: 100%;
+      max-width: 900px;
+      color: var(--accent);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
     }
     .eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       font-family: var(--mono);
-      font-size: 11.5px;
+      font-size: 11px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--accent);
       margin-bottom: 12px;
       font-weight: 600;
+      background: var(--accent-soft);
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
     }
     .dot {
-      width: 7px;
-      height: 7px;
+      width: 6.5px;
+      height: 6.5px;
       border-radius: 50%;
       background: var(--green);
     }
     h1 {
-      font-size: 30px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
       color: var(--ink);
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      line-height: 1.15;
     }
     .intro {
       font-size: 16px;
       line-height: 1.6;
       color: var(--ink-muted);
-      margin-bottom: 24px;
+      margin-bottom: 26px;
+      max-width: 780px;
     }
 
     .meta-grid {
@@ -123,50 +342,54 @@
       gap: 12px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 14px 18px;
+      border-radius: 8px;
+      padding: 16px 20px;
       font-size: 13px;
+      box-shadow: var(--stage-shadow);
     }
     .meta-item span {
       display: block;
       color: var(--ink-dim);
-      font-size: 11px;
+      font-size: 10.5px;
       text-transform: uppercase;
       font-family: var(--mono);
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
     .meta-item strong {
       color: var(--ink);
       font-weight: 600;
     }
 
-    /* Step Navigation */
+    /* Step Navigation Grid */
     .nav-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 48px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 56px;
     }
     .nav-card {
       display: block;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px 14px;
+      border-radius: 8px;
+      padding: 14px 16px;
       color: var(--ink);
-      transition: background 0.15s, border-color 0.15s;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: var(--stage-shadow);
     }
     .nav-card:hover {
       background: var(--surface-raised);
       border-color: var(--accent);
       text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: var(--card-glow);
     }
     .nav-num {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--ink-dim);
       display: block;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
     .nav-title {
       font-size: 13.5px;
@@ -371,15 +594,42 @@
 
     footer {
       border-top: 1px solid var(--border);
-      padding-top: 24px;
-      margin-top: 56px;
+      padding-top: 28px;
+      margin-top: 72px;
       font-family: var(--mono);
       font-size: 11.5px;
       color: var(--ink-dim);
       display: flex;
       justify-content: space-between;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 16px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .footer-link {
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-link:hover {
+      color: var(--ink);
+      text-decoration: none;
     }
 
     /* Screenshot and Visual Cards */
@@ -517,38 +767,106 @@
     .hud-bar { color: #38bdf8; }
   </style>
 </head>
-<body>
+<body class="hero-grid-dark">
+
+  <!-- Ambient Glowing Halos matching index.html -->
+  <div class="ambient-halo-top"></div>
+
+  <!-- Fixed Top Navigation matching https://bepaldes.github.io/ -->
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <a href="index.html" class="brand-link" title="Bernardo Paldes Open Source Tools">
+        <div class="brand-badge">BP</div>
+        <div>
+          <div class="brand-title">Bernardo Paldes</div>
+          <div class="brand-sub">Multi-Agent AI Stack</div>
+        </div>
+      </a>
+
+      <nav class="nav-steps-bar" aria-label="Step Links">
+        <a href="#step-1" class="step-chip"><span class="chip-dot dot-blue"></span>Step 01: CLI</a>
+        <a href="#step-2" class="step-chip"><span class="chip-dot dot-emerald"></span>Step 02: GC-Helper</a>
+        <a href="#step-3" class="step-chip"><span class="chip-dot dot-amber"></span>Step 03: Herdr</a>
+        <a href="#step-4" class="step-chip"><span class="chip-dot dot-purple"></span>Step 04: Heimdall</a>
+      </nav>
+
+      <div class="nav-controls">
+        <a href="index.html" class="btn-nav" title="Back to Main Overview">
+          <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
+          <span>Overview</span>
+        </a>
+        <button type="button" id="theme-toggle" onclick="toggleTheme()" class="btn-nav btn-icon-only" title="Toggle Theme">
+          <i id="theme-icon-sun" data-lucide="sun" style="width: 15px; height: 15px;"></i>
+          <i id="theme-icon-moon" data-lucide="moon" style="width: 15px; height: 15px;" class="hidden"></i>
+        </button>
+        <a href="https://github.com/bepaldes/heimdall-agent" target="_blank" rel="noopener noreferrer" class="btn-nav" title="View on GitHub">
+          <i data-lucide="github" style="width: 14px; height: 14px;"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
 
   <div class="wrapper">
 
-    <header>
-      <div class="eyebrow">
-        <span class="dot"></span>
-        Multi-Agent Workspace Setup
+    <!-- Hero / Header with architectural perspective SVG -->
+    <header class="guide-hero">
+      <div class="hero-blueprint-bg">
+        <svg class="blueprint-svg" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3">
+            <line x1="640" y1="280" x2="0" y2="720" />
+            <line x1="640" y1="280" x2="160" y2="720" />
+            <line x1="640" y1="280" x2="320" y2="720" />
+            <line x1="640" y1="280" x2="480" y2="720" />
+            <line x1="640" y1="280" x2="800" y2="720" />
+            <line x1="640" y1="280" x2="960" y2="720" />
+            <line x1="640" y1="280" x2="1120" y2="720" />
+            <line x1="640" y1="280" x2="1280" y2="720" />
+          </g>
+          <g stroke="currentColor" stroke-width="1.5">
+            <ellipse cx="640" cy="480" rx="520" ry="140" opacity="0.3" />
+            <ellipse cx="640" cy="540" rx="600" ry="160" opacity="0.2" />
+            <ellipse cx="640" cy="620" rx="680" ry="180" opacity="0.15" />
+          </g>
+          <g fill="currentColor">
+            <circle cx="640" cy="280" r="4" />
+            <circle cx="480" cy="420" r="3" />
+            <circle cx="800" cy="420" r="3" />
+            <circle cx="320" cy="520" r="3.5" />
+            <circle cx="960" cy="520" r="3.5" />
+          </g>
+        </svg>
       </div>
-      <h1>Multi-Agent AI Engineering Stack Setup Guide</h1>
-      <p class="intro">
-        A simple, step-by-step setup guide for users with <strong>Claude Desktop</strong> who want to add 
-        <strong>Claude Code</strong>, <strong>OpenAI Codex CLI</strong>, <strong>GC-Helper</strong>, 
-        <strong>Heimdall Agent</strong>, and <strong>Herdr-App</strong> as an integrated terminal and desktop IDE.
-      </p>
 
-      <div class="meta-grid">
-        <div class="meta-item">
-          <span>Starting Point</span>
-          <strong>Claude Desktop Installed</strong>
+      <div class="hero-content">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          Multi-Agent Workspace Setup
         </div>
-        <div class="meta-item">
-          <span>CLI Tools</span>
-          <strong>Claude Code &amp; Codex CLI</strong>
-        </div>
-        <div class="meta-item">
-          <span>Configurator</span>
-          <strong>GC-Helper (Optional GhostCLI)</strong>
-        </div>
-        <div class="meta-item">
-          <span>Workspace &amp; Skills</span>
-          <strong>Herdr &amp; Heimdall</strong>
+        <h1>Multi-Agent AI Engineering Stack Setup Guide</h1>
+        <p class="intro">
+          A simple, step-by-step setup guide for users with <strong>Claude Desktop</strong> who want to add 
+          <strong>Claude Code</strong>, <strong>OpenAI Codex CLI</strong>, <strong>GC-Helper</strong>, 
+          <strong>Heimdall Agent</strong>, and <strong>Herdr (App &amp; CLI)</strong> as an integrated terminal and desktop IDE.
+        </p>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span>Starting Point</span>
+            <strong>Claude Desktop Installed</strong>
+          </div>
+          <div class="meta-item">
+            <span>CLI Tools</span>
+            <strong>Claude Code &amp; Codex CLI</strong>
+          </div>
+          <div class="meta-item">
+            <span>Configurator</span>
+            <strong>GC-Helper (Optional GhostCLI)</strong>
+          </div>
+          <div class="meta-item">
+            <span>Workspace &amp; Skills</span>
+            <strong>Herdr &amp; Heimdall</strong>
+          </div>
         </div>
       </div>
     </header>
@@ -1117,15 +1435,71 @@ heimdall herdr</code></pre>
     </section>
 
     <footer>
-      <div>Multi-Agent Engineering Setup &bull; docs/install-guide.html</div>
-      <div>Heimdall Architecture &bull; MIT License</div>
+      <div class="footer-brand">
+        <span class="footer-dot"></span>
+        <span>Bernardo Paldes &bull; Multi-Agent Engineering Stack</span>
+      </div>
+      <div class="footer-links">
+        <a href="index.html" class="footer-link">Overview</a>
+        <a href="https://github.com/bepaldes/heimdall-agent" target="_blank" rel="noopener noreferrer" class="footer-link">Heimdall Agent</a>
+        <a href="https://github.com/bepaldes" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub Profile</a>
+      </div>
     </footer>
 
   </div>
 
   <script>
+    // Theme Engine matching https://bepaldes.github.io/
+    function initTheme() {
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = stored ? stored === 'dark' : prefersDark;
+      applyTheme(isDark);
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyTheme(!isDark);
+    }
+
+    function applyTheme(isDark) {
+      const html = document.documentElement;
+      const body = document.body;
+      const sunIcon = document.getElementById('theme-icon-sun');
+      const moonIcon = document.getElementById('theme-icon-moon');
+
+      if (isDark) {
+        html.classList.add('dark');
+        if (body) {
+          body.classList.remove('hero-grid-light');
+          body.classList.add('hero-grid-dark');
+        }
+        if (sunIcon) sunIcon.classList.remove('hidden');
+        if (moonIcon) moonIcon.classList.add('hidden');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.classList.remove('dark');
+        if (body) {
+          body.classList.remove('hero-grid-dark');
+          body.classList.add('hero-grid-light');
+        }
+        if (sunIcon) sunIcon.classList.add('hidden');
+        if (moonIcon) moonIcon.classList.remove('hidden');
+        localStorage.setItem('theme', 'light');
+      }
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    initTheme();
+
     // 1-Click Copy Button for Terminal Code Blocks
     document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
       document.querySelectorAll('.terminal').forEach((term) => {
         const top = term.querySelector('.terminal-top');
         if (!top) return;
