@@ -28,6 +28,8 @@
     "audit": "node setup.mjs --audit",
     "sync": "node setup.mjs sync",
     "sync-models": "node setup.mjs sync-models",
+    "herdr": "node setup.mjs herdr",
+    "herdr-fix": "node setup.mjs herdr",
     "uninstall": "node setup.mjs --uninstall",
     "minimal": "node setup.mjs --profile minimal",
     "full": "node setup.mjs --profile full"

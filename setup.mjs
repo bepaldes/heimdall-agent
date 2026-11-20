@@ -764,7 +764,14 @@ function configureHermesContextLimit(hermesDir, modelsList = null, dryRun = fals
  */
 function syncHerdrAppConfig(dryRun = false) {
   const herdrDir = path.join(userHome, '.config', 'herdr-app');
-  if (!fs.existsSync(herdrDir)) return false;
+  if (!fs.existsSync(herdrDir)) {
+    if (dryRun) return true;
+    try {
+      fs.mkdirSync(herdrDir, { recursive: true });
+    } catch {
+      return false;
+    }
+  }
 
   const keysPath = path.join(herdrDir, 'keys.json');
   const settingsPath = path.join(herdrDir, 'settings.json');
@@ -824,6 +831,29 @@ function syncHerdrAppConfig(dryRun = false) {
     fs.writeFileSync(settingsPath, JSON.stringify(settingsObj, null, 2) + '\n', 'utf8');
     return true;
   } catch {
+    return false;
+  }
+}
+
+function runHerdrApp(options) {
+  console.log(`${colors.bold}${colors.cyan}=== Herdr-App Configuration & Clipboard Fix ===${colors.reset}\n`);
+  const herdrDir = path.join(userHome, '.config', 'herdr-app');
+  if (options.dryRun) {
+    console.log(`[DRY RUN] Would configure Herdr-App clipboard reliability & Herdr-Roundup layout at:`);
+    console.log(`  - ${path.join(herdrDir, 'keys.json')}`);
+    console.log(`  - ${path.join(herdrDir, 'settings.json')}`);
+    return true;
+  }
+
+  const success = syncHerdrAppConfig(false);
+  if (success) {
+    console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Ctrl+V / Alt+V / Ctrl+Shift+V mapped to text paste (terminal.paste, UTF-8 clean)`);
+    console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Ctrl+C / Ctrl+Shift+C mapped to copy (terminal.copy)`);
+    console.log(`  ${colors.green}✔ Configured settings.json:${colors.reset} 'copy_on_select: true' and 'layout: Herdr-Roundup' active`);
+    console.log(`\n${colors.dim}Tip: Inside Herdr-App, use Shift + Click/Drag to highlight and copy text within full-screen TUI apps.${colors.reset}\n`);
+    return true;
+  } else {
+    console.log(`  ${colors.red}✖ Failed to update Herdr-App configuration at ${herdrDir}.${colors.reset}\n`);
     return false;
   }
 }
@@ -1083,6 +1113,7 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}hud${colors.reset} (or ${colors.dim}--hud${colors.reset})             Enable, disable, or theme Heimdall HUD (--on | --off | --theme <name> | --lines <1|2>)
   ${colors.green}skills${colors.reset} (or ${colors.dim}--skills${colors.reset})         List all canonical skills, categories, and upstream provenance
   ${colors.green}update-skill <name|all>${colors.reset}     Inspect upstream repository, updates, and bounded review protocol
+  ${colors.green}herdr${colors.reset} (or ${colors.dim}--herdr, herdr-fix${colors.reset})   Configure Herdr-App clipboard reliability & Herdr-Roundup layout
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
@@ -1103,6 +1134,7 @@ ${colors.bold}EXAMPLES:${colors.reset}
   heimdall                                  # Interactive management hub (audit, sync, uninstall)
   heimdall sync                             # Instant sync after installing a new tool
   heimdall audit                            # Environment health check
+  heimdall herdr                            # Optimize Herdr-App (fix clipboard paste/copy & enable Roundup layout)
   heimdall uninstall                        # Safely unbind Heimdall skills and agents
   heimdall skills                           # Browse canonical skills catalog
   heimdall update-skill ponytail           # Inspect upstream provenance & review protocol for single skill
@@ -1131,6 +1163,7 @@ function parseArgs() {
     audit: false,
     syncModels: false,
     hud: false,
+    herdr: false,
     hudEnabled: true,
     hudOff: false,
     hudTheme: null,
@@ -1153,6 +1186,7 @@ function parseArgs() {
     else if (arg === 'uninstall' || arg === '--uninstall') options.uninstall = true;
     else if (arg === 'sync-models' || arg === '--sync-models' || arg === 'syncmodels') options.syncModels = true;
     else if (arg === 'hud' || arg === '--hud') options.hud = true;
+    else if (arg === 'herdr' || arg === '--herdr' || arg === 'herdr-fix' || arg === '--herdr-fix') options.herdr = true;
     else if (arg === '--on') options.hudOff = false;
     else if (arg === '--off') options.hudOff = true;
     else if (arg === '--no-hud') options.hudEnabled = false;
@@ -1661,6 +1695,12 @@ async function runSync(options, detected) {
     if (syncHud(options.dryRun, { theme: options.hudTheme, lines: options.hudLines })) syncedAny = true;
   }
 
+  // Synchronize Herdr-App optimizations (clipboard paste/copy fixes & Roundup layout)
+  const herdrConfigDir = path.join(userHome, '.config', 'herdr-app');
+  if (fs.existsSync(herdrConfigDir) || checkCommand('herdr-app')) {
+    if (syncHerdrAppConfig(options.dryRun)) syncedAny = true;
+  }
+
   // Refresh bridge tools & shims
   const activeToolsDir = options.toolsDir || detected.pathCandidates[0];
   if (activeToolsDir && fs.existsSync(activeToolsDir)) {
@@ -1999,6 +2039,7 @@ async function runPostInstallMenu(options, detected) {
         { label: 'Fast Sync Skills & Agents (1-sec zero-drift)', action: 'sync' },
         ...(hasCustomApi ? [{ label: 'Refresh Dynamic Models (sync-models)', action: 'sync-models' }] : []),
         { label: 'Configure / Toggle Heimdall HUD Statusline', action: 'hud' },
+        { label: 'Herdr-App Fix & Layout (Clipboard & Roundup)', action: 'herdr' },
         { label: 'Uninstall Heimdall', action: 'uninstall' },
         { label: 'Reinstall / Reconfigure Profile & Targets', action: 'reinstall' },
         { label: 'Exit', action: 'exit' }
@@ -2028,6 +2069,8 @@ async function runPostInstallMenu(options, detected) {
         await syncModelsFromEndpoint();
       } else if (selected === 'hud') {
         await runHudInteractive(options, rl);
+      } else if (selected === 'herdr') {
+        runHerdrApp(options);
       } else if (selected === 'uninstall') {
         await runUninstall(options, currentDetected, rl);
       } else if (selected === 'reinstall') {
@@ -2324,6 +2367,11 @@ async function main() {
 
   if (options.syncModels) {
     await syncModelsFromEndpoint();
+    process.exit(0);
+  }
+
+  if (options.herdr) {
+    runHerdrApp(options);
     process.exit(0);
   }
 

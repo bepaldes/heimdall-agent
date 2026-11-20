@@ -718,11 +718,17 @@ npm install</code></pre>
         </table>
       </div>
 
-      <h3>4.3 Verify Installation</h3>
+      <h3>4.3 Verify Installation &amp; Management</h3>
       <div class="terminal">
-        <div class="terminal-top"><span>Verification</span><span>CLI</span></div>
-        <pre><code>npm test
-node setup.mjs --audit</code></pre>
+        <div class="terminal-top"><span>Verification &amp; Management</span><span>CLI</span></div>
+        <pre><code># Run terminating test suites
+npm test
+
+# Environment health check
+heimdall audit
+
+# Configure or re-run Herdr-App clipboard &amp; layout fix at any time
+heimdall herdr</code></pre>
       </div>
     </section>
 
