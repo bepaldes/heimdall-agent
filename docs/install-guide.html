@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Agent AI Stack Installation Guide</title>
+  <style>
+    /* System theme auto-detection via CSS variables */
+    :root {
+      /* Default / Light Theme */
+      --bg: #ffffff;
+      --surface: #f8fafc;
+      --surface-raised: #f1f5f9;
+      --border: #e2e8f0;
+      --ink: #0f172a;
+      --ink-muted: #475569;
+      --ink-dim: #94a3b8;
+      --accent: #0284c7;
+      --accent-soft: rgba(2, 132, 199, 0.08);
+      --green: #16a34a;
+      --green-soft: rgba(22, 163, 74, 0.08);
+      --amber: #d97706;
+      --amber-soft: rgba(217, 119, 6, 0.08);
+      --term-bg: #0f172a;
+      --term-ink: #f8fafc;
+      --term-border: #1e293b;
+      --term-header: #1e293b;
+      --mono: "JetBrains Mono", "Cascadia Code", ui-monospace, Menlo, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Dark Theme */
+        --bg: #090b0e;
+        --surface: #12151b;
+        --surface-raised: #181c24;
+        --border: #242933;
+        --ink: #f1f5f9;
+        --ink-muted: #94a3b8;
+        --ink-dim: #64748b;
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.08);
+        --green: #34d399;
+        --green-soft: rgba(52, 211, 153, 0.08);
+        --amber: #fbbf24;
+        --amber-soft: rgba(251, 191, 36, 0.08);
+        --term-bg: #06080b;
+        --term-ink: #f8fafc;
+        --term-border: #242933;
+        --term-header: #12151b;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding: 0 16px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .wrapper {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 56px 0 100px;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 48px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    h1 {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .intro {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink-muted);
+      margin-bottom: 24px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 18px;
+      font-size: 13px;
+    }
+    .meta-item span {
+      display: block;
+      color: var(--ink-dim);
+      font-size: 11px;
+      text-transform: uppercase;
+      font-family: var(--mono);
+      margin-bottom: 2px;
+    }
+    .meta-item strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* Step Navigation */
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+    .nav-card {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      color: var(--ink);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .nav-card:hover {
+      background: var(--surface-raised);
+      border-color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-dim);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .nav-title {
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    /* Steps */
+    section {
+      margin-bottom: 56px;
+      scroll-margin-top: 24px;
+    }
+    .step-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .step-num {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 24px 0 10px;
+    }
+    p {
+      margin-bottom: 14px;
+      color: var(--ink-muted);
+    }
+    strong {
+      color: var(--ink);
+    }
+
+    /* Terminal blocks (always dark for code legibility) */
+    .terminal {
+      background: var(--term-bg);
+      border: 1px solid var(--term-border);
+      border-radius: 6px;
+      margin: 12px 0 20px;
+      overflow: hidden;
+    }
+    .terminal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 12px;
+      background: var(--term-header);
+      border-bottom: 1px solid var(--term-border);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .terminal-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 4px;
+      color: #94a3b8;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 2.5px 8px;
+      cursor: pointer;
+      line-height: 1.3;
+      transition: all 0.15s ease;
+    }
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .copy-btn.copied {
+      background: rgba(52, 211, 153, 0.15);
+      color: #34d399;
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+    pre {
+      font-family: var(--mono);
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--term-ink);
+      padding: 14px 18px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: var(--surface-raised);
+      color: var(--ink);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .panel-green {
+      border-left-color: var(--green);
+      background: var(--green-soft);
+    }
+    .panel-accent {
+      border-left-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .panel-head {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .panel-green .panel-head { color: var(--green); }
+    .panel-accent .panel-head { color: var(--accent); }
+    .panel p:last-child { margin-bottom: 0; }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+    th, td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: var(--surface-raised);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    tr:last-child td { border-bottom: none; }
+
+    /* Check list */
+    .checklist {
+      list-style: none;
+      margin: 14px 0;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      margin-bottom: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13.5px;
+    }
+    .check-icon {
+      color: var(--green);
+      font-family: var(--mono);
+      font-weight: bold;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      margin-top: 56px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--ink-dim);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+
+    <header>
+      <div class="eyebrow">
+        <span class="dot"></span>
+        Multi-Agent Workspace Setup
+      </div>
+      <h1>Multi-Agent AI Engineering Stack Setup Guide</h1>
+      <p class="intro">
+        A simple, step-by-step setup guide for users with <strong>Claude Desktop</strong> who want to add 
+        <strong>Claude Code</strong>, <strong>OpenAI Codex CLI</strong>, <strong>GC-Helper</strong>, 
+        <strong>Heimdall Agent</strong>, and <strong>Herdr-App</strong> as an integrated terminal and desktop IDE.
+      </p>
+
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span>Starting Point</span>
+          <strong>Claude Desktop Installed</strong>
+        </div>
+        <div class="meta-item">
+          <span>CLI Tools</span>
+          <strong>Claude Code &amp; Codex CLI</strong>
+        </div>
+        <div class="meta-item">
+          <span>Configurator</span>
+          <strong>GC-Helper (GhostCLI)</strong>
+        </div>
+        <div class="meta-item">
+          <span>Skills &amp; IDE</span>
+          <strong>Heimdall &amp; Herdr-App</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav-grid" aria-label="Installation Steps">
+      <a class="nav-card" href="#step-1">
+        <span class="nav-num">STEP 01</span>
+        <span class="nav-title">Prerequisites &amp; CLI</span>
+      </a>
+      <a class="nav-card" href="#step-2">
+        <span class="nav-num">STEP 02</span>
+        <span class="nav-title">GC-Helper Setup</span>
+      </a>
+      <a class="nav-card" href="#step-3">
+        <span class="nav-num">STEP 03</span>
+        <span class="nav-title">Heimdall Skills</span>
+      </a>
+      <a class="nav-card" href="#step-4">
+        <span class="nav-num">STEP 04</span>
+        <span class="nav-title">Herdr-App IDE</span>
+      </a>
+    </nav>
+
+    <!-- STEP 1 -->
+    <section id="step-1">
+      <div class="step-head">
+        <span class="step-num">01</span>
+        <h2>Prerequisites &amp; CLI Runtimes</h2>
+      </div>
+
+      <p>
+        Your existing <strong>Claude Desktop</strong> app stays as it is. 
+        In this step, we install the tools required for command-line agent execution.
+      </p>
+
+      <h3>1.1 Allow PowerShell Script Execution</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>PowerShell</span><span>Terminal</span></div>
+        <pre><code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code></pre>
+      </div>
+
+      <h3>1.2 Verify Git and Node.js</h3>
+      <p>Ensure Git and Node.js (v18 or higher, v20+ recommended) are installed:</p>
+      <div class="terminal">
+        <div class="terminal-top"><span>Verification</span><span>CLI</span></div>
+        <pre><code>git --version
+node -v
+npm -v</code></pre>
+      </div>
+
+      <h3>1.3 Install CLI Coding Agents</h3>
+      <p>Install Claude Code CLI and OpenAI Codex CLI globally via npm:</p>
+      <div class="terminal">
+        <div class="terminal-top"><span>Install CLI Tools</span><span>npm</span></div>
+        <pre><code>npm install -g @anthropic-ai/claude-code
+npm install -g @openai/codex</code></pre>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="step-2">
+      <div class="step-head">
+        <span class="step-num">02</span>
+        <h2>GC-Helper Configuration</h2>
+      </div>
+
+      <p>
+        <strong>GC-Helper</strong> connects your CLI tools (Claude Code, Codex) to 
+        <strong>GhostCLI</strong> (<code>https://ghostcli.cloud</code>) for high-reasoning models 
+        (Claude Opus 5.5, Sonnet 5.5, GPT-6 Astra, GLM 5.3) with 1M context windows.
+      </p>
+
+      <div class="panel panel-green">
+        <div class="panel-head">&#10004; Claude Desktop Safe</div>
+        <p>
+          Claude Desktop uses browser web OAuth (<code>claude.ai</code>). <code>gc-helper</code> only configures 
+          the CLI files (<code>~/.claude/settings.json</code> and <code>~/.codex/config.toml</code>). 
+          Claude Desktop continues running on official Anthropic cloud without any changes.
+        </p>
+      </div>
+
+      <h3>2.1 Install and Run GC-Helper</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>GC-Helper</span><span>CLI</span></div>
+        <pre><code>npm install -g gc-helper
+gc</code></pre>
+      </div>
+
+      <p>Follow the interactive prompts:</p>
+      <ul class="checklist">
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Base URL:</strong> Press <code>Enter</code> to accept <code>https://ghostcli.cloud</code>.</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>API Key:</strong> Paste your GhostCLI key (<code>gcli_...</code>).</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Confirmation:</strong> GC-Helper tests the connection, fetches available models, and saves the configuration.</div>
+        </li>
+      </ul>
+
+      <h3>2.2 Check Connection Health</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>Audit</span><span>CLI</span></div>
+        <pre><code>gc audit
+gc status</code></pre>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="step-3">
+      <div class="step-head">
+        <span class="step-num">03</span>
+        <h2>Heimdall Agent Setup (Skills &amp; Personas)</h2>
+      </div>
+
+      <p>
+        <strong>Heimdall Agent</strong> installs 10 specialized agent personas (Orchestrator, Reviewer, Code Sentinel, etc.), 
+        69 engineering skills (TDD, clean code, security scans, HUD statusline), and pre-push quality hooks.
+      </p>
+
+      <div class="panel panel-accent">
+        <div class="panel-head">&#9432; Workspace Location (You Decide)</div>
+        <p>
+          You choose where Heimdall is cloned. The folder where you clone Heimdall can also serve as the workspace folder 
+          where all your other project repositories will live.
+          <br /><br />
+          <strong>Suggested locations:</strong>
+          <br />
+          &bull; <code>C:\Apps</code> (e.g., <code>C:\Apps\heimdall-agent</code> alongside your project repos)
+          <br />
+          &bull; <code>C:\Projects</code> or <code>C:\Dev</code>
+          <br />
+          &bull; <code>~/projects</code> or <code>$HOME\Workspace</code>
+        </p>
+      </div>
+
+      <h3>3.1 Clone Heimdall into Your Chosen Folder</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>Git Clone &amp; Dependencies</span><span>PowerShell</span></div>
+        <pre><code># 1. Open or create your chosen workspace folder (example: C:\Apps or C:\Projects)
+mkdir -p &lt;your-workspace-dir&gt;
+cd &lt;your-workspace-dir&gt;
+
+# 2. Clone the repository
+git clone https://github.com/bepaldes/heimdall-agent.git
+cd heimdall-agent
+
+# 3. Install dependencies
+npm install</code></pre>
+      </div>
+
+      <h3>3.2 Run the Setup Wizard</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>Run Setup</span><span>Node.js</span></div>
+        <pre><code>node setup.mjs</code></pre>
+      </div>
+
+      <p>Recommended selections during setup:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Setting</th>
+              <th>Recommended Value</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Profile</strong></td>
+              <td><code>1. full</code></td>
+              <td>Installs the complete suite of 69 skills.</td>
+            </tr>
+            <tr>
+              <td><strong>Target Harnesses</strong></td>
+              <td><code>all</code> (or <code>claude,codex,desktop</code>)</td>
+              <td>Configures Claude Code, Codex, and adds Context7 MCP to Claude Desktop.</td>
+            </tr>
+            <tr>
+              <td><strong>Link Mode</strong></td>
+              <td><code>1. Live Symlinks / Junctions</code></td>
+              <td>Links skills directly. Any <code>git pull</code> in Heimdall updates all tools instantly.</td>
+            </tr>
+            <tr>
+              <td><strong>HUD Statusline</strong></td>
+              <td><code>night-blue</code></td>
+              <td>Adds a 2-line token, cost, and context bar in terminal sessions.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>3.3 Verify Installation</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>Verification</span><span>CLI</span></div>
+        <pre><code>npm test</code></pre>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section id="step-4">
+      <div class="step-head">
+        <span class="step-num">04</span>
+        <h2>Herdr-App (Terminal Multiplexer &amp; IDE)</h2>
+      </div>
+
+      <p>
+        <strong>Herdr-App</strong> is a fast, native desktop app (written in Rust using GPUI and libghostty) 
+        designed for managing multiple AI coding agents with visual spaces, tabs, and split panes.
+      </p>
+
+      <h3>4.1 Install Herdr-App on Windows</h3>
+      <div class="terminal">
+        <div class="terminal-top"><span>Install Herdr-App</span><span>PowerShell</span></div>
+        <pre><code>irm https://releases.herdr.dev/app/install.ps1 | iex</code></pre>
+      </div>
+
+      <div class="panel panel-accent">
+        <div class="panel-head">&#9432; macOS &amp; Linux Compatibility</div>
+        <p>
+          Herdr-App is fully cross-platform:
+          <br />
+          &bull; <strong>macOS:</strong> <code>brew install --cask herdr-app</code> or <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code>
+          <br />
+          &bull; <strong>Linux:</strong> <code>curl -fsSL https://releases.herdr.dev/app/install.sh | sh</code> (requires desktop session + Vulkan)
+        </p>
+      </div>
+
+      <h3>4.2 Launch &amp; Organize</h3>
+      <p>Open Herdr-App from your Start Menu or command line:</p>
+      <div class="terminal">
+        <div class="terminal-top"><span>Launch</span><span>CLI</span></div>
+        <pre><code>herdr-app</code></pre>
+      </div>
+
+      <ul class="checklist">
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Spaces:</strong> Create a Space for each project in your workspace folder.</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Split Panes:</strong> Run Claude Code (Opus/Sonnet) on the left, Codex (Astra) on the right, and tests below.</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Agent Tracking:</strong> Herdr automatically tracks agent states (<code>working</code>, <code>blocked</code>, <code>idle</code>) in the sidebar.</div>
+        </li>
+        <li>
+          <span class="check-icon">&#10003;</span>
+          <div><strong>Persistent Sessions:</strong> Background daemon (<code>herdr-core</code>) keeps processes running even when the app window is closed.</div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Summary -->
+    <section id="summary">
+      <div class="step-head">
+        <span class="step-num">05</span>
+        <h2>Summary Overview</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th>Type</th>
+              <th>Backend / Provider</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Claude Desktop</strong></td>
+              <td>GUI App</td>
+              <td>Anthropic Official Cloud</td>
+              <td>Conversational chat &amp; MCP exploration.</td>
+            </tr>
+            <tr>
+              <td><strong>Claude Code</strong></td>
+              <td>CLI Tool</td>
+              <td>GhostCLI (<code>claude-opus-5-5</code>)</td>
+              <td>Autonomous coding &amp; subagent execution.</td>
+            </tr>
+            <tr>
+              <td><strong>Codex CLI</strong></td>
+              <td>CLI Tool</td>
+              <td>GhostCLI (<code>gpt-6-astra</code>)</td>
+              <td>Reasoning &amp; peer review validation.</td>
+            </tr>
+            <tr>
+              <td><strong>GC-Helper</strong></td>
+              <td>CLI Tool</td>
+              <td>GhostCLI Gateway</td>
+              <td>One-command config &amp; connection audits.</td>
+            </tr>
+            <tr>
+              <td><strong>Heimdall</strong></td>
+              <td>Repo (git clone)</td>
+              <td>Local Workspace</td>
+              <td>Skills, personas, and quality guardrails.</td>
+            </tr>
+            <tr>
+              <td><strong>Herdr-App</strong></td>
+              <td>Native IDE</td>
+              <td>Rust / GPUI</td>
+              <td>Multi-pane terminal cockpit &amp; agent manager.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      <div>Multi-Agent Engineering Setup &bull; docs/install-guide.html</div>
+      <div>Heimdall Architecture &bull; MIT License</div>
+    </footer>
+
+  </div>
+
+  <script>
+    // 1-Click Copy Button for Terminal Code Blocks
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.terminal').forEach((term) => {
+        const top = term.querySelector('.terminal-top');
+        if (!top) return;
+
+        // Wrap or group the right-side actions
+        const actions = document.createElement('div');
+        actions.className = 'terminal-actions';
+
+        // Check if there is existing right-side text (e.g. tag/kind)
+        const children = Array.from(top.children);
+        if (children.length > 1) {
+          const kindSpan = children[children.length - 1];
+          actions.appendChild(kindSpan);
+        }
+
+        const btn = document.createElement('button');
+        btn.className = 'copy-btn';
+        btn.type = 'button';
+        btn.title = 'Copy command to clipboard';
+        btn.setAttribute('aria-label', 'Copy code to clipboard');
+        btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span>Copy</span>`;
+
+        btn.addEventListener('click', () => {
+          const code = term.querySelector('pre code') || term.querySelector('pre');
+          if (!code) return;
+          const text = code.innerText.trim();
+          navigator.clipboard.writeText(text).then(() => {
+            btn.classList.add('copied');
+            const label = btn.querySelector('span');
+            if (label) label.textContent = 'Copied!';
+            setTimeout(() => {
+              btn.classList.remove('copied');
+              if (label) label.textContent = 'Copy';
+            }, 2000);
+          }).catch(() => {
+            // Fallback if clipboard API is restricted
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.classList.add('copied');
+            const label = btn.querySelector('span');
+            if (label) label.textContent = 'Copied!';
+            setTimeout(() => {
+              btn.classList.remove('copied');
+              if (label) label.textContent = 'Copy';
+            }, 2000);
+          });
+        });
+
+        actions.appendChild(btn);
+        top.appendChild(actions);
+      });
+    });
+  </script>
+
+</body>
+</html>

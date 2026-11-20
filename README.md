@@ -458,7 +458,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 - **`communication-doctrine`**: Bottom Line Up Front (BLUF) and Simplified Technical English (STE) communication doctrine for AI agents, implementation plans, code reviews, and subagent handoffs.
 - **`threat-modeling`**: Systematic STRIDE threat modeling, trust boundary mapping, and mitigation verification for architecture, API, and cloud infrastructure changes.
 - **`mcp-engineering`**: Standards, JSON-RPC 2.0 protocol compliance, schema validation, and stdio/SSE transport discipline for authoring Model Context Protocol (MCP) servers and tools.
-- **`herdr`**: Control Herdr, a terminal workspace manager for coding agents. Inspect or control panes, tabs, workspaces, commands, or coordinate with peer agents in persistent terminal sessions.
+- **`herdr`**: Control Herdr, a workspace manager for coding agents. Inspect or control panes, tabs, workspaces, commands, or coordinate with peer agents in persistent sessions (`herdr` in terminal, `herdr-app` for desktop IDE).
 - **`clean-code` (`ub-mode`)**: Robert C. "Uncle Bob" Martin's disciplined Clean Code engineering standard. Enforces TDD cycles, laziness protocol, premise interrogation, boundary discipline, and mathematical complexity gates (CRAP < 10, DRY similarity < 0.8, mutant-killing test design).
 - **`ponytail`**: Pragmatic senior developer discipline. Enforces Dietrich Gebert's Decision Ladder: YAGNI checks, codebase reuse, built-in standard library, native platform features, and zero premature abstractions.
 - **`karpathy-guidelines`**: Andrej Karpathy's simplicity heuristics: write minimal surgical code, reject speculative configurability, surface hidden assumptions, and never touch adjacent working code.
@@ -489,7 +489,9 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 
 For multi-device pair programming, mobile monitoring, and project memory, Heimdall integrates with:
 
-* **[Herdr (`herdr.dev`)](https://herdr.dev/)**: Terminal-native agent multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`).
+* **[Herdr (`herdr.dev`)](https://herdr.dev/)**: Agent workspace manager and multiplexer written in Rust. Keeps background agent sessions persistent across connection drops and tracks status (`working`, `blocked`, `idle`). Recommended setups:
+  - **`herdr` (CLI / Core)**: Lightweight terminal-native multiplexer and daemon (`herdr-core` / `hc`) recommended for terminal workflows and headless/remote environments.
+  - **`herdr-app`**: Dedicated desktop application providing a Windows "native" IDE experience (also compatible with macOS and Linux via GPUI/Vulkan) for visual space/tab management, split panes, and live agent status monitoring.
 * **[OpenDesign (`open-design.ai`)](https://open-design.ai/)**: Local-first, open-source AI visual design canvas workspace. Spawns Claude Code, Codex, and Gemini CLI as runtime adapters; Heimdall's visual canvas contract exempts canvas generation from Turn 1 grilling gates while enforcing `taste-skill`, WCAG AAA accessibility, and `data-od-*` DOM layer preservation.
 * **[Moshi (`getmoshi.app`)](https://getmoshi.app/)**: Mobile client (iOS/Android) pairing with your terminal session. Delivers push notifications when an agent hits an interactive planning gate and enables remote approval.
 * **[Graphify (`github.com/Graphify-Labs/graphify`)](https://github.com/Graphify-Labs/graphify)**: Local-first code knowledge graph builder. Uses Tree-sitter AST parsing across 40+ programming languages to build deterministic dependency maps with zero LLM API costs, exporting directly to Obsidian vaults.
