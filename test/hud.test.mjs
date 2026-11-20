@@ -109,7 +109,7 @@ test('Heimdall HUD Renderer & Harness Sync', async (t) => {
 
       const claudeCfg = JSON.parse(fs.readFileSync(path.join(claudeDir, 'settings.json'), 'utf8'));
       assert.equal(claudeCfg.model, 'opus');
-      assert.equal(claudeCfg.statusLine.command, `node ${hudPath}`);
+      assert.equal(claudeCfg.statusLine.command, `node "${hudPath.replace(/\\/g, '/')}"`);
 
       const agyCfg = JSON.parse(fs.readFileSync(path.join(agyDir, 'settings.json'), 'utf8'));
       assert.equal(agyCfg.agentMode, 'auto');
