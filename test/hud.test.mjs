@@ -17,6 +17,7 @@ import {
 
 const require = createRequire(import.meta.url);
 const {
+  formatHudCommand,
   configureClaudeStatusLine,
   configureAntigravityStatusLine,
   configureCodexStatusLine,
@@ -188,7 +189,7 @@ test('Heimdall HUD Renderer & Harness Sync', async (t) => {
 
       const claudeCfg = JSON.parse(fs.readFileSync(path.join(claudeDir, 'settings.json'), 'utf8'));
       assert.equal(claudeCfg.model, 'opus');
-      assert.equal(claudeCfg.statusLine.command, `node "${hudPath.replace(/\\/g, '/')}"`);
+      assert.equal(claudeCfg.statusLine.command, formatHudCommand(hudPath));
 
       const agyCfg = JSON.parse(fs.readFileSync(path.join(agyDir, 'settings.json'), 'utf8'));
       assert.equal(agyCfg.agentMode, 'auto');
