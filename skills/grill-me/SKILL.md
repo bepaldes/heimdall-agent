@@ -18,9 +18,12 @@ Work the design tree in **rounds**.
 
 ---
 
-## 2. The "Yes-to-Approve" Triage Format
+## 2. Questioning Protocol: Interactive Tools First, Markdown Fallback
 
-Always format questions so the user can quickly accept your recommendations with minimal keystrokes (e.g. replying *"1: yes, 2: yes, 3: no do Y"*):
+- **Interactive Question Tools (Primary)**:
+  - In environments equipped with interactive question tools (`AskUserQuestion` in Claude Code/Codex, `ask_question` in Antigravity), invoke the native tool to present questions directly with selectable options, boundary conditions, and the recommended option highlighted.
+- **"Yes-to-Approve" Triage Format (Markdown Fallback)**:
+  - If interactive question tools are unavailable in your environment, format questions directly in Markdown so the user can quickly accept recommendations with minimal keystrokes (e.g. replying *"1: yes, 2: yes, 3: no do Y"*):
 
 ```markdown
 ❓ **Q1 - <Decision Title>**: <Context, boundary conditions, edge cases, and options>

@@ -19,6 +19,12 @@ import readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { CANONICAL_MODEL_CONTEXTS, resolveModelMaxContext, resolveCustomModelsEndpoint } from './lib/model-context.cjs';
+import {
+  discoverInstalledHarnesses,
+  discoverCustomEndpoints,
+  syncGeminiModelsForHarness,
+  buildOfficialHarnessModels
+} from './lib/harness-models.cjs';
 import { syncAgentsWithModels, syncModelRegistryPlaybook } from './lib/model-router.cjs';
 import { updateHermesConfigContext } from './lib/hermes-context.cjs';
 import { detectPathCandidates } from './lib/path-discovery.cjs';
@@ -1110,7 +1116,7 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}sync-docs${colors.reset} (or ${colors.dim}--sync-docs${colors.reset})      Synchronize documentation and config count references from Single Source of Truth
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
   ${colors.green}uninstall${colors.reset} (or ${colors.dim}--uninstall${colors.reset})     Safely remove Heimdall skills and agent personas from all harnesses
-  ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe active proxy/endpoint (e.g. Custom Proxies / API or Custom Vendors) and refresh models.json
+  ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe installed harnesses, Gemini/Antigravity, and custom APIs to refresh models.json
   ${colors.green}hud${colors.reset} (or ${colors.dim}--hud${colors.reset})             Enable, disable, or theme Heimdall HUD (--on | --off | --theme <name> | --lines <1|2>)
   ${colors.green}skills${colors.reset} (or ${colors.dim}--skills${colors.reset})         List all canonical skills, categories, and upstream provenance
   ${colors.green}update-skill <name|all>${colors.reset}     Inspect upstream repository, updates, and bounded review protocol
@@ -1479,90 +1485,166 @@ function deduplicateModelsByMaxContext(modelsList = []) {
 }
 
 async function syncModelsFromEndpoint({ quiet = false } = {}) {
-  if (!quiet) console.log(`${colors.cyan}${colors.bold}=== Live Model Synchronization ===${colors.reset}\n`);
-  const detected = detectEnvironment();
-  const targetUrl = resolveCustomModelsEndpoint(detected.endpoints);
+  if (!quiet) console.log(`${colors.cyan}${colors.bold}=== Multi-Harness Live Model Synchronization ===${colors.reset}\n`);
 
-  if (targetUrl) {
-    if (!quiet) console.log(`Probing Proxy / Vendor Models API: ${colors.yellow}${targetUrl}${colors.reset}...`);
-    const rawApiKey = detected.endpoints.claude_key || detected.endpoints.codex_key || process.env.ANTHROPIC_API_KEY || process.env.GHOSTCLI_API_KEY || '';
-    const apiKey = typeof rawApiKey === 'string' ? rawApiKey.trim() : '';
+  const harnesses = discoverInstalledHarnesses({ userHome });
+  const installedList = Object.values(harnesses).filter(h => h.installed && h.deliversModels !== false);
+
+  if (!quiet) {
+    if (installedList.length === 0) {
+      console.log(`${colors.yellow}No model-delivering AI harnesses detected on this machine.${colors.reset}\n`);
+    } else {
+      console.log(`${colors.bold}Detected Model Harnesses on System (${installedList.length}):${colors.reset}`);
+      for (const h of installedList) {
+        const modelHint = h.activeModelDisplay || h.activeModel ? ` (model: ${colors.cyan}${h.activeModelDisplay || h.activeModel}${colors.reset})` : '';
+        console.log(`  • ${colors.green}${h.label}${colors.reset} — ${colors.dim}${h.baseUrl || h.mode}${colors.reset}${modelHint}`);
+      }
+      console.log('');
+    }
+  }
+
+  let currentModels = {};
+  if (fs.existsSync(modelsPath)) {
+    try {
+      currentModels = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
+    } catch {}
+  }
+
+  let catalogChanged = false;
+
+  // 1. Probe all custom APIs / proxy endpoints discovered across installed harnesses & env
+  const customEndpoints = discoverCustomEndpoints(harnesses, process.env);
+  const aggregatedCustomModels = new Map();
+
+  for (const ep of customEndpoints) {
+    if (!quiet) {
+      console.log(`Probing Custom Endpoint [${colors.magenta}${ep.harnesses.join(', ')}${colors.reset}]: ${colors.yellow}${ep.modelsUrl}${colors.reset}...`);
+    }
     const getHeaders = { Accept: 'application/json' };
-    if (apiKey) {
-      getHeaders['Authorization'] = `Bearer ${apiKey}`;
-      getHeaders['x-api-key'] = apiKey;
+    if (ep.apiKey) {
+      getHeaders['Authorization'] = `Bearer ${ep.apiKey}`;
+      getHeaders['x-api-key'] = ep.apiKey;
     }
 
     try {
       const probeController = new AbortController();
       const probeTimeout = setTimeout(() => probeController.abort(), 10000);
-      const res = await fetch(targetUrl, { headers: getHeaders, signal: probeController.signal });
+      const res = await fetch(ep.modelsUrl, { headers: getHeaders, signal: probeController.signal });
       clearTimeout(probeTimeout);
+
       if (res.ok) {
         const data = await res.json();
         const rawModelsList = data.data || data.models || [];
         const modelsList = deduplicateModelsByMaxContext(rawModelsList);
-        if (!quiet) console.log(`${colors.green}✔ Successfully discovered ${modelsList.length} unique live models from endpoint!${colors.reset}\n`);
-
-        let currentModels = {};
-        if (fs.existsSync(modelsPath)) {
-          currentModels = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
-        }
-
-        if (!quiet) console.log(`Checking live health of discovered models...`);
-        const baseUrl = targetUrl.replace(/\/v1\/models\/?$/, '');
-
-        const messagesUrl = `${baseUrl}/v1/messages`;
-
-        const testedModels = await Promise.all(modelsList.map(async m => {
-          const status = apiKey ? await probeModelHealth(messagesUrl, apiKey, m.id, 20000) : 'alive';
-          return { spec: m, modelId: m.id, status };
-        }));
-
-        const liveModels = testedModels.filter(t => t.status !== 'dead');
-        const deadModels = testedModels.filter(t => t.status === 'dead');
-        const slowModels = testedModels.filter(t => t.status === 'slow');
-
-        if (deadModels.length > 0 && !quiet) {
-          console.log(`${colors.yellow}⚠ Filtered out ${deadModels.length} unresponsive model(s): ${deadModels.map(d => d.modelId).join(', ')}${colors.reset}\n`);
-        }
-        if (slowModels.length > 0 && !quiet) {
-          console.log(`${colors.yellow}⚠ Slow / timed-out model(s) preserved: ${slowModels.map(s => s.modelId).join(', ')}${colors.reset}\n`);
-        }
-
-        const mapped = liveModels.map(({ spec }) => spec);
-
-        currentModels.custom_proxies = mapped;
-        currentModels.ghostcli = mapped;
-
-        fs.writeFileSync(modelsPath, JSON.stringify(currentModels, null, 2));
         if (!quiet) {
-          console.log(`${colors.green}✔ Synchronized models catalog to config/models.json${colors.reset}\n`);
-          console.log(`${colors.bold}Available Models Catalog (${mapped.length} models):${colors.reset}`);
-          mapped.forEach(m => {
-            const idStr = `${colors.cyan}${m.id.padEnd(24)}${colors.reset}`;
-            const ctxStr = `${colors.yellow}[${m.context}]${colors.reset}`;
-            const descStr = m.description ? `${colors.dim}— ${m.description}${colors.reset}` : '';
-            console.log(`  • ${idStr} ${ctxStr} ${descStr}`);
-          });
-          console.log('');
+          console.log(`${colors.green}✔ Discovered ${modelsList.length} unique live model(s) from ${ep.modelsUrl}${colors.reset}`);
         }
 
-        syncAgentsWithModels(__dirname, false);
-        syncModelRegistryPlaybook(__dirname, false);
+        let liveSpecs = modelsList;
+        const isAnthropicGateway = ep.modelsUrl.includes('ghostcli.cloud') || ep.harnesses.includes('claude');
+        if (ep.apiKey && isAnthropicGateway && modelsList.length > 0) {
+          if (!quiet) console.log(`Checking live health of discovered models...`);
+          const baseUrl = ep.modelsUrl.replace(/\/v1\/models\/?$/, '').replace(/\/models\/?$/, '');
+          const messagesUrl = `${baseUrl}/v1/messages`;
 
-        const hermesDir = getHermesDir();
-        if (fs.existsSync(hermesDir)) {
-          const hermesContextUpdated = configureHermesContextLimit(hermesDir, mapped);
-          if (hermesContextUpdated && !quiet) {
-            console.log(`${colors.green}✔ Enforced maximum context limits in Hermes config.yaml${colors.reset}\n`);
+          const testedModels = await Promise.all(modelsList.map(async m => {
+            const status = await probeModelHealth(messagesUrl, ep.apiKey, m.id, 20000);
+            return { spec: m, modelId: m.id, status };
+          }));
+
+          const liveModels = testedModels.filter(t => t.status !== 'dead');
+          const deadModels = testedModels.filter(t => t.status === 'dead');
+          const slowModels = testedModels.filter(t => t.status === 'slow');
+
+          if (deadModels.length > 0 && !quiet) {
+            console.log(`${colors.yellow}⚠ Filtered out ${deadModels.length} unresponsive model(s): ${deadModels.map(d => d.modelId).join(', ')}${colors.reset}`);
+          }
+          if (slowModels.length > 0 && !quiet) {
+            console.log(`${colors.yellow}⚠ Slow / timed-out model(s) preserved: ${slowModels.map(s => s.modelId).join(', ')}${colors.reset}`);
+          }
+          liveSpecs = liveModels.map(({ spec }) => spec);
+        }
+
+        for (const spec of liveSpecs) {
+          if (!aggregatedCustomModels.has(spec.id)) {
+            aggregatedCustomModels.set(spec.id, spec);
           }
         }
       } else if (!quiet) {
-        console.log(`${colors.yellow}Notice: Endpoint returned HTTP ${res.status}. Preserving cached models.json.${colors.reset}\n`);
+        console.log(`${colors.yellow}Notice: ${ep.modelsUrl} returned HTTP ${res.status}. Preserving cached models.${colors.reset}`);
       }
     } catch (err) {
-      if (!quiet) console.log(`${colors.yellow}Notice: Could not reach remote models API (${err.message}). Using local models.json.${colors.reset}\n`);
+      if (!quiet) {
+        console.log(`${colors.yellow}Notice: Could not reach ${ep.modelsUrl} (${err.message}). Preserving cached models.${colors.reset}`);
+      }
+    }
+    if (!quiet) console.log('');
+  }
+
+  const mappedCustom = Array.from(aggregatedCustomModels.values());
+  if (mappedCustom.length > 0) {
+    currentModels.custom_proxies = mappedCustom;
+    currentModels.ghostcli = mappedCustom;
+    catalogChanged = true;
+  }
+
+  // 2. Sync Google Gemini / Antigravity models when Gemini/Antigravity is installed or configured
+  const geminiResult = await syncGeminiModelsForHarness(harnesses.gemini, currentModels.google || []);
+  if (geminiResult.updated) {
+    currentModels.google = geminiResult.models;
+    catalogChanged = true;
+    if (!quiet) {
+      const liveNote = geminiResult.liveCount > 0 ? ` (${geminiResult.liveCount} live from Google GenAI API)` : '';
+      const activeNote = geminiResult.activeModel ? ` | Active: ${colors.cyan}${geminiResult.activeModel}${colors.reset}` : '';
+      console.log(`${colors.green}✔ Synchronized ${geminiResult.models.length} Google Gemini model(s) [${geminiResult.source}]${liveNote}${activeNote}${colors.reset}`);
+    }
+  }
+
+  // 3. Sync official 1P models for installed harnesses not routed through a custom proxy
+  const officialSections = buildOfficialHarnessModels(harnesses);
+  for (const [sectionKey, sectionModels] of Object.entries(officialSections)) {
+    currentModels[sectionKey] = sectionModels;
+    catalogChanged = true;
+    if (!quiet) {
+      console.log(`${colors.green}✔ Registered ${sectionModels.length} official ${sectionKey} model(s) for installed harness${colors.reset}`);
+    }
+  }
+
+  if (catalogChanged) {
+    fs.writeFileSync(modelsPath, JSON.stringify(currentModels, null, 2) + '\n');
+    if (!quiet) {
+      console.log(`\n${colors.green}✔ Synchronized multi-harness catalog to config/models.json${colors.reset}\n`);
+      if (mappedCustom.length > 0) {
+        console.log(`${colors.bold}Custom Proxy / Gateway Models (${mappedCustom.length}):${colors.reset}`);
+        mappedCustom.forEach(m => {
+          const idStr = `${colors.cyan}${m.id.padEnd(24)}${colors.reset}`;
+          const ctxStr = `${colors.yellow}[${m.context}]${colors.reset}`;
+          const descStr = m.description ? `${colors.dim}— ${m.description}${colors.reset}` : '';
+          console.log(`  • ${idStr} ${ctxStr} ${descStr}`);
+        });
+        console.log('');
+      }
+      if (Array.isArray(currentModels.google) && currentModels.google.length > 0) {
+        console.log(`${colors.bold}Google Gemini / Antigravity Models (${currentModels.google.length}):${colors.reset}`);
+        currentModels.google.forEach(m => {
+          const idStr = `${colors.cyan}${m.id.padEnd(24)}${colors.reset}`;
+          const ctxStr = `${colors.yellow}[${m.context || '1M'}]${colors.reset}`;
+          const descStr = m.specialization ? `${colors.dim}— ${m.specialization}${colors.reset}` : '';
+          console.log(`  • ${idStr} ${ctxStr} ${descStr}`);
+        });
+        console.log('');
+      }
+    }
+
+    syncAgentsWithModels(__dirname, false);
+    syncModelRegistryPlaybook(__dirname, false);
+
+    const hermesDir = getHermesDir();
+    if (fs.existsSync(hermesDir) && mappedCustom.length > 0) {
+      const hermesContextUpdated = configureHermesContextLimit(hermesDir, mappedCustom);
+      if (hermesContextUpdated && !quiet) {
+        console.log(`${colors.green}✔ Enforced maximum context limits in Hermes config.yaml${colors.reset}\n`);
+      }
     }
   } else if (!quiet) {
     console.log(`Using configured models from ${modelsPath}.\n`);
@@ -1574,7 +1656,7 @@ async function syncModelsFromEndpoint({ quiet = false } = {}) {
  * with live models from config/models.json during install or resync.
  */
 async function convergeModelAwareArtifacts(options, detected) {
-  if (!options.dryRun && resolveCustomModelsEndpoint(detected.endpoints)) {
+  if (!options.dryRun) {
     await syncModelsFromEndpoint({ quiet: true });
   }
   const agentsSync = syncAgentsWithModels(__dirname, options.dryRun);
@@ -2030,7 +2112,6 @@ async function runPostInstallMenu(options, detected) {
   let currentDetected = detected;
   try {
     while (true) {
-      const hasCustomApi = Boolean(resolveCustomModelsEndpoint(currentDetected.endpoints));
       console.log(`${colors.bold}${colors.cyan}=== Heimdall Management Hub ===${colors.reset}`);
       console.log(`Heimdall is currently installed and active across your environment.\n`);
       console.log(`What would you like to do?`);
@@ -2038,7 +2119,7 @@ async function runPostInstallMenu(options, detected) {
       const menuItems = [
         { label: 'Audit Environment & Health Check', action: 'audit' },
         { label: 'Fast Sync Skills & Agents (1-sec zero-drift)', action: 'sync' },
-        ...(hasCustomApi ? [{ label: 'Refresh Dynamic Models (sync-models)', action: 'sync-models' }] : []),
+        { label: 'Refresh Dynamic Models across Installed Harnesses (sync-models)', action: 'sync-models' },
         { label: 'Configure / Toggle Heimdall HUD Statusline', action: 'hud' },
         { label: 'Herdr-App Fix & Layout (Clipboard & Roundup)', action: 'herdr' },
         { label: 'Uninstall Heimdall', action: 'uninstall' },

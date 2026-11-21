@@ -48,12 +48,13 @@ All GhostCLI models are discovered dynamically via `heimdall sync` / `heimdall s
 
 Accessed natively via Google Antigravity / `agy` CLI (never through GhostCLI):
 
-| Model Name | Canonical Flag | Allowed Effort Levels | Optimal Specialization |
+| Model Name | Canonical Flag | Allowed Effort Levels | Tier & Optimal Specialization |
 | :--- | :--- | :--- | :--- |
-| **Gemini 4 Hydrogen** | `gemini-4-hydrogen-{effort}` (e.g. `gemini-4-hydrogen-xhigh`) | `low`, `medium`, `high`, `xhigh` | Efficient frontier reasoning with speed and long decodes up to 1M tokens. Supports xhigh effort tier. Replaces Flash branding. |
-| **Gemini 4 Argon** | `gemini-4-argon-{effort}` (e.g. `gemini-4-argon-high`) | `low`, `medium`, `high` | Efficient Gemini 4 frontier reasoning, faster responses and lower token spend. Subject to quota cooldowns. |
-| **Orchestrator (Argon)** | N/A (model dropdown option in Antigravity) | Auto-managed | Dynamic mode that splits tasks between Carbon (planning/review) and Hydrogen (implementation) within one session. Uses ~24% less quota and finishes ~19% faster than Carbon alone. Requires Google AI Ultra subscription; not a standalone model. |
-| **Gemini 3.8 Flash** | `gemini-3.8-flash-{effort}` (e.g. `gemini-3.8-flash-high`) | `low`, `medium`, `high` | Stable previous-generation Flash for software engineering, autonomous agents, and complex enterprise workflows. Current default workhorse. |
+| **Gemini 4 Neon** | `gemini-4-neon-{effort}` (e.g. `gemini-4-neon-high`) | `low`, `medium`, `high`, `xhigh` | **Quota-Limited Flagship**. High-end Gemini 4 model; reserve for specialized architecture and critical reasoning tasks. |
+| **Gemini 4 Argon** | `gemini-4-argon-{effort}` (e.g. `gemini-4-argon-high`) | `low`, `medium`, `high` | **Quota-Limited Flagship**. High-end Gemini 4 frontier reasoning; reserve for specialized high-stakes tasks. Subject to quota cooldowns. |
+| **Gemini 4 Hydrogen** | `gemini-4-hydrogen-{effort}` (e.g. `gemini-4-hydrogen-xhigh`) | `low`, `medium`, `high`, `xhigh` | **Mid-Tier Reviewer & Balanced Workhorse**. Stronger reasoning than Flash with lower quota pressure than Argon/Neon; default for cross-family review. |
+| **Orchestrator (Argon)** | N/A (model dropdown option in Antigravity) | Auto-managed | Dynamic mode that splits tasks between Carbon (planning/review) and Hydrogen (implementation) within one session. |
+| **Gemini 3.8 Flash** | `gemini-3.8-flash-{effort}` (e.g. `gemini-3.8-flash-high`) | `low`, `medium`, `high` | **Fast Utility**. Rapid scans, boilerplate scaffolding, and quick verification. Lower reasoning depth than Hydrogen. |
 
 ---
 
@@ -84,8 +85,13 @@ Gemini models (`gemini-4-hydrogen`, `gemini-4-argon`, `gemini-3.8-flash`) are ne
 
 ---
 
-## 6. Effort Constraint & Fallback Rules
+## 6. Effort Constraint, Tier Policy & Fallback Rules
 
-- **Effort Constraint Rule**: Each task in a plan must explicitly declare one of the registered models and an allowed effort level matching the tables above.
-- **Quota Fallback Rule**: When Gemini 4 Argon reaches quota cooldown, fallback in order: Gemini 4 Hydrogen → Gemini 3.8 Flash → GhostCLI models (Claude/GPT).
+- **Model Tier Policy**:
+  - **Quota-Limited Flagships** (`gemini-4-argon`, `gemini-4-neon`): Reserve strictly for specialized architecture, deep synthesis, and critical final reviews.
+  - **Unlimited Workhorses** (`claude-opus-5-5`, `claude-fable-5.2`, `gpt-6-astra` / Codex): No Antigravity quota limits; default for heavy implementation, migrations, and E2E verification.
+  - **Mid-Tier Reviewer** (`gemini-4-hydrogen`): Stronger reasoning than Flash; default for cross-family reviews and balanced tasks.
+  - **Fast Utility** (`gemini-3.8-flash`, `z-ai/glm-5.3-flash`, `deepseek-ai/DeepSeek-V4.1-Flash-1017`): Rapid scans, scaffolding, and quick utility checks.
+- **Effort Constraint Rule**: Each task in a plan must explicitly declare a registered model, an allowed effort level, and a Selection Rationale.
+- **Quota Fallback Rule**: When Gemini 4 Argon or Neon reaches quota cooldown, fallback in order: `Gemini 4 Hydrogen` → `Gemini 3.8 Flash` → GhostCLI unlimited workhorses (`Claude Opus 5.5` / `GPT-6 Astra`).
 - **Headless Execution Limitation**: The `agy` CLI requires a TTY for all execution modes including `--print`. Non-interactive/headless invocations from scripts, CI, or piped environments will hang indefinitely. Use Herdr split/tab/window modes instead, or run `agy` interactively.

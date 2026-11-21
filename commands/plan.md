@@ -10,10 +10,9 @@ CRITICAL DISCIPLINE:
    - Classify scope out loud (Spike, Bounded, or Architectural).
    - Interrogate assumptions with at least 2-3 probing questions on failure modes, bounds, and edge cases.
    - Present at least 2 concrete architectural alternatives with trade-offs.
-   - **MANDATORY VISIBLE TEMPLATE (CRITICAL ANTI-PATTERN BAN)**:
-     NEVER keep the questions only in internal thinking/scratchpads.
-     NEVER emit a bare "Awaiting your answers..." blocker message without the questions.
-     Your response MUST literally render the following Markdown structure in visible chat:
+   - **QUESTIONING PROTOCOL (INTERACTIVE TOOLS FIRST, MARKDOWN FALLBACK)**:
+     - **Interactive Tool Execution (Primary)**: In environments equipped with interactive question tools (`AskUserQuestion` in Claude Code/Codex, `ask_question` in Antigravity), invoke the native tool to present the questions with selectable options and recommended paths.
+     - **Visible Markdown Fallback**: If no interactive question tool is available, render the following Markdown structure in visible chat (NEVER keep questions inside internal thinking or emit a bare "awaiting answers" blocker message):
      ```markdown
      ### 1. Scope Classification
      - **Scope**: [Spike / Bounded / Architectural]
@@ -27,4 +26,4 @@ CRITICAL DISCIPLINE:
      - **Alternative 1**: [Description + architectural trade-offs]
      - **Alternative 2**: [Description + architectural trade-offs]
      ```
-4. Stop and wait for the user's explicit response and approval ONLY AFTER printing the questions and alternatives in full.
+4. Stop and wait for the user's explicit response and direction alignment before proceeding.

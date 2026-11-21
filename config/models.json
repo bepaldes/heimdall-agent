@@ -36,6 +36,34 @@
         "high",
         "xhigh"
       ]
+    },
+    {
+      "id": "gemini-4-hydrogen",
+      "displayName": "Gemini 4 Hydrogen",
+      "family": "google",
+      "specialization": "Efficient frontier reasoning with speed and long decodes up to 1M tokens.",
+      "context": "1M",
+      "context_window_tokens": 1048576,
+      "effort": [
+        "low",
+        "medium",
+        "high",
+        "xhigh"
+      ]
+    },
+    {
+      "id": "gemini-4-neon",
+      "displayName": "Gemini 4 Neon",
+      "family": "google",
+      "specialization": "Antigravity Gemini 4 Neon model.",
+      "context": "1M",
+      "context_window_tokens": 1048576,
+      "effort": [
+        "low",
+        "medium",
+        "high",
+        "xhigh"
+      ]
     }
   ],
   "custom_proxies": [

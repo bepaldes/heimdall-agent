@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolveModelMaxContext, normalizeContextTokens, resolveCustomModelsEndpoint, lookupModelContextFromCatalog } from '../lib/model-context.cjs';
+import { resolveModelMaxContext, normalizeContextTokens, resolveCustomModelsEndpoint, resolveAllCustomModelsEndpoints, lookupModelContextFromCatalog } from '../lib/model-context.cjs';
 
 describe('Model Context Discovery & Maximum Context Resolution', () => {
   test('normalizes raw token numbers into integer tokens and human readable string', () => {
@@ -90,5 +90,17 @@ describe('Model Context Discovery & Maximum Context Resolution', () => {
     const hy4 = lookupModelContextFromCatalog('tencent/Hy4-preview', process.cwd());
     assert.equal(hy4.tokens, 1000000);
     assert.equal(hy4.label, '1M');
+  });
+
+  test('resolveAllCustomModelsEndpoints collects unique custom endpoints across all harnesses', () => {
+    const all = resolveAllCustomModelsEndpoints({
+      claude: 'https://ghostcli.cloud',
+      codex: 'https://ghostcli.cloud/v1',
+      hermes: 'http://localhost:11434',
+      gemini: 'https://generativelanguage.googleapis.com'
+    });
+    assert.equal(all.length, 2);
+    assert.equal(all[0].url, 'https://ghostcli.cloud/v1/models');
+    assert.equal(all[1].url, 'http://localhost:11434/v1/models');
   });
 });

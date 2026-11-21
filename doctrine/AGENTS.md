@@ -32,10 +32,10 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
     1. TURN 1 INTERACTIVE GRILLING:
        - Autonomous fact-finding first: inspect the codebase; never ask questions the files answer.
        - Focus strictly on the active decision frontier (unsettled decisions whose prerequisites are met).
-       - Ask 2-3 probing questions in the "Yes-to-Approve" format (❓ Question + ➡️ Recommended answer).
+       - In environments with interactive question tools (`AskUserQuestion` in Claude Code/Codex, `ask_question` in Antigravity), invoke the native tool to present choices and recommendations interactively. Fall back to rendering Scope, Questions ("Yes-to-Approve" format), and Alternatives clearly in chat markdown when interactive tools are unavailable.
        - Propose 2 distinct concrete approaches with explicit architectural trade-offs.
        - For architectural scope, record settled choices in ADRs (`docs/adr/`).
-       - Render Scope, Questions, and Alternatives clearly in chat markdown, then pause for user approval.
+       - Pause for user approval before generating any code or plan.
     2. TURN 2+ MULTI-MODEL PLAN GENERATION:
        - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `playbooks/`, `../playbooks/`, or `../heimdall-agent/playbooks/`).
        - PLAN STORAGE & LIFECYCLE: All plans MUST be created in `docs/designs/YYYY-MM-DD <plan name>.md`. Once implemented, verified, and confirmed working, the plan is moved to `docs/designs/old/YYYY-MM-DD <plan name>.md`.

@@ -31,11 +31,19 @@
 - **Anti-Default Discipline**: Specific AI tropes explicitly rejected for this surface.
 
 ## 3. Multi-Agent Orchestration & Model Allocation Matrix
+
+> **Model Tier Policy**:
+> - **Quota-Limited Flagships** (`gemini-4-argon`, `gemini-4-neon`): High-end models with strict quota limits. Reserve for specialized architecture, complex synthesis, and critical final reviews.
+> - **Unlimited Workhorses** (`claude-opus-5-5`, `claude-fable-5.2`, `gpt-6-astra` / Codex, `claude-sonnet-5-5`): No Antigravity quota cooldowns. Use as default workhorses for core implementation, migrations, and heavy execution.
+> - **Mid-Tier Reviewer** (`gemini-4-hydrogen`): Stronger reasoning than Flash with lower quota pressure than Argon/Neon. Default for cross-family code reviews and balanced verification.
+> - **Fast Utility** (`gemini-3.8-flash`, `z-ai/glm-5.3-flash`, `deepseek-ai/DeepSeek-V4.1-Flash-1017`): Rapid scans, boilerplate scaffolding, and quick utility checks.
+
 | Task ID | Phase & Task Description | Assigned Model | Effort Level | Selection Rationale | Cross-Reviewer & Tool Command |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| T1 | Phase 1: Scaffolding | claude-sonnet-5 | high | Schema & component structure | Gemini 3.8 Flash (`herdr agent prompt gemini-reviewer`) |
-| T2 | Phase 2: Implementation | claude-sonnet-5 | high | Core business logic & UI | Gemini 3.8 Flash (`herdr agent prompt gemini-reviewer`) |
-| T3 | Phase 3: Playwright E2E | claude-sonnet-5 | high | Full user journey verification | Gemini 3.8 Flash (`herdr agent prompt gemini-reviewer`) |
+| T1 | Phase 1: Architecture & Schema | `gemini-4-argon` | `high` | Quota-limited flagship reserved for specialized domain & boundary design | `claude-opus-5-5` (`herdr agent prompt claude-reviewer`) |
+| T2 | Phase 2: Core Implementation | `claude-opus-5-5` | `high` | Unlimited workhorse for multi-file implementation & business logic | `gemini-4-hydrogen` (`herdr agent prompt agy-reviewer`) |
+| T3 | Phase 3: Test Scaffolding & Lint | `gemini-3.8-flash` | `medium` | Fast utility for rapid test boilerplate and static checks | `gpt-6-astra` (`herdr agent prompt codex-reviewer`) |
+| T4 | Phase 4: Playwright E2E & Audit | `gpt-6-astra` | `high` | Unlimited Codex workhorse for full browser verification & final audit | `gemini-4-hydrogen` (`herdr agent prompt agy-reviewer`) |
 
 ## 4. Multi-Phase Implementation Plan
 ### Phase 1: Architecture & Scaffolding
@@ -106,8 +114,9 @@
    - Enforces the strict ban on pseudo-verification (`curl`, `grep`, `tsc --noEmit` alone, container status).
    - Mandates browser verification for backend changes with UI impact.
 
-### Effort Constraint Rules
-- Every task must explicitly declare one of the registered models and an allowed effort level (`low`, `medium`, `high`, `xhigh`) defined in `playbooks/06-model-registry-matrix.md`.
+### Effort Constraint & Tier Rules
+- Every task must explicitly declare one of the registered models, an allowed effort level (`low`, `medium`, `high`, `xhigh`), and a **Selection Rationale** column explaining why that tier fits the task.
+- Avoid uniform model assignments across all rows; match each task to its tier (`Quota-Limited Flagship`, `Unlimited Workhorse`, `Mid-Tier Reviewer`, or `Fast Utility`).
 - Tasks requiring deep architectural reasoning, type safety, or complex algorithms must use `high` or `xhigh`.
 - Fast scans, boilerplate scaffolding, or rapid audits may use `low` or `medium`.
-- When Gemini 4 Argon reaches quota cooldown, fallback in order: Gemini 4 Hydrogen → Gemini 3.8 Flash → GhostCLI models (Claude/GPT).
+- When Gemini 4 Argon or Neon reaches quota cooldown, fallback in order: `Gemini 4 Hydrogen` → `Gemini 3.8 Flash` → GhostCLI unlimited workhorses (`Claude Opus 5.5` / `GPT-6 Astra`).

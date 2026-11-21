@@ -9,8 +9,9 @@ Follow this execution lifecycle:
    - Enforce Research & Reuse First: check codebase symbols, standard libraries, and dependencies before designing new abstractions.
    - Interrogate assumptions with 2–3 probing questions on edge cases, failure modes, and boundaries.
    - Propose 2 concrete approaches with architectural trade-offs. Wait for user direction approval.
-   - **MANDATORY VISIBLE TEMPLATE (NEVER swallow questions in thinking scratchpads or output a bare "awaiting answers" blocker message)**:
-     Your Turn 1 response MUST literally render this Markdown structure in visible chat:
+   - **QUESTIONING PROTOCOL (INTERACTIVE TOOLS FIRST, MARKDOWN FALLBACK)**:
+     - **Interactive Tool Execution (Primary)**: In environments equipped with interactive question tools (`AskUserQuestion` in Claude Code/Codex, `ask_question` in Antigravity), invoke the native tool to present the questions with structured options and recommendations.
+     - **Visible Markdown Fallback**: If no interactive question tool is available, render this Markdown structure in visible chat (NEVER keep questions inside internal thinking or emit a bare "awaiting answers" blocker message):
      ```markdown
      ### 1. Scope Classification
      - **Scope**: [Spike / Bounded / Architectural]
@@ -24,9 +25,10 @@ Follow this execution lifecycle:
      - **Alternative 1**: [Description + architectural trade-offs]
      - **Alternative 2**: [Description + architectural trade-offs]
      ```
-     STOP and wait for the user to answer ONLY AFTER rendering the questions and alternatives in full visible text.
+     STOP and wait for the user's answers and alignment before proceeding.
 2. **Canonical Plan Generation (Turn 2)**:
    - Generate a 7-section canonical plan following `playbooks/05-canonical-plan-template.md`.
+   - Apply the **Model Tier Policy** in Section 3 (Model Allocation Matrix) with an explicit `Selection Rationale` column per task: reserve `Argon`/`Neon` for specialized tasks, use `Opus`/`Fable`/`Codex` as unlimited workhorses, use `Hydrogen` as mid-tier reviewer (stronger than `Flash`), and use `Flash` for fast utility.
 3. **Subagent Delegation (Turn 3+)**:
    - Act as the deep-context Elephant. Delegate tasks to fresh, isolated Goldfish subagents:
      - `tester` for failing tests first (TDD)

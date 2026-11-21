@@ -34,8 +34,9 @@ Before generating any code, creating plans, or taking action on any user request
    - Declare your professional recommendation with clear reasoning.
    - **ADR Synchronization**: For Tier 3 architectural decisions, record settled choices in `docs/adr/YYYY-MM-DD-<title>.md`.
 
-4. **Hard Gate**:
-   - MANDATORY VISIBLE OUTPUT (ANTI-PATTERN BAN): NEVER keep the questions or alternatives inside internal thinking/scratchpads. NEVER output a bare "awaiting answers..." blocker message. You MUST render the Scope, Frontier Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
+4. **Hard Gate & Interaction Mode**:
+   - **Interactive Question Tools (Primary)**: In environments equipped with interactive question tools (`AskUserQuestion` in Claude Code/Codex, `ask_question` in Antigravity), invoke the native tool to prompt the user with selectable options and explicit recommendations.
+   - **Mandatory Visible Markdown Fallback**: If native interactive question tools are unavailable, NEVER keep questions inside internal thinking or emit a bare "awaiting answers..." blocker message. You MUST render the Scope, Frontier Questions, and Alternatives explicitly in user-visible chat markdown using this exact template:
      ```markdown
      ### 1. Scope Classification
      - **Scope**: [Spike / Bounded / Architectural]
@@ -53,6 +54,6 @@ Before generating any code, creating plans, or taking action on any user request
      - **Alternative 1**: [Description + architectural trade-offs]
      - **Alternative 2**: [Description + architectural trade-offs]
      ```
-   - STOP and wait for the user to answer and select an approach ONLY AFTER rendering the questions in full.
+   - STOP and wait for the user to answer and select an approach before proceeding.
    - Only after receiving explicit alignment may you proceed to planning or implementation.
 ```
