@@ -26,6 +26,7 @@ import {
   buildOfficialHarnessModels
 } from './lib/harness-models.cjs';
 import { syncAgentsWithModels, syncModelRegistryPlaybook } from './lib/model-router.cjs';
+import { syncHerdrPrograms } from './lib/herdr-programs.cjs';
 import { updateHermesConfigContext } from './lib/hermes-context.cjs';
 import { detectPathCandidates } from './lib/path-discovery.cjs';
 import { syncCatalogCounts } from './lib/catalog-sync.cjs';
@@ -835,10 +836,38 @@ function syncHerdrAppConfig(dryRun = false) {
     }
 
     fs.writeFileSync(settingsPath, JSON.stringify(settingsObj, null, 2) + '\n', 'utf8');
+
+    // 3. Register non-native GhostCLI / proxy models in programs.json
+    syncHerdrProgramsFromCatalog(false);
     return true;
   } catch {
     return false;
   }
+}
+
+/**
+ * Synchronizes non-native GhostCLI / custom proxy models from config/models.json
+ * into Herdr-App's programs.json when Herdr-App and Claude Code are present.
+ */
+function syncHerdrProgramsFromCatalog(dryRun = false, catalog = null) {
+  const herdrDir = path.join(userHome, '.config', 'herdr-app');
+  if (!fs.existsSync(herdrDir)) return { updated: false, count: 0, models: [] };
+
+  let activeCatalog = catalog;
+  if (!activeCatalog) {
+    const modelsPath = path.join(__dirname, 'config', 'models.json');
+    if (!fs.existsSync(modelsPath)) return { updated: false, count: 0, models: [] };
+    try {
+      activeCatalog = JSON.parse(fs.readFileSync(modelsPath, 'utf8'));
+    } catch {
+      return { updated: false, count: 0, models: [] };
+    }
+  }
+
+  return syncHerdrPrograms(herdrDir, activeCatalog, {
+    dryRun,
+    claudeInstalled: checkCommand('claude')
+  });
 }
 
 function runHerdrApp(options) {
@@ -848,6 +877,7 @@ function runHerdrApp(options) {
     console.log(`[DRY RUN] Would configure Herdr-App clipboard reliability & Herdr-Roundup layout at:`);
     console.log(`  - ${path.join(herdrDir, 'keys.json')}`);
     console.log(`  - ${path.join(herdrDir, 'settings.json')}`);
+    console.log(`  - ${path.join(herdrDir, 'programs.json')}`);
     return true;
   }
 
@@ -857,6 +887,7 @@ function runHerdrApp(options) {
     console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Alt+V & Ctrl+Shift+V routed to native agent image paste (send:\\u001bv)`);
     console.log(`  ${colors.green}✔ Configured keys.json:${colors.reset} Ctrl+C / Ctrl+Shift+C mapped to copy (terminal.copy)`);
     console.log(`  ${colors.green}✔ Configured settings.json:${colors.reset} 'copy_on_select: true' and 'layout: Herdr-Roundup' active`);
+    console.log(`  ${colors.green}✔ Configured programs.json:${colors.reset} Registered GhostCLI proxy models for '+' Start an agent menu`);
     console.log(`\n${colors.dim}Shortcuts: In Claude Code on Windows, press Alt+V (or Ctrl+Shift+V) to paste images; press Ctrl+V for text.${colors.reset}\n`);
     return true;
   } else {
@@ -1638,6 +1669,11 @@ async function syncModelsFromEndpoint({ quiet = false } = {}) {
 
     syncAgentsWithModels(__dirname, false);
     syncModelRegistryPlaybook(__dirname, false);
+
+    const herdrProgramsRes = syncHerdrProgramsFromCatalog(false, currentModels);
+    if (herdrProgramsRes.updated && !quiet) {
+      console.log(`${colors.green}✔ Registered ${herdrProgramsRes.count} GhostCLI proxy model(s) in Herdr-App programs.json${colors.reset}\n`);
+    }
 
     const hermesDir = getHermesDir();
     if (fs.existsSync(hermesDir) && mappedCustom.length > 0) {

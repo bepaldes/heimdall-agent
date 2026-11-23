@@ -5,6 +5,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const { syncHerdrPrograms } = require('../lib/herdr-programs.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -60,5 +64,67 @@ test('Herdr-App CLI Support & Configuration', async (t) => {
     const settings = JSON.parse(settingsBuf.toString('utf8'));
     assert.equal(settings.copy_on_select, true);
     assert.equal(settings.layout, 'Herdr-Roundup');
+  });
+
+  await t.test('syncHerdrPrograms registers non-native proxy models, preserves manual entries, and writes without BOM', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-programs-test-'));
+    try {
+      const programsPath = path.join(tmpDir, 'programs.json');
+      const errorPath = path.join(tmpDir, 'programs.error');
+
+      // Seed with BOM, manual entries, and an existing claude --model entry with a custom key
+      const initial = {
+        programs: {
+          'my-custom-tool': { name: 'My Tool', run: ['mytool'] },
+          'glm-5-3': { name: 'GLM 5.3', icon: 'icons/claude.svg', run: ['claude', '--model', 'z-ai/glm-5.3'] },
+          'hunyuan-hy4': { name: 'Old Hunyuan', icon: 'icons/claude.svg', run: ['claude', '--model', 'tencent/Hy4-preview'] }
+        },
+        shells: ['pwsh']
+      };
+      fs.writeFileSync(programsPath, '\uFEFF' + JSON.stringify(initial, null, 2), 'utf8');
+      fs.writeFileSync(errorPath, 'stale error', 'utf8');
+
+      const catalog = {
+        ghostcli: [
+          { id: 'claude-fable-5.2', displayName: 'Claude Fable 5.2' },
+          { id: 'gpt-6-astra', displayName: 'GPT-6 Astra' },
+          { id: 'gemini-4-hydrogen-high', displayName: 'Gemini 4 Hydrogen' },
+          { id: 'z-ai/glm-5.3', displayName: 'GLM 5.3' },
+          { id: 'tencent/Hy4-preview', displayName: 'Hunyuan Hy4 Preview' },
+          { id: 'deepseek-ai/DeepSeek-V4.1-Flash-1017', displayName: 'DeepSeek V4.1 Flash' },
+          { id: 'XiaomiMiMo/MiMo-V2.6-Pro', displayName: 'MiMo V2.6 Pro' }
+        ]
+      };
+
+      const res = syncHerdrPrograms(tmpDir, catalog, { claudeInstalled: true });
+      assert.equal(res.updated, true);
+      assert.equal(res.count, 3);
+      assert.equal(fs.existsSync(errorPath), false, 'programs.error should be cleared');
+
+      const buf = fs.readFileSync(programsPath);
+      assert.notDeepStrictEqual(buf.slice(0, 3), Buffer.from([0xef, 0xbb, 0xbf]), 'programs.json must not have UTF-8 BOM');
+
+      const parsed = JSON.parse(buf.toString('utf8'));
+      assert.deepEqual(parsed.shells, ['pwsh']);
+      assert.deepEqual(parsed.programs['my-custom-tool'], { name: 'My Tool', run: ['mytool'] });
+      assert.equal(parsed.programs['glm-5-3'], undefined, 'GLM entries should be removed/excluded');
+      // Updated in place under existing key without creating a duplicate key
+      assert.deepEqual(parsed.programs['hunyuan-hy4'], {
+        name: 'Hunyuan Hy4 Preview',
+        icon: 'icons/claude.svg',
+        run: ['claude', '--model', 'tencent/Hy4-preview']
+      });
+      assert.equal(parsed.programs['hunyuan-hy4-preview'], undefined);
+      assert.equal(parsed.programs['claude-fable-5-2'], undefined);
+      assert.equal(parsed.programs['gpt-6-astra'], undefined);
+      assert.equal(parsed.programs['gemini-4-hydrogen'], undefined);
+
+      // Skips when claude is not installed
+      const skipped = syncHerdrPrograms(tmpDir, catalog, { claudeInstalled: false });
+      assert.equal(skipped.updated, false);
+      assert.equal(skipped.count, 0);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });
