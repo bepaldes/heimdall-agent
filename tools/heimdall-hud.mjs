@@ -134,7 +134,8 @@ function thresholdColor(pct, theme) {
  */
 export function renderContextBar(pct, width = 8, theme = THEMES['night-blue']) {
   const clamped = Math.max(0, Math.min(100, Number(pct) || 0));
-  const filled = Math.round((clamped / 100) * width);
+  // Guard: at 0% or near-zero, force empty bar to avoid false solid-fill appearance
+  const filled = clamped < 1 ? 0 : Math.round((clamped / 100) * width);
   const empty = Math.max(0, width - filled);
   const color = thresholdColor(clamped, theme);
   return `${color}[${'█'.repeat(filled)}${'░'.repeat(empty)}] ${Math.round(clamped)}%${RESET}`;
@@ -369,7 +370,10 @@ export function renderHud(payload = {}, options = {}) {
 
   // Line 1: Model │ Context Bar │ State │ Cost │ Vim
   const line1 = [`${BOLD}${theme.model}${modelName}${RESET}`, ctxSegment];
-  if (payload.agent_state) line1.push(formatStateBadge(payload.agent_state, theme));
+  // Infer state badge when harness omits agent_state (e.g. Claude Code)
+  const effectiveState = payload.agent_state ||
+    (payload.cost?.total_duration_ms > 0 ? 'idle' : null);
+  if (effectiveState) line1.push(formatStateBadge(effectiveState, theme));
   if (typeof payload.cost?.total_cost_usd === 'number') {
     line1.push(`${theme.cost}$${payload.cost.total_cost_usd.toFixed(2)}${RESET}`);
   }
@@ -379,14 +383,17 @@ export function renderHud(payload = {}, options = {}) {
 
   // Line 2: Workspace (branch *dirty) │ Tokens │ Duration │ Quota / Rate Limits
   const line2 = [locSegment];
-  if (inTok || outTok) {
-    line2.push(`${DIM}↑${inTok || '0'} ↓${outTok || '0'}${RESET}`);
-  }
+  // Always render token segment for visual parity across harnesses
+  line2.push(`${DIM}↑${inTok || '0'} ↓${outTok || '0'}${RESET}`);
   if (duration && !compact) {
     line2.push(`${DIM}⏱ ${duration}${RESET}`);
   }
   if (quotaSegment) {
     line2.push(quotaSegment);
+  } else if (compact) {
+    // Compact fallback: show highest-usage quota bucket when full segments are hidden
+    const compactQuota = formatQuotaSegments(payload, theme, { compact: true, now: options.now });
+    if (compactQuota) line2.push(compactQuota);
   }
 
   return `${line1.join(sep)}\n${line2.join(sep)}`;

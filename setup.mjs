@@ -1613,9 +1613,16 @@ async function syncModelsFromEndpoint({ quiet = false } = {}) {
   }
 
   const mappedCustom = Array.from(aggregatedCustomModels.values());
+  // Enforce Codex model allowlist: only GPT-6 Astra and GLM models
+  const CODEX_MODEL_ALLOWLIST = new Set([
+    'gpt-6-astra',
+    'z-ai/glm-5.3',
+    'z-ai/glm-5.3-flash'
+  ]);
+  const filteredCustom = mappedCustom.filter(m => CODEX_MODEL_ALLOWLIST.has(m.id));
   if (mappedCustom.length > 0) {
-    currentModels.custom_proxies = mappedCustom;
-    currentModels.ghostcli = mappedCustom;
+    currentModels.custom_proxies = filteredCustom;
+    currentModels.ghostcli = filteredCustom;
     catalogChanged = true;
   }
 

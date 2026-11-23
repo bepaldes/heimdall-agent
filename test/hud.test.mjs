@@ -163,6 +163,75 @@ test('Heimdall HUD Renderer & Harness Sync', async (t) => {
     assert.equal(agy3pOut, '5h:40% (1h) wk:20% (1d)');
   });
 
+  await t.test('renderContextBar forces empty bar at 0% to avoid false solid-fill', () => {
+    const zero = stripAnsi(renderContextBar(0, 8, THEMES['night-blue']));
+    assert.equal(zero.includes('█'), false);
+    assert.match(zero, /░{8}/);
+    assert.match(zero, /0%/);
+
+    const nearZero = stripAnsi(renderContextBar(0.5, 8, THEMES['night-blue']));
+    assert.equal(nearZero.includes('█'), false);
+    assert.match(nearZero, /1%/); // rounds to 1% label but bar stays empty
+  });
+
+  await t.test('renderHud always shows token segment on line 2 even when tokens are zero', () => {
+    const out = stripAnsi(renderHud({
+      model: 'Opus 5.5',
+      workspace: { current_dir: '/tmp/app', branch: 'main' },
+      context_window: { used_percentage: 5, size: 200000 },
+      terminal: { columns: 120 }
+    }, { skipGit: true }));
+
+    const lines = out.split('\n');
+    assert.match(lines[1], /↑0 ↓0/);
+  });
+
+  await t.test('renderHud infers idle state badge when agent_state is missing but cost exists', () => {
+    const out = stripAnsi(renderHud({
+      model: 'Opus 5.5',
+      workspace: { current_dir: '/tmp/app', branch: 'main' },
+      context_window: { used_percentage: 10, size: 200000 },
+      cost: { total_cost_usd: 0.05, total_duration_ms: 30000 },
+      terminal: { columns: 120 }
+    }, { skipGit: true }));
+
+    assert.match(out, /● idle/);
+  });
+
+  await t.test('renderHud omits inferred state badge when no cost data exists', () => {
+    const out = stripAnsi(renderHud({
+      model: 'Opus 5.5',
+      workspace: { current_dir: '/tmp/app', branch: 'main' },
+      context_window: { used_percentage: 10, size: 200000 },
+      terminal: { columns: 120 }
+    }, { skipGit: true }));
+
+    assert.equal(out.includes('idle'), false);
+    assert.equal(out.includes('working'), false);
+  });
+
+  await t.test('renderHud shows quota indicators in narrow terminals via compact fallback', () => {
+    const now = Date.UTC(2026, 10, 19, 12, 0, 0);
+    // At 60 cols, quota segments render without reset times (compact strips them)
+    const out = stripAnsi(renderHud({
+      model: 'Opus 5.5',
+      workspace: { current_dir: '/tmp/app', branch: 'main' },
+      context_window: { used_percentage: 10, size: 200000 },
+      rate_limits: {
+        five_hour: { used_percentage: 42, resets_at: Math.floor((now + 45 * 60_000) / 1000) },
+        seven_day: { used_percentage: 82, resets_at: Math.floor((now + 50 * 3600_000) / 1000) }
+      },
+      terminal: { columns: 60 }
+    }, { skipGit: true, now }));
+
+    // Quota percentages must be visible even in narrow terminals
+    assert.match(out, /5h:42%/);
+    assert.match(out, /wk:82%/);
+    // Reset times should be omitted in compact mode
+    assert.equal(out.includes('45m'), false);
+    assert.equal(out.includes('2d2h'), false);
+  });
+
   await t.test('HUD sync configures Claude, Antigravity, and Codex idempotently', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'heimdall-hud-'));
     try {
