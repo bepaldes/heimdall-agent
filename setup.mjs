@@ -15,9 +15,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import dns from 'node:dns';
 import readline from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+
+// Force IPv4 DNS resolution globally — avoids IPv6 timeouts on networks
+// where AAAA records resolve but IPv6 connectivity is broken or slow.
+dns.setDefaultResultOrder('ipv4first');
 import { CANONICAL_MODEL_CONTEXTS, resolveModelMaxContext, resolveCustomModelsEndpoint } from './lib/model-context.cjs';
 import {
   discoverInstalledHarnesses,
@@ -198,6 +203,14 @@ function isAgentConfigurable(agent) {
   }
   if (agent === 'vscode') {
     return Boolean(fs.existsSync(getCopilotDir()) || fs.existsSync(getVSCodeUserDir()) || detectVSCodeBinary());
+  }
+  // Gemini: require agy binary on PATH or antigravity-cli config dir.
+  // Do NOT treat ~/.gemini alone as installed — Heimdall creates that dir for its own config.
+  if (agent === 'gemini') {
+    const agyDir = path.join(userHome, '.gemini', 'antigravity-cli');
+    let agyOnPath = false;
+    try { execSync('command -v agy', { stdio: 'ignore' }); agyOnPath = true; } catch {}
+    return agyOnPath || fs.existsSync(agyDir);
   }
   const rootDir = getAgentRootDir(agent);
   return Boolean(rootDir && fs.existsSync(rootDir));
@@ -524,9 +537,13 @@ function auditMcpServers() {
   const results = [];
   const serverNames = ['context7', 'chrome-devtools', 'open-design', 'rea', 'mobbin'];
 
-  // Gemini
+  // Gemini — only audit MCP if Gemini CLI is actually installed (agy binary or antigravity-cli dir).
+  // Do NOT treat ~/.gemini/config/mcp_config.json alone as proof — Heimdall creates that file during sync.
   const agyMcpFile = path.join(userHome, '.gemini', 'config', 'mcp_config.json');
-  if (fs.existsSync(agyMcpFile)) {
+  const agyDir = path.join(userHome, '.gemini', 'antigravity-cli');
+  let agyOnPath = false;
+  try { execSync('command -v agy', { stdio: 'ignore' }); agyOnPath = true; } catch {}
+  if ((agyOnPath || fs.existsSync(agyDir)) && fs.existsSync(agyMcpFile)) {
     try {
       const cfg = JSON.parse(fs.readFileSync(agyMcpFile, 'utf8'));
       for (const s of serverNames) {
