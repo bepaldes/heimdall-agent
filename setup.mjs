@@ -2572,10 +2572,22 @@ async function main() {
     }
   }
 
+  // Load persisted agent selection from previous install/sync
+  const stateFile = path.join(userHome, '.heimdall-state.json');
+  let savedState = {};
+  try { savedState = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
+
   if (!options.yes) {
     await runInteractive(options, detected);
+    // Persist the user's harness selection for future resyncs
+    try {
+      savedState.agents = options.agents;
+      savedState.savedAt = new Date().toISOString();
+      fs.writeFileSync(stateFile, JSON.stringify(savedState, null, 2));
+    } catch {}
   } else if (!options.agents) {
-    options.agents = ['all'];
+    // Non-interactive mode: use saved selection if available, otherwise fall back to all
+    options.agents = savedState.agents || ['all'];
   }
 
   const profilesData = JSON.parse(fs.readFileSync(profilesPath, 'utf8'));
