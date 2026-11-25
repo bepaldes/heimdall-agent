@@ -29,6 +29,26 @@ const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
 const SYNC = args.includes('--sync');
 
+function resolveAllowedAgents() {
+  const idx = args.indexOf('--agents');
+  if (idx !== -1 && args[idx + 1]) {
+    return new Set(args[idx + 1].split(',').map(s => s.trim().toLowerCase()));
+  }
+  const statePath = path.join(os.homedir(), '.heimdall-state.json');
+  if (fs.existsSync(statePath)) {
+    try {
+      const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+      if (Array.isArray(state.agents) && state.agents.length > 0) {
+        return new Set(state.agents.map(s => String(s).toLowerCase()));
+      }
+    } catch {}
+  }
+  return new Set(['all']);
+}
+
+const ALLOWED_AGENTS = resolveAllowedAgents();
+const isAgentAllowed = (agent) => ALLOWED_AGENTS.has('all') || ALLOWED_AGENTS.has(agent);
+
 // ── Path Resolution ──────────────────────────────────────────────
 
 // Strip \r and trailing whitespace from shell output (Windows dir/where emit \r\n)
@@ -218,14 +238,16 @@ if (SYNC) {
     geminiConfig.mcpServers[name] = entry;
   }
 
-  const geminiPath = path.join(os.homedir(), '.gemini', 'config', 'mcp_config.json');
-  fs.mkdirSync(path.dirname(geminiPath), { recursive: true });
-  fs.writeFileSync(geminiPath, JSON.stringify(geminiConfig, null, 2) + '\n');
-  console.log(`✓ Synced to ${geminiPath}`);
+  if (isAgentAllowed('gemini')) {
+    const geminiPath = path.join(process.env.GEMINI_CLI_HOME || path.join(os.homedir(), '.gemini'), 'config', 'mcp_config.json');
+    fs.mkdirSync(path.dirname(geminiPath), { recursive: true });
+    fs.writeFileSync(geminiPath, JSON.stringify(geminiConfig, null, 2) + '\n');
+    console.log(`✓ Synced to ${geminiPath}`);
+  }
 
   // Claude Code uses settings.json mcpServers — same flat format
-  const claudeSettingsPath = path.join(os.homedir(), '.claude', 'settings.json');
-  if (fs.existsSync(claudeSettingsPath)) {
+  const claudeSettingsPath = path.join(process.env.CLAUDE_CONFIG_DIR || path.join(os.homedir(), '.claude'), 'settings.json');
+  if (isAgentAllowed('claude') && fs.existsSync(claudeSettingsPath)) {
     const claudeSettings = JSON.parse(fs.readFileSync(claudeSettingsPath, 'utf8'));
     claudeSettings.mcpServers = {};
     for (const [name, server] of Object.entries(resolved.mcpServers)) {
@@ -245,8 +267,8 @@ if (SYNC) {
   }
 
   // ── Codex CLI (config.toml) ──────────────────────────────────────
-  const codexConfigPath = path.join(os.homedir(), '.codex', 'config.toml');
-  if (fs.existsSync(codexConfigPath)) {
+  const codexConfigPath = path.join(process.env.CODEX_HOME || path.join(os.homedir(), '.codex'), 'config.toml');
+  if (isAgentAllowed('codex') && fs.existsSync(codexConfigPath)) {
     const lines = fs.readFileSync(codexConfigPath, 'utf8').split(/\r?\n/);
     const keptLines = [];
     let inMcpSection = false;
@@ -273,8 +295,8 @@ if (SYNC) {
   }
 
   // ── Hermes CLI (config.yaml) ─────────────────────────────────────
-  const hermesConfigPath = path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'hermes', 'config.yaml');
-  if (fs.existsSync(hermesConfigPath)) {
+  const hermesConfigPath = path.join(process.env.HERMES_HOME || path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'hermes'), 'config.yaml');
+  if (isAgentAllowed('hermes') && fs.existsSync(hermesConfigPath)) {
     let hermesYaml = fs.readFileSync(hermesConfigPath, 'utf8');
     // Strip existing mcp_servers block (from "mcp_servers:" to next top-level key or EOF)
     hermesYaml = hermesYaml.replace(/^mcp_servers:[\s\S]*?(?=^[a-z_]+:|\s*$)/m, '');
@@ -311,7 +333,7 @@ if (SYNC) {
     : process.platform === 'darwin'
       ? path.join(os.homedir(), 'Library', 'Application Support', 'Code', 'User')
       : path.join(os.homedir(), '.config', 'Code', 'User');
-  if (fs.existsSync(vscodeUserDir)) {
+  if (isAgentAllowed('vscode') && fs.existsSync(vscodeUserDir)) {
     const vscodeMcpPath = path.join(vscodeUserDir, 'mcp.json');
     let vscodeMcp = { servers: {} };
     if (fs.existsSync(vscodeMcpPath)) {
@@ -345,7 +367,7 @@ if (SYNC) {
 
   // ── GitHub Copilot CLI (~/.copilot/mcp-config.json) ──────────────
   const copilotDir = path.join(os.homedir(), '.copilot');
-  if (fs.existsSync(copilotDir)) {
+  if (isAgentAllowed('vscode') && fs.existsSync(copilotDir)) {
     const copilotMcpPath = path.join(copilotDir, 'mcp-config.json');
     let copilotMcp = { mcpServers: {} };
     if (fs.existsSync(copilotMcpPath)) {

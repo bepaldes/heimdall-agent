@@ -17,6 +17,7 @@ import path from 'node:path';
 import os from 'node:os';
 import dns from 'node:dns';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 // Force IPv4 DNS resolution globally — avoids IPv6 timeouts on networks
 // where AAAA records resolve but IPv6 connectivity is broken or slow.
@@ -65,6 +66,14 @@ import {
   runListSkills,
   runUpdateSkill
 } from './lib/interactive-menu.cjs';
+import {
+  loadHeimdallState,
+  saveHeimdallState,
+  addProfile,
+  removeProfile,
+  listProfiles,
+  getProfileLaunchEnv
+} from './lib/profiles.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -174,11 +183,14 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}skills${colors.reset} (or ${colors.dim}--skills${colors.reset})         List all canonical skills, categories, and upstream provenance
   ${colors.green}update-skill <name|all>${colors.reset}     Inspect upstream repository, updates, and bounded review protocol
   ${colors.green}herdr${colors.reset} (or ${colors.dim}--herdr, herdr-fix${colors.reset})   Configure Herdr-App clipboard reliability & Herdr-Roundup layout
+  ${colors.green}profile <add|list|remove>${colors.reset}   Manage isolated multi-account profiles (claude, codex, agy)
+  ${colors.green}run <tool>/<name> [args]${colors.reset}    Launch a registered account profile with isolated env vars
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
   ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (69), minimal (16), security (12), design (14) [default: full]
   ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, vscode, desktop, all [default: all]
+  ${colors.yellow}--profiles <ids>${colors.reset}       Comma-separated account profiles to sync (e.g. claude/work,agy/personal,all)
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
   ${colors.yellow}--clean${colors.reset}                Wipe legacy skills from target directory before deploying
   ${colors.yellow}-y, --yes${colors.reset}              Non-interactive mode (use defaults or provided CLI arguments)
@@ -210,6 +222,12 @@ function parseArgs() {
   const options = {
     profile: 'full',
     agents: null,
+    profiles: null,
+    profileCmd: null,
+    profileArg: null,
+    profileDir: null,
+    runProfile: null,
+    runArgs: [],
     link: false,
     clean: false,
     sync: false,
@@ -247,6 +265,17 @@ function parseArgs() {
     else if (arg === 'sync-models' || arg === '--sync-models' || arg === 'syncmodels') options.syncModels = true;
     else if (arg === 'hud' || arg === '--hud') options.hud = true;
     else if (arg === 'herdr' || arg === '--herdr' || arg === 'herdr-fix' || arg === '--herdr-fix') options.herdr = true;
+    else if (arg === 'profile' && i === 0) {
+      options.profileCmd = (args[i + 1] || 'list').toLowerCase();
+      options.profileArg = args[i + 2] && !args[i + 2].startsWith('-') ? args[i + 2] : null;
+      const dirIdx = args.indexOf('--dir');
+      if (dirIdx !== -1 && args[dirIdx + 1]) options.profileDir = args[dirIdx + 1];
+      break;
+    } else if (arg === 'run' && i === 0 && args[i + 1]) {
+      options.runProfile = args[i + 1];
+      options.runArgs = args.slice(i + 2);
+      break;
+    }
     else if (arg === '--on') options.hudOff = false;
     else if (arg === '--off') options.hudOff = true;
     else if (arg === '--no-hud') options.hudEnabled = false;
@@ -270,6 +299,8 @@ function parseArgs() {
       options.profile = args[++i].toLowerCase();
     } else if (arg === '--agents' && args[i + 1]) {
       options.agents = args[++i].split(',').map(s => s.trim().toLowerCase());
+    } else if (arg === '--profiles' && args[i + 1]) {
+      options.profiles = args[++i].split(',').map(s => s.trim().toLowerCase());
     } else if (arg === '--tools-dir' && args[i + 1]) {
       options.toolsDir = args[++i];
     } else if (arg === '--doctrine-path' && args[i + 1]) {
@@ -314,6 +345,47 @@ async function main() {
   if (options.herdr) {
     runHerdrApp(options);
     process.exit(0);
+  }
+
+  if (options.profileCmd) {
+    if (options.profileCmd === 'add') {
+      const created = addProfile(options.profileArg, { dir: options.profileDir });
+      console.log(`${colors.green}✔ Registered profile ${created.id}${colors.reset} -> ${created.dir}`);
+    } else if (options.profileCmd === 'remove' || options.profileCmd === 'rm') {
+      const removed = removeProfile(options.profileArg);
+      console.log(removed
+        ? `${colors.yellow}✔ Unregistered profile ${options.profileArg}${colors.reset}`
+        : `${colors.dim}Profile '${options.profileArg}' not found.${colors.reset}`);
+    } else {
+      const profiles = listProfiles();
+      console.log(`${colors.bold}${colors.cyan}=== Heimdall Account Profiles (${profiles.length}) ===${colors.reset}\n`);
+      if (profiles.length === 0) {
+        console.log(`  ${colors.dim}No multi-account profiles registered. Run: heimdall profile add claude/work${colors.reset}\n`);
+      } else {
+        for (const p of profiles) {
+          console.log(`  • ${colors.green}${p.id.padEnd(20)}${colors.reset} ${colors.dim}${p.dir}${colors.reset}`);
+        }
+        console.log('');
+      }
+    }
+    process.exit(0);
+  }
+
+  if (options.runProfile) {
+    const profiles = listProfiles();
+    const target = profiles.find(p => p.id === options.runProfile.toLowerCase());
+    if (!target) {
+      console.error(`${colors.red}Profile '${options.runProfile}' not found. Run 'heimdall profile list'.${colors.reset}`);
+      process.exit(1);
+    }
+    const envOverrides = getProfileLaunchEnv(target);
+    const bin = target.tool;
+    const res = spawnSync(bin, options.runArgs, {
+      stdio: 'inherit',
+      env: { ...process.env, ...envOverrides },
+      shell: os.platform() === 'win32'
+    });
+    process.exit(res.status ?? 0);
   }
 
   if (options.hud) {
@@ -370,18 +442,16 @@ async function main() {
     }
   }
 
-  // Load persisted agent selection from previous install/sync
-  const stateFile = path.join(userHome, '.heimdall-state.json');
-  let savedState = {};
-  try { savedState = JSON.parse(fs.readFileSync(stateFile, 'utf8')); } catch {}
+  // Load persisted agent & profile selection from previous install/sync
+  const savedState = loadHeimdallState();
 
   if (!options.yes) {
     await runInteractive(options, detected);
-    // Persist the user's harness selection for future resyncs
+    // Persist the user's harness selection for future resyncs while preserving profiles
     try {
       savedState.agents = options.agents;
-      savedState.savedAt = new Date().toISOString();
-      fs.writeFileSync(stateFile, JSON.stringify(savedState, null, 2));
+      if (options.profiles) savedState.selectedProfiles = options.profiles;
+      saveHeimdallState(savedState);
     } catch {}
   } else if (!options.agents) {
     // Non-interactive mode: use saved selection if available, otherwise fall back to all
