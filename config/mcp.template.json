@@ -6,7 +6,7 @@
       "name": "OpenDesign MCP",
       "category": "design",
       "description": "Direct bridge to OpenDesign canvas, styles, components, and project context for coding agents.",
-      "disabled": false,
+      "disabled": true,
       "autoDetect": {
         "platform": "win32",
         "appDataSubdir": "Open Design"

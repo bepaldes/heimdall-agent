@@ -92,4 +92,13 @@ test('Heimdall MCP Registry Template and Resolver', async (t) => {
       assert.equal(server.autoDetect, undefined, `${name} should not have autoDetect in resolved output`);
     }
   });
+
+  await t.test('escapeToml and escapeYamlString escape quotes, backslashes, newlines, and tabs', async () => {
+    const { createRequire } = await import('node:module');
+    const require = createRequire(import.meta.url);
+    const { escapeToml, escapeYamlString } = require('../lib/mcp-serialize.cjs');
+    const sample = 'C:\\path\\"test"\nline2\tü';
+    assert.equal(escapeToml(sample), 'C:\\\\path\\\\\\"test\\"\\nline2\\tü');
+    assert.equal(escapeYamlString(sample), 'C:\\\\path\\\\\\"test\\"\\nline2\\tü');
+  });
 });

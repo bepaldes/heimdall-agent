@@ -9,6 +9,7 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 const { syncHerdrPrograms } = require('../lib/herdr-programs.cjs');
+const { syncHerdrAppConfig } = require('../lib/installer-engine.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -64,6 +65,10 @@ test('Herdr-App CLI Support & Configuration', async (t) => {
     const settings = JSON.parse(settingsBuf.toString('utf8'));
     assert.equal(settings.copy_on_select, true);
     assert.equal(settings.layout, 'Herdr-Roundup');
+
+    const modDir = path.join(herdrDir, 'mods', 'heimdall-auto-resume');
+    assert.ok(fs.existsSync(path.join(modDir, 'mod.json')), 'heimdall-auto-resume mod.json should be installed');
+    assert.ok(fs.existsSync(path.join(modDir, 'main.js')), 'heimdall-auto-resume main.js should be installed');
   });
 
   await t.test('syncHerdrPrograms registers non-native proxy models, preserves manual entries, and writes without BOM', () => {
@@ -125,6 +130,32 @@ test('Herdr-App CLI Support & Configuration', async (t) => {
       assert.equal(skipped.count, 0);
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  await t.test('syncHerdrAppConfig applies macOS cmd bindings and overrides existing default layout', () => {
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mac-test-'));
+    try {
+      const herdrDir = path.join(tmpHome, '.config', 'herdr-app');
+      fs.mkdirSync(herdrDir, { recursive: true });
+      fs.writeFileSync(path.join(herdrDir, 'settings.json'), JSON.stringify({ layout: 'default', copy_on_select: false }));
+      fs.writeFileSync(path.join(herdrDir, 'keys.json'), JSON.stringify({ terminal: { 'ctrl-v': 'terminal.paste' } }));
+
+      const ok = syncHerdrAppConfig(false, { platform: 'darwin', homeDir: tmpHome });
+      assert.equal(ok, true);
+
+      const keys = JSON.parse(fs.readFileSync(path.join(herdrDir, 'keys.json'), 'utf8'));
+      assert.equal(keys.terminal['cmd-v'], 'terminal.paste');
+      assert.equal(keys.terminal['cmd-shift-v'], 'send:\u001bv');
+      assert.equal(keys.terminal['ctrl-shift-v'], 'send:\u001bv');
+      assert.equal(keys.terminal['cmd-c'], 'terminal.copy');
+      assert.equal(keys.terminal['ctrl-v'], undefined);
+
+      const settings = JSON.parse(fs.readFileSync(path.join(herdrDir, 'settings.json'), 'utf8'));
+      assert.equal(settings.layout, 'Herdr-Roundup');
+      assert.equal(settings.copy_on_select, true);
+    } finally {
+      fs.rmSync(tmpHome, { recursive: true, force: true });
     }
   });
 });

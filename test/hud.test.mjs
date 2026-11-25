@@ -290,4 +290,12 @@ test('Heimdall HUD Renderer & Harness Sync', async (t) => {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
+
+  await t.test('formatHudCommand quotes paths with shell metacharacters while keeping safe paths unquoted', async () => {
+    const { formatHudCommand } = require('../lib/hud-sync.cjs');
+    assert.equal(formatHudCommand('C:/Apps/heimdall/tools/heimdall-hud.mjs'), 'node C:/Apps/heimdall/tools/heimdall-hud.mjs');
+    assert.equal(formatHudCommand('/tmp/$HOME/hud.mjs'), 'node "/tmp/$HOME/hud.mjs"');
+    assert.equal(formatHudCommand('/tmp/a`b/hud.mjs'), 'node "/tmp/a`b/hud.mjs"');
+    assert.equal(formatHudCommand('/tmp/a;b/hud.mjs'), 'node "/tmp/a;b/hud.mjs"');
+  });
 });

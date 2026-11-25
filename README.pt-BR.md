@@ -263,6 +263,9 @@ heimdall audit
 # Atualizar o catálogo dinâmico de modelos a partir do seu provedor/proxy ativo
 heimdall sync-models
 
+# Otimizar Herdr-App (atalhos de colar/copiar no Windows/macOS/Linux, layout Roundup e mod auto-resume)
+heimdall herdr
+
 # Ativar, desativar ou escolher o tema da statusline Heimdall HUD (2 linhas)
 heimdall hud
 heimdall hud --on --theme night-blue
@@ -285,6 +288,7 @@ heimdall uninstall
 | :--- | :---: | :--- | :--- |
 | `--profile <nome>` | `full` | Perfil de skills: `full`, `minimal`, `security` ou `design`. | `heimdall --profile minimal` |
 | `--agents <alvos>` | `all` | Lista de ferramentas separadas por vírgula: `claude`, `gemini`, `codex`, `hermes`, `openclaw`, `vscode`, `desktop`, `all`. | `heimdall --agents claude,vscode` |
+| `herdr` / `--herdr` | `false` | Configura atalhos do Herdr-App (Windows/Linux e macOS), layout `Herdr-Roundup` e mod `heimdall-auto-resume`. | `heimdall herdr` |
 | `--theme <nome>` | `night-blue` | Tema de cores do HUD: `night-blue`, `heimdall`, `claude-warm` ou `titanium`. | `heimdall hud --theme claude-warm` |
 | `--no-hud` | `false` | Pula a configuração da statusline Heimdall HUD durante a instalação ou sincronização. | `heimdall --no-hud` |
 | `--link` | `true` (rec.) | Implanta skills usando junctions NTFS (Windows) ou symlinks POSIX (macOS/Linux). | `heimdall --link` |

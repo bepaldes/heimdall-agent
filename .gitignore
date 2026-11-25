@@ -1,10 +1,15 @@
 node_modules/
 .npm-cache/
 docs/runs/
-docs/designs/
 hooks/herdr-agent-state.ps1
 *.tgz
 .DS_Store
 Thumbs.db
 
 config/mcp.resolved.json
+
+# Deprecated bridge scripts (superseded by setup.mjs native detection)
+tools/archive/
+
+# Generated artifact (README.md is source of truth)
+readme.html

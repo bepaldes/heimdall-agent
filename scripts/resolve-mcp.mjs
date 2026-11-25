@@ -15,6 +15,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import os from 'node:os';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const { escapeToml, escapeYamlString } = require('../lib/mcp-serialize.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -258,7 +262,6 @@ if (SYNC) {
       if (!inMcpSection) keptLines.push(line);
     }
     let codexToml = keptLines.join('\n').trimEnd() + '\n';
-    const escapeToml = (s) => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     // Append new mcp_servers sections for enabled non-URL servers
     for (const [name, server] of Object.entries(resolved.mcpServers)) {
       if (server.disabled || server.config.serverUrl) continue;
@@ -282,16 +285,16 @@ if (SYNC) {
       if (server.disabled) continue;
       hasEntries = true;
       if (server.config.serverUrl) {
-        mcpBlock += `  ${name}:\n    url: "${server.config.serverUrl}"\n`;
+        mcpBlock += `  ${name}:\n    url: "${escapeYamlString(server.config.serverUrl)}"\n`;
       } else {
-        mcpBlock += `  ${name}:\n    command: "${server.config.command.replace(/\\/g, '\\\\')}"\n    args:\n`;
+        mcpBlock += `  ${name}:\n    command: "${escapeYamlString(server.config.command)}"\n    args:\n`;
         for (const arg of server.config.args) {
-          mcpBlock += `      - "${arg.replace(/\\/g, '\\\\')}"\n`;
+          mcpBlock += `      - "${escapeYamlString(arg)}"\n`;
         }
         if (server.config.env) {
           mcpBlock += `    env:\n`;
           for (const [k, v] of Object.entries(server.config.env)) {
-            mcpBlock += `      ${k}: "${v.replace(/\\/g, '\\\\')}"\n`;
+            mcpBlock += `      ${k}: "${escapeYamlString(v)}"\n`;
           }
         }
       }
@@ -314,11 +317,17 @@ if (SYNC) {
     if (fs.existsSync(vscodeMcpPath)) {
       try {
         vscodeMcp = JSON.parse(fs.readFileSync(vscodeMcpPath, 'utf8'));
-      } catch { vscodeMcp = { servers: {} }; }
+      } catch (err) {
+        console.warn(`⚠ Failed to parse ${vscodeMcpPath}: ${err.message}`);
+        vscodeMcp = { servers: {} };
+      }
     }
     if (!vscodeMcp.servers || typeof vscodeMcp.servers !== 'object') vscodeMcp.servers = {};
     for (const [name, server] of Object.entries(resolved.mcpServers)) {
-      if (server.disabled) continue;
+      if (server.disabled) {
+        delete vscodeMcp.servers[name];
+        continue;
+      }
       if (server.config.serverUrl) {
         vscodeMcp.servers[name] = { type: 'http', url: server.config.serverUrl };
       } else {
@@ -342,11 +351,17 @@ if (SYNC) {
     if (fs.existsSync(copilotMcpPath)) {
       try {
         copilotMcp = JSON.parse(fs.readFileSync(copilotMcpPath, 'utf8'));
-      } catch { copilotMcp = { mcpServers: {} }; }
+      } catch (err) {
+        console.warn(`⚠ Failed to parse ${copilotMcpPath}: ${err.message}`);
+        copilotMcp = { mcpServers: {} };
+      }
     }
     if (!copilotMcp.mcpServers || typeof copilotMcp.mcpServers !== 'object') copilotMcp.mcpServers = {};
     for (const [name, server] of Object.entries(resolved.mcpServers)) {
-      if (server.disabled) continue;
+      if (server.disabled) {
+        delete copilotMcp.mcpServers[name];
+        continue;
+      }
       if (server.config.serverUrl) {
         copilotMcp.mcpServers[name] = { type: 'http', url: server.config.serverUrl };
       } else {

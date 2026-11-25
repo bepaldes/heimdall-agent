@@ -63,6 +63,7 @@ function getActiveContextLimit() {
 function trackContextUsage(payloadRaw) {
   const session = loadSessionState();
   session.turns = (session.turns || 0) + 1;
+  // Advisory-only heuristic (~3.8 chars/token); not a live tokenizer count
   const turnTokens = Math.round((payloadRaw ? payloadRaw.length : 0) / 3.8);
   session.estimatedTokens = (session.estimatedTokens || 0) + turnTokens;
   session.updatedAt = Date.now();
@@ -127,6 +128,179 @@ function getActiveGitBranch() {
   }
 }
 
+/**
+ * Splits a shell command string into individual command segments on ;, &&, ||, |, &, or newlines,
+ * respecting single and double quotes.
+ */
+function splitShellSegments(command) {
+  const segments = [];
+  let current = '';
+  let quote = null;
+
+  for (let i = 0; i < command.length; i++) {
+    const ch = command[i];
+    if (quote) {
+      if (ch === '\\' && quote === '"' && i + 1 < command.length) {
+        current += ch + command[++i];
+        continue;
+      }
+      if (ch === quote) quote = null;
+      current += ch;
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      current += ch;
+      continue;
+    }
+
+    if (ch === ';' || ch === '\n' || ch === '|' || ch === '&') {
+      if (current.trim()) segments.push(current.trim());
+      current = '';
+      if ((ch === '|' || ch === '&') && command[i + 1] === ch) i++;
+      continue;
+    }
+
+    current += ch;
+  }
+
+  if (current.trim()) segments.push(current.trim());
+  return segments;
+}
+
+/**
+ * Tokenizes a single shell segment into normalized lowercase tokens with outer quotes stripped.
+ */
+function tokenizeSegment(segment) {
+  const tokens = [];
+  let current = '';
+  let quote = null;
+
+  for (let i = 0; i < segment.length; i++) {
+    const ch = segment[i];
+    if (quote) {
+      if (ch === '\\' && quote === '"' && i + 1 < segment.length) {
+        current += segment[++i];
+        continue;
+      }
+      if (ch === quote) {
+        quote = null;
+        continue;
+      }
+      current += ch;
+      continue;
+    }
+
+    if (ch === '"' || ch === "'") {
+      quote = ch;
+      continue;
+    }
+
+    if (/\s/.test(ch)) {
+      if (current) {
+        tokens.push(current.toLowerCase());
+        current = '';
+      }
+      continue;
+    }
+
+    current += ch;
+  }
+
+  if (current) tokens.push(current.toLowerCase());
+  return tokens;
+}
+
+function commandBasename(token) {
+  const norm = token.replace(/\\/g, '/');
+  const idx = norm.lastIndexOf('/');
+  const base = idx >= 0 ? norm.slice(idx + 1) : norm;
+  return base.replace(/\.(exe|cmd|bat|ps1)$/i, '');
+}
+
+function isDestructiveSegment(tokens) {
+  if (tokens.length === 0) return false;
+  const cmd = commandBasename(tokens[0]);
+
+  if (cmd === 'rm') {
+    let hasRecursive = false;
+    let hasForce = false;
+    const targets = [];
+
+    for (let i = 1; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t.startsWith('--')) {
+        if (t === '--recursive') hasRecursive = true;
+        else if (t === '--force') hasForce = true;
+      } else if (t.startsWith('-') && t.length > 1) {
+        if (t.includes('r')) hasRecursive = true;
+        if (t.includes('f')) hasForce = true;
+      } else {
+        targets.push(t);
+      }
+    }
+
+    if (hasRecursive && hasForce) {
+      return targets.some(t => /^(\/|\/\*|~|~\/*|\$home|\$\{home\}|\.\/|\*|[a-z]:\\?)$/i.test(t));
+    }
+  }
+
+  if (cmd === 'rmdir') {
+    const hasS = tokens.includes('/s');
+    const hasQ = tokens.includes('/q');
+    const hasDriveRoot = tokens.some(t => /^[a-z]:\\?$/i.test(t));
+    if (hasS && hasQ && hasDriveRoot) return true;
+  }
+
+  return false;
+}
+
+function isDevServerSegment(tokens) {
+  if (tokens.length === 0) return false;
+  // Skip leading env assignments (e.g. PORT=3000 vite)
+  let idx = 0;
+  while (idx < tokens.length && /^[a-z_][a-z0-9_]*=/.test(tokens[idx])) idx++;
+  if (idx >= tokens.length) return false;
+
+  const cmd = commandBasename(tokens[idx]);
+  const rest = tokens.slice(idx + 1);
+
+  if (cmd === 'npm' || cmd === 'pnpm' || cmd === 'yarn' || cmd === 'bun') {
+    const sub = rest[0] === 'run' ? rest[1] : rest[0];
+    if (sub && /^(dev|start|serve)(:|$)/i.test(sub)) return true;
+  }
+
+  const directDevTools = new Set(['vite', 'live-server', 'http-server', 'nodemon', 'uvicorn']);
+  if (directDevTools.has(cmd)) return true;
+
+  if ((cmd === 'next' || cmd === 'nuxt') && rest[0] === 'dev') return true;
+  if ((cmd === 'flask' && rest[0] === 'run')) return true;
+  if ((cmd === 'python' || cmd === 'python3') && rest[0] === 'manage.py' && rest[1] === 'runserver') return true;
+
+  if (cmd === 'npx' || cmd === 'bunx' || cmd === 'pnpx') {
+    let i = 0;
+    while (i < rest.length) {
+      const t = rest[i];
+      if (t === '-p' || t === '--package') { i += 2; continue; }
+      if (t.startsWith('-')) { i++; continue; }
+      const pkg = commandBasename(t.split('@')[0]);
+      if (directDevTools.has(pkg) || pkg === 'next' || pkg === 'nuxt') return true;
+      break;
+    }
+  }
+
+  if (cmd === 'node') {
+    const scriptToken = rest.find(t => !t.startsWith('-'));
+    if (scriptToken) {
+      const scriptBase = commandBasename(scriptToken).replace(/\.(m|c)?js$/i, '');
+      if (directDevTools.has(scriptBase) || scriptBase === 'next' || scriptBase === 'nuxt') return true;
+    }
+  }
+
+  return false;
+}
+
 async function main() {
   const event = process.argv[2] || '';
   const raw = await readStdin();
@@ -146,21 +320,16 @@ async function main() {
     case 'pre-bash': {
       trackContextUsage(raw);
       const command = (toolInput.command || '').trim();
+      const segments = splitShellSegments(command);
+
       // Block destructive system commands
-      if (/(^|[;&|]\s*)(rm\s+-rf\s+(\/|~|\$HOME|\.\/|\*)|rmdir\s+\/s\s+\/q\s+[a-zA-Z]:\\)/i.test(command)) {
+      if (segments.some(seg => isDestructiveSegment(tokenizeSegment(seg)))) {
         process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Destructive root/system command detected.\n');
         process.exit(2);
       }
 
       // Block dev server commands (STRICT ZERO DEV-SERVER POLICY)
-      const isDevServer =
-        /(^|[;&|\s])(npm|pnpm|yarn|bun)\s+(run\s+)?(dev|start|serve)(\b|:|\s)/i.test(command) ||
-        /(^|[;&|\s])(npx\s+)?(vite|live-server|http-server|nodemon)(\b|\s)/i.test(command) ||
-        /(^|[;&|\s])(next|nuxt)\s+dev(\b|\s)/i.test(command) ||
-        /(^|[;&|\s])python\s+manage\.py\s+runserver(\b|\s)/i.test(command) ||
-        /(^|[;&|\s])(flask\s+run|uvicorn)(\b|\s)/i.test(command);
-
-      if (isDevServer) {
+      if (segments.some(seg => isDevServerSegment(tokenizeSegment(seg)))) {
         process.stderr.write(`[Heimdall Sentinel Guardrail] BLOCKED: Dev server execution detected ("${command}"). Running development servers is strictly prohibited by user doctrine. Use non-interactive terminating checks (npm test, npm run build, vitest run, lint, typecheck).\n`);
         process.exit(2);
       }
