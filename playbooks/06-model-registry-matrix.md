@@ -27,15 +27,8 @@ All GhostCLI models are discovered dynamically via `heimdall sync` / `heimdall s
 
 | Model Name | Canonical Flag | Family | Context Window | Allowed Effort Levels | Specialization / Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Claude Opus 5.5** | `claude-opus-5-5` | anthropic | 1M | `low`, `medium`, `high`, `xhigh` | Melhor equilíbrio entre capacidade e custo |
-| **Claude Sonnet 5** | `claude-sonnet-5` | anthropic | 1M | `low`, `medium`, `high` | O mais rápido sem abrir mão de qualidade |
-| **Claude Sonnet 5.5** | `claude-sonnet-5-5` | anthropic | 1M | `low`, `medium`, `high` | Rápido e mais capaz que o Sonnet 5 |
-| **Claude Fable 5.2** | `claude-fable-5.2` | anthropic | 1M | `low`, `medium`, `high`, `xhigh` | Máxima capacidade disponível |
 | **GLM 5.3** | `z-ai/glm-5.3` | z-ai | 1M | `low`, `medium`, `high`, `xhigh` | Código agêntico com contexto de 1M |
 | **GLM 5.3 Flash** | `z-ai/glm-5.3-flash` | z-ai | 1M | `low`, `medium`, `high` | Respostas rápidas para código |
-| **Hunyuan Hy4 Preview** | `tencent/Hy4-preview` | tencent | 1M | `low`, `medium`, `high`, `xhigh` | Raciocínio e código |
-| **DeepSeek V4.1 Flash** | `deepseek-ai/DeepSeek-V4.1-Flash-1017` | deepseek-ai | 1M | `low`, `medium`, `high` | Respostas rápidas para código |
-| **MiMo V2.6 Pro** | `XiaomiMiMo/MiMo-V2.6-Pro` | xiaomi | 1M | `low`, `medium`, `high`, `xhigh` | Código e raciocínio |
 | **GPT-6 Astra** | `gpt-6-astra` | openai | 1M | `low`, `medium`, `high`, `xhigh` | Trabalho agêntico longo com janela de 1M |
 
 > [!NOTE]

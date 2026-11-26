@@ -48,4 +48,22 @@ test('hooks/heimdall-hook.cjs pre-bash guardrails', async (t) => {
       assert.equal(res.status, 0, `Expected exit 0 for "${cmd}", got ${res.status} (stderr: ${res.stderr})`);
     });
   }
+
+  await t.test('user-prompt injects Heimdall Plan Gate on /plan prompts', () => {
+    const res = spawnSync(process.execPath, [HOOK_SCRIPT, 'user-prompt'], {
+      input: JSON.stringify({ prompt: '/plan add billing' }),
+      encoding: 'utf8'
+    });
+    assert.equal(res.status, 0);
+    assert.match(res.stdout, /\[Heimdall Plan Gate\]/);
+  });
+
+  await t.test('pre-write warns when docs/designs/*.md omits Persona or Required Skills columns', () => {
+    const res = spawnSync(process.execPath, [HOOK_SCRIPT, 'pre-write'], {
+      input: JSON.stringify({ tool_input: { file_path: 'docs/designs/2026-11-25 test.md', content: '# Plan\nNo columns' } }),
+      encoding: 'utf8'
+    });
+    assert.equal(res.status, 0);
+    assert.match(res.stderr, /\[Heimdall Plan Sentinel\]/);
+  });
 });

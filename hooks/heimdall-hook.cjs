@@ -382,6 +382,15 @@ async function main() {
       if (lineCount > 800 && !isCanvasArtifact) {
         process.stderr.write(`[Heimdall Karpathy Sentinel] Advisory: File '${filePath}' exceeds 800 lines (${lineCount} lines). Consider decomposing or keeping edits minimal.\n`);
       }
+      const normPath = filePath.replace(/\\/g, '/');
+      if (/(^|\/)docs\/designs\/[^/]+\.md$/i.test(normPath) && !normPath.includes('/old/')) {
+        const missingCols = [];
+        if (!/Heimdall Agent Persona/i.test(content)) missingCols.push('Heimdall Agent Persona');
+        if (!/Required Skills/i.test(content)) missingCols.push('Required Skills (SKILL.md)');
+        if (missingCols.length > 0) {
+          process.stderr.write(`[Heimdall Plan Sentinel] Advisory: Plan '${filePath}' is missing required Section 3 columns: ${missingCols.join(', ')}. Follow playbooks/05-canonical-plan-template.md.\n`);
+        }
+      }
       break;
     }
 
@@ -392,6 +401,10 @@ async function main() {
 
     case 'user-prompt': {
       process.stdout.write('[Heimdall Communication Doctrine] Lead with BLUF (conclusion in first 1-2 sentences). Use ASD-STE100 for procedural steps: active imperative verb first, <=20 words/step, zero banned words (ensure, properly, appropriately, gracefully, as needed, etc.).\n');
+      const promptText = String(payload.prompt || payload.user_prompt || toolInput.prompt || '');
+      if (/(^|\s)\/(plan|orchestrate|grill-me)\b/i.test(promptText)) {
+        process.stdout.write('[Heimdall Plan Gate] Load ~/.claude/agents/orchestrator.md, assign Heimdall Agent Persona (agents/*.md) + Required Skills (SKILL.md) per task in playbooks/05-canonical-plan-template.md, and enforce reviewer.md skill verification.\n');
+      }
       break;
     }
 

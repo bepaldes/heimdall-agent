@@ -40,15 +40,16 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
        - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `playbooks/`, `../playbooks/`, or `../heimdall-agent/playbooks/`).
        - PLAN STORAGE & LIFECYCLE: All plans MUST be created in `docs/designs/YYYY-MM-DD <plan name>.md`. Once implemented, verified, and confirmed working, the plan is moved to `docs/designs/old/YYYY-MM-DD <plan name>.md`.
        - The plan MUST specify:
-         a) Multi-Agent Orchestration & Model Allocation Matrix (allocating tasks by capability tier across available model families in `06-model-registry-matrix.md` / `config/models.json` — including Claude, Gemini, Codex/GPT, GLM, Hunyuan, MiMo, and newly synced GhostCLI models).
-         b) Symmetric Cross-Model Validation Loop (`herdr agent prompt`) and Non-Interactive Verification Harness.
+         a) Multi-Agent Orchestration & Model Allocation Matrix (assigning `Heimdall Agent Persona` from `agents/*.md`, `Required Skills (SKILL.md)`, capability-tier model from `06-model-registry-matrix.md` / `config/models.json`, effort level, rationale, and cross-reviewer).
+         b) Symmetric Cross-Model Validation Loop (`reviewer.md` / `code-sentinel.md` / `security-auditor.md` verifying diffs against `Required Skills (SKILL.md)`).
          c) Orchestrator Heartbeat (cadence for monitoring task progress and liveness).
          d) Verification Harness (Non-interactive terminating test suites, static builds, and linters. Playwright E2E strictly against pre-existing human-managed servers or static build previews. NEVER include steps to start a dev server).
   </planning_protocol>
 
   <subagent_execution_contract>
     When invoked as a child subagent across ANY harness (Antigravity invoke_subagent, Claude Code Agent, Codex CLI):
-    - Autonomous executor (Implementer, Tester, Reviewer, Code-Sentinel).
+    - Autonomous executor (Implementer, Tester, Reviewer, Code-Sentinel, Security-Auditor).
+    - PERSONA & SKILL INJECTION: The parent Orchestrator MUST supply the assigned `~/.<harness>/agents/<persona>.md` and `SKILL.md` paths; the subagent MUST read and follow those invariants before editing or reviewing.
     - Planning gate does NOT apply to child subagents. Do NOT ask conversational questions back to caller.
     - NEVER start dev servers. Verify strictly through terminating unit tests, builds, typechecks, and lints.
     - Inspect files, write failing tests first (TDD), write surgical code, verify, return diff report.

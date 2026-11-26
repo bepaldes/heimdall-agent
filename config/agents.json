@@ -8,12 +8,8 @@
       "description": "Enforces planning gates (/grill-me), teases out hidden assumptions, creates modular execution plans, and coordinates subagent handoffs.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-opus-5-5",
         "codex": "gpt-6-astra",
-        "tencent": "tencent/Hy4-preview",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
         "z-ai": "z-ai/glm-5.3",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "default": "inherit"
       },
       "skills": [
@@ -34,16 +30,11 @@
       "recommendedModels": [
         "gpt-6-astra",
         "gemini-4-hydrogen",
-        "claude-opus-5-5",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
         "z-ai/glm-5.3"
       ],
       "crossReviewers": [
         "gemini-4-hydrogen",
-        "claude-opus-5-5",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro"
+        "z-ai/glm-5.3"
       ]
     },
     "frontend-designer": {
@@ -52,12 +43,8 @@
       "description": "Enforces design systems, typography hierarchy, token adherence, aesthetic cohesion, and anti-slop visual rules for desktop/web surfaces.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-fable-5.2",
         "codex": "gpt-6-astra",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
         "z-ai": "z-ai/glm-5.3-flash",
-        "tencent": "tencent/Hy4-preview",
         "default": "inherit"
       },
       "skills": [
@@ -74,18 +61,13 @@
         "redesign-skill"
       ],
       "recommendedModels": [
-        "claude-fable-5.2",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
         "z-ai/glm-5.3-flash",
         "gemini-4-hydrogen",
         "gpt-6-astra"
       ],
       "crossReviewers": [
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
-        "z-ai/glm-5.3-flash",
-        "gemini-4-hydrogen"
+        "gemini-4-hydrogen",
+        "gpt-6-astra"
       ]
     },
     "mobile-designer": {
@@ -94,12 +76,8 @@
       "description": "Guarantees mobile layout integrity, touch-target sizing (48px+), zero-clipping overflow flex containers, and responsive viewport safety.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-sonnet-5",
         "codex": "gpt-6-astra",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai": "z-ai/glm-5.3-flash",
-        "tencent": "tencent/Hy4-preview",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
         "default": "inherit"
       },
       "skills": [
@@ -111,15 +89,10 @@
       ],
       "recommendedModels": [
         "gemini-4-hydrogen",
-        "claude-sonnet-5",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai/glm-5.3-flash",
-        "gpt-6-astra",
-        "tencent/Hy4-preview"
+        "gpt-6-astra"
       ],
       "crossReviewers": [
-        "claude-sonnet-5",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai/glm-5.3-flash",
         "gpt-6-astra"
       ]
@@ -130,12 +103,8 @@
       "description": "Enforces strict Test-Driven Development (TDD). Mandates failing automated tests before implementation, boundary testing, and negative error coverage.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-sonnet-5",
         "codex": "gpt-6-astra",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai": "z-ai/glm-5.3-flash",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
-        "tencent": "tencent/Hy4-preview",
         "default": "inherit"
       },
       "skills": [
@@ -145,18 +114,13 @@
         "executing-plans"
       ],
       "recommendedModels": [
-        "claude-sonnet-5",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai/glm-5.3-flash",
         "gemini-4-hydrogen",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
         "gpt-6-astra"
       ],
       "crossReviewers": [
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-        "z-ai/glm-5.3-flash",
         "gemini-4-hydrogen",
-        "XiaomiMiMo/MiMo-V2.6-Pro"
+        "gpt-6-astra"
       ]
     },
     "security-auditor": {
@@ -165,12 +129,8 @@
       "description": "Performs dynamic differential HTTP probing across unprivileged/admin roles, audits OWASP Top 10 vulnerabilities, and detects insecure default configurations.",
       "vendorPreferences": {
         "gemini": "gemini-4",
-        "claude": "claude-opus-5-5",
         "codex": "gpt-6-astra",
-        "tencent": "tencent/Hy4-preview",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
         "z-ai": "z-ai/glm-5.3",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "default": "inherit"
       },
       "skills": [
@@ -184,18 +144,13 @@
         "trailofbits-triage-brocards"
       ],
       "recommendedModels": [
-        "claude-opus-5-5",
         "gpt-6-astra",
-        "tencent/Hy4-preview",
         "gemini-4",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
         "z-ai/glm-5.3"
       ],
       "crossReviewers": [
-        "gpt-6-astra",
-        "tencent/Hy4-preview",
         "gemini-4",
-        "XiaomiMiMo/MiMo-V2.6-Pro"
+        "z-ai/glm-5.3"
       ]
     },
     "database-architect": {
@@ -204,11 +159,7 @@
       "description": "Governs schema migrations, normalization, query optimization, connection pooling, and transaction safety across PostgreSQL, SQLite, MySQL, and NoSQL.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-opus-5-5",
         "codex": "gpt-6-astra",
-        "tencent": "tencent/Hy4-preview",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai": "z-ai/glm-5.3",
         "default": "inherit"
       },
@@ -220,16 +171,11 @@
       "recommendedModels": [
         "gemini-4-hydrogen",
         "gpt-6-astra",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
-        "claude-opus-5-5",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+        "z-ai/glm-5.3"
       ],
       "crossReviewers": [
         "gpt-6-astra",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
-        "claude-opus-5-5"
+        "z-ai/glm-5.3"
       ]
     },
     "code-sentinel": {
@@ -238,12 +184,8 @@
       "description": "Demands minimal surgical edits, strips redundant comments and defensive bloat, purges dead code, and enforces clean branch hygiene.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-sonnet-5",
         "codex": "gpt-6-astra",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai": "z-ai/glm-5.3-flash",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
-        "tencent": "tencent/Hy4-preview",
         "default": "inherit"
       },
       "skills": [
@@ -258,18 +200,13 @@
         "ponytail"
       ],
       "recommendedModels": [
-        "claude-sonnet-5",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai/glm-5.3-flash",
         "gemini-4-hydrogen",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
         "gpt-6-astra"
       ],
       "crossReviewers": [
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017",
-        "z-ai/glm-5.3-flash",
         "gemini-4-hydrogen",
-        "XiaomiMiMo/MiMo-V2.6-Pro"
+        "gpt-6-astra"
       ]
     },
     "reviewer": {
@@ -278,11 +215,7 @@
       "description": "Performs adversarial pull request and diff critiques, identifies edge-case regressions, and coordinates cross-model validation reviews.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-opus-5-5",
         "codex": "gpt-6-astra",
-        "tencent": "tencent/Hy4-preview",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai": "z-ai/glm-5.3",
         "default": "inherit"
       },
@@ -300,16 +233,11 @@
       "recommendedModels": [
         "gemini-4-hydrogen",
         "gpt-6-astra",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
-        "claude-opus-5-5",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+        "z-ai/glm-5.3"
       ],
       "crossReviewers": [
         "gpt-6-astra",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
-        "claude-opus-5-5"
+        "z-ai/glm-5.3"
       ]
     },
     "modernizer": {
@@ -318,11 +246,7 @@
       "description": "Executes legacy codebase transformations, runtime upgrades, and Strangler Fig migrations guarded by Golden Master characterization tests.",
       "vendorPreferences": {
         "gemini": "gemini-4-hydrogen",
-        "claude": "claude-sonnet-5",
         "codex": "gpt-6-astra",
-        "tencent": "tencent/Hy4-preview",
-        "xiaomi": "XiaomiMiMo/MiMo-V2.6-Pro",
-        "deepseek-ai": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
         "z-ai": "z-ai/glm-5.3",
         "default": "inherit"
       },
@@ -339,16 +263,11 @@
       "recommendedModels": [
         "gemini-4-hydrogen",
         "gpt-6-astra",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
-        "claude-sonnet-5",
-        "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+        "z-ai/glm-5.3"
       ],
       "crossReviewers": [
         "gpt-6-astra",
-        "tencent/Hy4-preview",
-        "XiaomiMiMo/MiMo-V2.6-Pro",
-        "claude-sonnet-5"
+        "z-ai/glm-5.3"
       ]
     }
   },

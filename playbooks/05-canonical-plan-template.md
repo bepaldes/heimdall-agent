@@ -38,12 +38,12 @@
 > - **Mid-Tier Reviewer** (`gemini-4-hydrogen`): Stronger reasoning than Flash with lower quota pressure than Argon/Neon. Default for cross-family code reviews and balanced verification.
 > - **Fast Utility** (`gemini-3.8-flash`, `z-ai/glm-5.3-flash`, `deepseek-ai/DeepSeek-V4.1-Flash-1017`): Rapid scans, boilerplate scaffolding, and quick utility checks.
 
-| Task ID | Phase & Task Description | Assigned Model | Effort Level | Selection Rationale | Cross-Reviewer & Tool Command |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| T1 | Phase 1: Architecture & Schema | `gemini-4-argon` | `high` | Quota-limited flagship reserved for specialized domain & boundary design | `claude-opus-5-5` (`herdr agent prompt claude-reviewer`) |
-| T2 | Phase 2: Core Implementation | `claude-opus-5-5` | `high` | Unlimited workhorse for multi-file implementation & business logic | `gemini-4-hydrogen` (`herdr agent prompt agy-reviewer`) |
-| T3 | Phase 3: Test Scaffolding & Lint | `gemini-3.8-flash` | `medium` | Fast utility for rapid test boilerplate and static checks | `gpt-6-astra` (`herdr agent prompt codex-reviewer`) |
-| T4 | Phase 4: Playwright E2E & Audit | `gpt-6-astra` | `high` | Unlimited Codex workhorse for full browser verification & final audit | `gemini-4-hydrogen` (`herdr agent prompt agy-reviewer`) |
+| Task ID | Phase & Task Description | Heimdall Agent Persona | Required Skills (`SKILL.md`) | Assigned Model | Effort Level | Selection Rationale | Cross-Reviewer & Tool Command |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| T1 | Phase 1: Architecture & Schema | `database-architect` | `domain-modeling`, `codebase-design` | `gemini-4-argon` | `high` | Quota-limited flagship reserved for specialized domain & boundary design | `claude-opus-5-5` (`reviewer.md`, `herdr agent prompt claude-reviewer`) |
+| T2 | Phase 2: Core Implementation | `code-sentinel` | `karpathy-guidelines`, `antislop`, `test-driven-development` | `claude-opus-5-5` | `high` | Unlimited workhorse for multi-file implementation & business logic | `gemini-4-hydrogen` (`reviewer.md`, `herdr agent prompt agy-reviewer`) |
+| T3 | Phase 3: Test Scaffolding & Lint | `tester` | `test-driven-development`, `verification-before-completion` | `gemini-3.8-flash` | `medium` | Fast utility for rapid test boilerplate and static checks | `gpt-6-astra` (`code-sentinel.md`, `herdr agent prompt codex-reviewer`) |
+| T4 | Phase 4: Playwright E2E & Audit | `security-auditor` | `verification-before-completion`, `differential-review` | `gpt-6-astra` | `high` | Unlimited Codex workhorse for full browser verification & final audit | `gemini-4-hydrogen` (`reviewer.md`, `herdr agent prompt agy-reviewer`) |
 
 ## 4. Multi-Phase Implementation Plan
 ### Phase 1: Architecture & Scaffolding
@@ -57,7 +57,8 @@
 - **Branch A: In Herdr / Herdr-App (Visual Ephemeral Side Panel)**:
   - Open side panel: `herdr-app do pane.split --direction right --argv '["<cross-family-reviewer>"]' --task "Review Task N"` (or `herdr pane split --current --direction right --cwd "$pwd" --no-focus`).
   - Execute adversarial review in the visible side panel across distinct model families (e.g., Anthropic ↔ Google ↔ OpenAI/Codex ↔ Zhipu/GLM ↔ Tencent/Hunyuan ↔ Xiaomi/MiMo) selected from `config/models.json` / `playbooks/06-model-registry-matrix.md`.
-  - Await verdict: `herdr agent prompt <cross-family-reviewer> "Review git diff for security regressions, boundary conditions, and type errors." --wait --timeout 120000`.
+  - **Mandatory Persona & Skill Injection**: Goldfish reviews MUST adopt `agents/reviewer.md` or `agents/code-sentinel.md` (and `agents/security-auditor.md` when touching auth, visibility, or crypto) and verify the diff against the task's `Required Skills (SKILL.md)` column.
+  - Await verdict: `herdr agent prompt <cross-family-reviewer> "Adopt agents/reviewer.md. Review git diff against Required Skills (<skills>) for security regressions, boundary conditions, and type errors." --wait --timeout 120000`.
   - Ingest findings report and triage ledger.
   - Close side panel upon completion: `herdr-app do pane.close --pane <id>` (or `herdr pane close <id>`) to keep workspace clean.
   - *Background Mode*: If background execution is requested, omit `--wait` and `pane close` to allow live asynchronous observation in Herdr-App.
@@ -96,8 +97,8 @@
    - Must state specific anti-default rejections (e.g., no centered dark mesh heroes, no generic card layouts).
 3. **Section 3: Model Allocation Matrix**:
    - Decomposes plan into discrete tasks with explicit task IDs.
-   - Each task assigns a canonical model and effort level from [`playbooks/06-model-registry-matrix.md`](file:///C:/Apps/heimdall-agent/playbooks/06-model-registry-matrix.md).
-   - Declares the cross-reviewer harness and Herdr prompt command.
+   - Each task assigns a `Heimdall Agent Persona` (`agents/*.md`), `Required Skills (SKILL.md)`, canonical model, and effort level from [`playbooks/06-model-registry-matrix.md`](file:///C:/Apps/heimdall-agent/playbooks/06-model-registry-matrix.md).
+   - Declares the cross-reviewer harness, reviewer persona, and Herdr prompt command.
 4. **Section 4: Multi-Phase Implementation Plan**:
    - Organized into logical progression (Scaffolding -> Core Implementation -> E2E Verification -> Review/Handoff).
    - Strict TDD: failing test first, minimal code, passing test, self-review.

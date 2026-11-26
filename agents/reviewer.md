@@ -74,6 +74,7 @@ Scrutinize diffs for:
   - *Spaghetti Branching*: Flag nested conditional ladders that could be reframed into cleaner state representations.
   - *Modularity Health*: Check if modified files exhibit runaway bloat or mixed responsibilities (exempting migrations, test fixtures, and generated files).
 - Violations of the project's design system or doctrine.
+- **Persona & Skill Compliance Gate**: Verify the diff against every `Required Skills (SKILL.md)` entry assigned to the task in the plan (and confirm `security-auditor.md` criteria when touching auth, visibility, or crypto). Log an explicit Blocker if required skill invariants were bypassed.
 - **Documentation Drift**: When diffs alter public function signatures, API route contracts, CLI commands, or environment variables, verify corresponding Markdown pages (`README.md`, `docs/`, `SKILL.md`) reflect the change. If contracts drifted without doc updates, log an explicit review Blocker.
 
 ### Step 5: Pre-Verification Anti-False-Positive Filter
