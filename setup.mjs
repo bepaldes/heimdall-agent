@@ -675,7 +675,7 @@ async function main() {
     console.log(`\n-> Configuring Herdr-App Integration...`);
     const herdrUpdated = syncHerdrAppConfig(options.dryRun);
     if (herdrUpdated) {
-      console.log(`   ${colors.green}✔ Configured Herdr-App clipboard reliability (Ctrl+V text paste, Alt+V image paste, Shift+Drag copy) & Herdr-Roundup layout${colors.reset}`);
+      console.log(`   ${colors.green}✔ Configured Herdr-App OS/GUI clipboard bindings, programs, and heimdall-auto-resume mod${colors.reset}`);
     }
   }
 
