@@ -288,7 +288,7 @@ heimdall uninstall
 | :--- | :---: | :--- | :--- |
 | `--profile <name>` | `full` | Skill profile tier: `full`, `minimal`, `security`, or `design`. | `heimdall --profile minimal` |
 | `--agents <targets>` | `all` | Comma-separated list of harnesses: `claude`, `gemini`, `codex`, `hermes`, `openclaw`, `vscode`, `desktop`, `all`. | `heimdall --agents claude,vscode` |
-| `herdr` / `--herdr` | `false` | Configure Herdr-App clipboard reliability (`Ctrl+V`/`Cmd+V` text paste, `Alt+V`/`Cmd+Shift+V`/`Ctrl+Shift+V` image paste), `Herdr-Roundup` layout, and `heimdall-auto-resume` mod across Windows, macOS, and Linux. | `heimdall herdr` |
+| `herdr` / `--herdr` | `false` | Configure OS/GUI-aware Herdr-App clipboard bindings (Linux/Omarchy `Ctrl+Shift+C`/`V` + `Ctrl+C` SIGINT, Windows `Ctrl+V`, macOS `Cmd+V`), install `carstenlucke/herdr-roundup` layout & `roundup-*` mods, show only installed harnesses + non-Claude/Codex/GLM GhostCLI models in `+` menu, and install `heimdall-auto-resume` mod. | `heimdall herdr` |
 | `--theme <name>` | `night-blue` | HUD color theme: `night-blue`, `heimdall`, `claude-warm`, or `titanium`. | `heimdall hud --theme claude-warm` |
 | `--no-hud` | `false` | Skip configuring the Heimdall HUD statusline during install or sync. | `heimdall --no-hud` |
 | `--link` | `true` (rec.) | Deploy skills using live NTFS junctions (Windows) or POSIX symlinks (macOS/Linux). | `heimdall --link` |
