@@ -68,6 +68,34 @@
   ],
   "custom_proxies": [
     {
+      "id": "claude-opus-5-5",
+      "displayName": "Claude Opus 5.5",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Melhor equilíbrio entre capacidade e custo"
+    },
+    {
+      "id": "claude-sonnet-5",
+      "displayName": "Claude Sonnet 5",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "O mais rápido sem abrir mão de qualidade"
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "displayName": "Claude Sonnet 5.5",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Rápido e mais capaz que o Sonnet 5"
+    },
+    {
+      "id": "claude-fable-5.2",
+      "displayName": "Claude Fable 5.2",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Máxima capacidade disponível"
+    },
+    {
       "id": "z-ai/glm-5.3",
       "displayName": "GLM 5.3",
       "context": "1M",
@@ -80,6 +108,27 @@
       "context": "1M",
       "context_window_tokens": 1000000,
       "description": "Respostas rápidas para código"
+    },
+    {
+      "id": "tencent/Hy4-preview",
+      "displayName": "Hunyuan Hy4 Preview",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Raciocínio e código"
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+      "displayName": "DeepSeek V4.1 Flash",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Respostas rápidas para código"
+    },
+    {
+      "id": "XiaomiMiMo/MiMo-V2.6-Pro",
+      "displayName": "MiMo V2.6 Pro",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Código e raciocínio"
     },
     {
       "id": "gpt-6-astra",
@@ -91,6 +140,34 @@
   ],
   "ghostcli": [
     {
+      "id": "claude-opus-5-5",
+      "displayName": "Claude Opus 5.5",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Melhor equilíbrio entre capacidade e custo"
+    },
+    {
+      "id": "claude-sonnet-5",
+      "displayName": "Claude Sonnet 5",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "O mais rápido sem abrir mão de qualidade"
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "displayName": "Claude Sonnet 5.5",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Rápido e mais capaz que o Sonnet 5"
+    },
+    {
+      "id": "claude-fable-5.2",
+      "displayName": "Claude Fable 5.2",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Máxima capacidade disponível"
+    },
+    {
       "id": "z-ai/glm-5.3",
       "displayName": "GLM 5.3",
       "context": "1M",
@@ -103,6 +180,27 @@
       "context": "1M",
       "context_window_tokens": 1000000,
       "description": "Respostas rápidas para código"
+    },
+    {
+      "id": "tencent/Hy4-preview",
+      "displayName": "Hunyuan Hy4 Preview",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Raciocínio e código"
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+      "displayName": "DeepSeek V4.1 Flash",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Respostas rápidas para código"
+    },
+    {
+      "id": "XiaomiMiMo/MiMo-V2.6-Pro",
+      "displayName": "MiMo V2.6 Pro",
+      "context": "1M",
+      "context_window_tokens": 1000000,
+      "description": "Código e raciocínio"
     },
     {
       "id": "gpt-6-astra",

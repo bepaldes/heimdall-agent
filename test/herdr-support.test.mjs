@@ -8,8 +8,8 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { syncHerdrPrograms } = require('../lib/herdr-programs.cjs');
-const { syncHerdrAppConfig, detectLinuxGui } = require('../lib/installer-engine.cjs');
+const { syncHerdrPrograms, isHerdrAgentInstalled } = require('../lib/herdr-programs.cjs');
+const { syncHerdrAppConfig, detectLinuxGui, syncCodexModelCatalog } = require('../lib/installer-engine.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -118,7 +118,7 @@ test('Herdr-App CLI Support & Configuration', async (t) => {
         ]
       };
 
-      const res = syncHerdrPrograms(tmpDir, catalog, { claudeInstalled: true });
+      const res = syncHerdrPrograms(tmpDir, catalog, { claudeInstalled: true, hideUninstalledAgents: false });
       assert.equal(res.updated, true);
       assert.equal(res.count, 3);
       assert.equal(fs.existsSync(errorPath), false, 'programs.error should be cleared');
@@ -142,7 +142,7 @@ test('Herdr-App CLI Support & Configuration', async (t) => {
       assert.equal(parsed.programs['gemini-4-hydrogen'], undefined);
 
       // Skips when claude is not installed
-      const skipped = syncHerdrPrograms(tmpDir, catalog, { claudeInstalled: false });
+      const skipped = syncHerdrPrograms(tmpDir, catalog, { claudeInstalled: false, hideUninstalledAgents: false });
       assert.equal(skipped.updated, false);
       assert.equal(skipped.count, 0);
     } finally {
@@ -263,6 +263,67 @@ test('Herdr-App CLI Support & Configuration', async (t) => {
       assert.deepEqual(keys['layout:Herdr-Roundup'], { 'cmd-w': 'roundup-tabs.close' });
     } finally {
       fs.rmSync(tmpHome, { recursive: true, force: true });
+    }
+  });
+
+  await t.test('syncHerdrPrograms hides uninstalled built-in harnesses and isHerdrAgentInstalled ignores lazy mise shims', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-installed-test-'));
+    try {
+      const shimsDir = path.join(tmpDir, 'mise', 'shims');
+      const realBinDir = path.join(tmpDir, 'usr', 'bin');
+      fs.mkdirSync(shimsDir, { recursive: true });
+      fs.mkdirSync(realBinDir, { recursive: true });
+      fs.writeFileSync(path.join(shimsDir, 'pi'), '');
+      fs.writeFileSync(path.join(realBinDir, 'claude'), '');
+
+      const env = { PATH: `${shimsDir}${path.delimiter}${realBinDir}` };
+      assert.equal(isHerdrAgentInstalled({ bin: 'pi', configDirs: [] }, { env, homeDir: tmpDir }), false);
+      assert.equal(isHerdrAgentInstalled({ bin: 'claude', configDirs: [] }, { env, homeDir: tmpDir }), true);
+
+      const programsDir = path.join(tmpDir, 'herdr-app');
+      fs.mkdirSync(programsDir, { recursive: true });
+      fs.writeFileSync(path.join(programsDir, 'programs.json'), JSON.stringify({
+        programs: { claude: { run: [] } }
+      }));
+
+      syncHerdrPrograms(programsDir, { ghostcli: [] }, {
+        claudeInstalled: true,
+        installedAgents: new Set(['claude', 'codex', 'antigravity'])
+      });
+
+      const parsed = JSON.parse(fs.readFileSync(path.join(programsDir, 'programs.json'), 'utf8'));
+      assert.equal(parsed.programs.claude, undefined, 'Installed agent should have disabled run override removed');
+      assert.equal(parsed.programs.codex, undefined, 'Installed codex should remain visible');
+      assert.deepEqual(parsed.programs.pi, { run: ['__heimdall_uninstalled__'] }, 'Uninstalled pi should be hidden');
+      assert.deepEqual(parsed.programs.opencode, { run: ['__heimdall_uninstalled__'] }, 'Uninstalled opencode should be hidden');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  await t.test('syncCodexModelCatalog filters ghostcli-models.json and models_cache.json to Astra + GLM only', () => {
+    const tmpCodex = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-catalog-test-'));
+    try {
+      const customCatalog = path.join(tmpCodex, 'ghostcli-models.json');
+      fs.writeFileSync(path.join(tmpCodex, 'config.toml'), `model = "gpt-6-astra"\nmodel_catalog_json = "${customCatalog.replace(/\\/g, '\\\\')}"\n`);
+      fs.writeFileSync(customCatalog, JSON.stringify({
+        models: [
+          { slug: 'claude-opus-5-5', model: 'claude-opus-5-5' },
+          { slug: 'gpt-6-astra', model: 'gpt-6-astra' },
+          { slug: 'z-ai/glm-5.3', model: 'z-ai/glm-5.3' },
+          { slug: 'z-ai/glm-5.3-flash', model: 'z-ai/glm-5.3-flash' },
+          { slug: 'tencent/Hy4-preview', model: 'tencent/Hy4-preview' }
+        ]
+      }));
+
+      const res = syncCodexModelCatalog(tmpCodex);
+      assert.equal(res.updated, true);
+      assert.equal(res.count, 3);
+
+      const updated = JSON.parse(fs.readFileSync(customCatalog, 'utf8'));
+      assert.deepEqual(updated.models.map(m => m.slug), ['gpt-6-astra', 'z-ai/glm-5.3', 'z-ai/glm-5.3-flash']);
+    } finally {
+      fs.rmSync(tmpCodex, { recursive: true, force: true });
     }
   });
 });
