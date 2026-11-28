@@ -14,6 +14,21 @@ const { lookupModelContextFromCatalog } = require('../lib/model-context.cjs');
 
 const MAX_STDIN = 1024 * 1024; // 1 MiB
 
+function recordTelemetryEvent(rule, action, detail = '') {
+  try {
+    const telemetryPath = process.env.HEIMDALL_TELEMETRY_PATH || path.join(os.homedir(), '.heimdall', 'telemetry.jsonl');
+    fs.mkdirSync(path.dirname(telemetryPath), { recursive: true });
+    const entry = {
+      timestamp: new Date().toISOString(),
+      rule,
+      action,
+      detail: String(detail).slice(0, 200),
+      cwd: process.cwd()
+    };
+    fs.appendFileSync(telemetryPath, JSON.stringify(entry) + '\n', 'utf8');
+  } catch {}
+}
+
 function getSessionFilePath() {
   const ppid = process.ppid || 'global';
   return path.join(os.tmpdir(), `heimdall-session-${ppid}.json`);
@@ -80,6 +95,7 @@ function trackContextUsage(payloadRaw) {
       ? `${Math.round(limit / 1000000)}M`
       : `${Math.round(limit / 1000)}K`;
     process.stderr.write(`[Heimdall Context Sentinel] WARNING: Session approaching context threshold (~${tokenDisplay} / ${limitDisplay} max tokens, turn ${session.turns} of 40-turn cadence). Trigger /compact or persist active state to disk.\n`);
+    recordTelemetryEvent('context-threshold', 'warn', `turns=${session.turns}`);
   }
 }
 
@@ -324,12 +340,14 @@ async function main() {
 
       // Block destructive system commands
       if (segments.some(seg => isDestructiveSegment(tokenizeSegment(seg)))) {
+        recordTelemetryEvent('destructive-cmd', 'block', command);
         process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Destructive root/system command detected.\n');
         process.exit(2);
       }
 
       // Block dev server commands (STRICT ZERO DEV-SERVER POLICY)
       if (segments.some(seg => isDevServerSegment(tokenizeSegment(seg)))) {
+        recordTelemetryEvent('zero-dev-server', 'block', command);
         process.stderr.write(`[Heimdall Sentinel Guardrail] BLOCKED: Dev server execution detected ("${command}"). Running development servers is strictly prohibited by user doctrine. Use non-interactive terminating checks (npm test, npm run build, vitest run, lint, typecheck).\n`);
         process.exit(2);
       }
@@ -338,6 +356,7 @@ async function main() {
       if (/git\s+push\s+.*(-f\b|--force\b|--force-with-lease\b)/i.test(command)) {
         // Explicit protected branch in command target
         if (/\b(origin\s+)?(main|master|release|production)\b/i.test(command)) {
+          recordTelemetryEvent('force-push', 'block', command);
           process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Force push to protected branch (main/master/release) is strictly forbidden.\n');
           process.exit(2);
         }
@@ -355,6 +374,7 @@ async function main() {
         );
 
         if (isExplicitProtected || (!hasExplicitFeature && isCurrentProtected)) {
+          recordTelemetryEvent('force-push', 'block', command);
           process.stderr.write(`[Heimdall Sentinel Guardrail] BLOCKED: Force push to protected branch '${currentBranch || 'main'}' is strictly forbidden.\n`);
           process.exit(2);
         }
@@ -367,6 +387,7 @@ async function main() {
 
       // Warn on accidental secret commits
       if (/git\s+add\s+.*(\.env($|\.local)|id_rsa|.*\.pem)/i.test(command)) {
+        recordTelemetryEvent('secret-staging', 'block', command);
         process.stderr.write('[Heimdall Sentinel Guardrail] BLOCKED: Attempting to stage sensitive credential or secret files.\n');
         process.exit(2);
       }
@@ -380,10 +401,12 @@ async function main() {
       const lineCount = content ? content.split('\n').length : 0;
       const isCanvasArtifact = /\.(html?|svg)$/i.test(filePath) || content.includes('data-od-id') || Boolean(process.env.OPENDESIGN);
       if (lineCount > 800 && !isCanvasArtifact) {
+        recordTelemetryEvent('karpathy-800-lines', 'warn', `${filePath} (${lineCount} lines)`);
         process.stderr.write(`[Heimdall Karpathy Sentinel] Advisory: File '${filePath}' exceeds 800 lines (${lineCount} lines). Consider decomposing or keeping edits minimal.\n`);
       }
       const normPath = filePath.replace(/\\/g, '/');
       if (/(^|\/)(docs\/superpowers\/plans|\.claude\/plans)\/[^/]+\.md$/i.test(normPath)) {
+        recordTelemetryEvent('plan-location', 'block', filePath);
         process.stderr.write(`[Heimdall Plan Sentinel] BLOCKED: Do not save plans to '${filePath}'. Save all plans to 'docs/designs/YYYY-MM-DD <plan name>.md' strictly following playbooks/05-canonical-plan-template.md.\n`);
         process.exit(2);
       }

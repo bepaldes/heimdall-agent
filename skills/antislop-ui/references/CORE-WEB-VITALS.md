@@ -21,7 +21,7 @@ If only source code is available, identify likely causes but do not claim that L
 |--------|----------|------|------------|------|
 | **LCP** | Loading | ≤ 2.5s | 2.5s to 4s | > 4s |
 | **INP** | Interactivity | ≤ 200ms | 200ms to 500ms | > 500ms |
-| **CLS** | Visual Stability | ��� 0.1 | 0.1 to 0.25 | > 0.25 |
+| **CLS** | Visual Stability | ≤ 0.1 | 0.1 to 0.25 | > 0.25 |
 
 Google measures at the **75th percentile**: 75% of page visits must meet "Good" thresholds.
 

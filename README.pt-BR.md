@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#10-personas-de-agentes-predefinidas"><img src="https://img.shields.io/badge/agents-10%20predefinidos-orange.svg?style=flat-square" alt="Agentes: 10 Predefinidos" /></a>
-  <a href="#inventario-de-skills-70-modulos-em-31-toolkits"><img src="https://img.shields.io/badge/skills-31%20toolkits%20%2870%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 31 Toolkits (70 Módulos)" /></a>
+  <a href="#inventario-de-skills-71-modulos-em-32-toolkits"><img src="https://img.shields.io/badge/skills-32%20toolkits%20%2871%20m%C3%B3dulos%29-blueviolet.svg?style=flat-square" alt="Skills: 32 Toolkits (71 Módulos)" /></a>
   <a href="#ferramentas-e-runtimes-suportados"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Idioma / Language:** [English](README.md) | **Português (Brasil)**
 
-O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **10 personas de agentes especializados** e **70 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
+O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para engenharia de software multi-agente. Ele impõe portões de planejamento antes da geração de código, previne *AI slop* (código e texto genérico de IA), isola fronteiras de módulos e sincroniza **10 personas de agentes especializados** e **71 skills modulares** entre **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign** e **Claude Desktop**.
 
 ---
 
@@ -34,7 +34,7 @@ O Heimdall é um toolkit portátil de bootstrap e sentinela de qualidade para en
 O **Heimdall** é um bootstrapper de ambiente e camada de coordenação multi-agente para ferramentas de programação com IA. Mais do que um agregador de skills, ele instala uma **maneira completa e opinativa de trabalhar e programar**—combinando comunicação estruturada, prova empírica, contenção cirúrgica de código e hooks de segurança em tempo de execução para construir um ambiente de engenharia determinístico e verificado.
 
 Em vez de manter manualmente instruções customizadas, prompts de sistema e arquivos de configuração espalhados em diferentes clientes de IA, o Heimdall fornece uma fonte única da verdade (*Single Source of Truth*):
-* **Skills Modulares**: 70 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
+* **Skills Modulares**: 71 capacidades ativadas sob demanda por tarefa (como modelagem de banco de dados, auditoria de segurança, aplicação de design tokens, divulgação progressiva e depuração sistemática) que carregam apenas quando necessário, economizando tokens de contexto.
 * **Personas de Agentes Especializados**: 10 papéis predefinidos com janelas de contexto isoladas (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Doutrina Universal**: Regras centrais (`AGENTS.md`) sincronizadas em todas as ferramentas, exigindo portões de planejamento, desenvolvimento orientado a testes (TDD) e edições cirúrgicas mínimas.
 
@@ -110,13 +110,13 @@ Durante o bootstrap, o Heimdall cria *junctions* (Windows) ou *symlinks* (POSIX)
 
 | Origem no Heimdall | Local Implantado | Finalidade |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<ferramenta>/skills/` | 70 toolkits de domínio carregados progressivamente sob demanda. |
+| `skills/` | `~/.<ferramenta>/skills/` | 71 toolkits de domínio carregados progressivamente sob demanda. |
 | `agents/` | `~/.<ferramenta>/agents/` | 10 definições de personas de agentes especializados. |
 | `hooks/` | `~/.claude/hooks/` | Hooks de ciclo de vida orientados a eventos para o Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (opcional) | Hook Git `pre-push` nativo universal para todas as ferramentas. |
 | `doctrine/AGENTS.md` | `~/.claude/CLAUDE.md`<br>`~/.gemini/GEMINI.md`<br>`~/.codex/AGENTS.md`<br>`~/.hermes/AGENTS.md` | Doutrina universal entre agentes e restrições operacionais. |
 | `playbooks/` | `~/.<ferramenta>/playbooks/` | Playbooks operacionais (portão de perguntas, TDD, revisões, planos, backlog & fluxo CR). |
-| `commands/` | `~/.claude/commands/` | Comandos slash (`/orchestrator`, `/orchestrate`, `/plan`, `/grill-me`). |
+| `commands/` | `~/.claude/commands/` | Comandos slash (`/orchestrator`, `/orchestrate`, `/plan`, `/grill-me`, `/council`). |
 | `tools/` | Diretório no `PATH` | Executável da CLI `heimdall` e utilitários de inicialização de ambiente. |
 | `docs/designs/` | Raiz do workspace | Localização canônica de planos (`YYYY-MM-DD <nome>.md`); planos verificados vão para `old/`. |
 | `docs/backlog.md` | Raiz do workspace | Ledger canônico de backlog do produto e Change Requests. |
@@ -192,8 +192,8 @@ Escolha o perfil de acordo com sua máquina e fluxo de trabalho:
 
 | Perfil | Skills | Agentes Predefinidos | Descrição | Ideal Para |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Padrão)* | 70 | 10 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
-| **`minimal`** | 17 | 4 | Núcleo enxuto: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Notebooks leves, janelas de contexto menores |
+| **`full`** *(Padrão)* | 71 | 10 | Suíte completa de engenharia: planejamento, design, segurança, banco de dados e higiene. | Desenvolvimento diário em todas as ferramentas |
+| **`minimal`** | 18 | 4 | Núcleo enxuto: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Notebooks leves, janelas de contexto menores |
 | **`security`** | 12 | 4 | Suíte AppSec: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Pentest e auditorias pré-deploy |
 | **`design`** | 13 | 4 | Frontend e mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | Design de UI/UX e design systems |
 
@@ -274,6 +274,18 @@ heimdall audit
 heimdall doctor
 heimdall doctor --json
 
+# Gerar e abrir console diagnóstico HTML estático (sem servidor)
+heimdall dashboard
+heimdall dashboard --no-open
+
+# Configurar allowlists autônomas multi-OS (safe-dev | full-autonomous | --reset)
+heimdall permissions --preset safe-dev
+heimdall permissions --preset full-autonomous
+heimdall permissions --reset
+
+# Criar nova skill e sincronizar catálogo/docs automaticamente
+heimdall create-skill my-skill --category "Collaboration & Process" --profile minimal
+
 # Atualizar o catálogo dinâmico de modelos a partir do seu provedor/proxy ativo
 heimdall sync-models
 
@@ -321,6 +333,7 @@ O **Orchestrator** é o coordenador-chefe de engenharia do Heimdall. Ele questio
   - `/orchestrator <tarefa>` ou `/orchestrate <tarefa>`: Inicia a orquestração completa para uma tarefa ou feature.
   - `/plan <feature>`: Decompõe uma solicitação em um plano canônico de 7 seções.
   - `/grill-me`: Questiona premissas e explora trade-offs antes de definir a arquitetura.
+  - `/council <proposta>`: Executa um debate paralelo com 3 personas (roda automaticamente como Tarefa 0 em planos EGM Tier 3).
 * **No Google Antigravity**:
   - Alterne para ou mencione a persona `@orchestrator`, ou digite `/plan` / `/grill-me`.
 * **No OpenAI Codex CLI e Hermes**:
@@ -391,10 +404,10 @@ Todas as personas declaram `model: inherit` para rodar em qualquer modelo ou pro
 
 ---
 
-<a id="inventario-de-skills-70-modulos-em-31-toolkits"></a>
-### Inventário de Skills (70 Módulos em 31 Toolkits)
+<a id="inventario-de-skills-71-modulos-em-32-toolkits"></a>
+### Inventário de Skills (71 Módulos em 32 Toolkits)
 
-O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 módulos)** e **25 Toolkits Independentes (25 módulos)**:
+O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 módulos)** e **26 Toolkits Independentes (26 módulos)**:
 
 #### Suítes Multi-Skill Principais (6 Suítes / 45 Módulos)
 
@@ -479,7 +492,7 @@ O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 mó
 
 </details>
 
-#### Toolkits Independentes (25 Toolkits Curados / 25 Módulos)
+#### Toolkits Independentes (26 Toolkits Curados / 26 Módulos)
 
 <details open>
 <summary><b>Explorar Toolkits Independentes</b></summary>
@@ -509,6 +522,7 @@ O Heimdall organiza as capacidades em **6 Suítes Multi-Skill Principais (45 mó
 - **`mcp-sync`**: Resolve o template MCP do Heimdall para caminhos locais e sincroniza com os harnesses instalados.
 - **`upstream-skill-sync`**: Audita repositórios upstream em `config/skills.json` e classifica atualizações em Seguro 1:1, Merge Seletivo ou Rejeitar.
 - **`onboard`**: Entrevista o usuário uma vez por workspace para registrar stack, comando de teste, lint/build, alvo de deploy e rigor em `.heimdall/workspace.md`.
+- **`council`**: Avalia decisões arquiteturais, PRs ou trade-offs despachando 3 personas especializadas do Heimdall em paralelo e sintetizando consenso vs. conflitos.
 
 </details>
 

@@ -20,7 +20,8 @@ Before generating any code, creating plans, or taking action on any user request
    - Classify scope into one of the **3 Smart Boundary Tiers (Google EGM Architecture)**:
      - **Tier 1: Spike / Bugfix (<50 LOC)**: Fast bugfix or exploration. Zero EGM ceremony. Pure Karpathy simplicity, TDD failing test first, minimal surgical code.
      - **Tier 2: Bounded Feature**: Localized feature or module. Lightweight EGM gate. Concise in-chat design outline, fast Critic & Readiness checks.
-     - **Tier 3: Architectural**: Subsystem addition, schema migration, auth boundary, or multi-component flow. Full Google EGM Pipeline (Artifact-First design spec in `docs/designs/<feature>.md` + 4-stage Goldfish review: Zoom Out, Comprehension, Critic, Readiness).
+     - **Tier 3: Architectural**: Subsystem addition, schema migration, auth boundary, or multi-component flow. Full Google EGM Pipeline (Task 0 `/council` 3-persona parallel debate + Artifact-First design spec in `docs/designs/<feature>.md` + 4-stage Goldfish review: Zoom Out, Comprehension, Critic, Readiness).
+     - *(Optional in `/grill-me`)*: Invoke `/council` whenever architectural trade-offs remain unsettled after initial frontier questioning.
    - Never assume missing requirements. Uncover implicit user assumptions upfront.
 
 2. **The Design Tree Frontier & Questioning Protocol**:

@@ -75,6 +75,9 @@ import {
   getProfileLaunchEnv
 } from './lib/profiles.cjs';
 import { runDoctor } from './lib/doctor.cjs';
+import { applyAutonomousPermissions } from './lib/permissions.cjs';
+import { generateDashboard } from './lib/dashboard.cjs';
+import { createSkill } from './lib/skill-scaffolder.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -179,6 +182,9 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}sync-docs${colors.reset} (or ${colors.dim}--sync-docs${colors.reset})      Synchronize documentation and config count references from Single Source of Truth
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
   ${colors.green}doctor${colors.reset} (or ${colors.dim}--doctor${colors.reset})       Run deterministic healthcheck on links, MCP entrypoints, and hooks
+  ${colors.green}dashboard${colors.reset} (or ${colors.dim}--dashboard${colors.reset}) Generate static HTML diagnostic console (~/.heimdall/dashboard.html)
+  ${colors.green}permissions${colors.reset}               Configure Cross-OS autonomous execution allowlists (safe-dev | full-autonomous | --reset)
+  ${colors.green}create-skill <name>${colors.reset}       Scaffold a new skill, register catalog/profiles/docs, and sync counts
   ${colors.green}uninstall${colors.reset} (or ${colors.dim}--uninstall${colors.reset})     Safely remove Heimdall skills and agent personas from all harnesses
   ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe installed harnesses, Gemini/Antigravity, and custom APIs to refresh models.json
   ${colors.green}hud${colors.reset} (or ${colors.dim}--hud${colors.reset})             Enable, disable, or theme Heimdall HUD (--on | --off | --theme <name> | --lines <1|2>)
@@ -190,7 +196,8 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
-  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (70), minimal (17), security (12), design (14) [default: full]
+  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (71), minimal (18), security (12), design (14) [default: full]
+  ${colors.yellow}--auto-allow [preset]${colors.reset}  Apply autonomous command permissions after install (safe-dev | full-autonomous)
   ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, vscode, desktop, all [default: all]
   ${colors.yellow}--profiles <ids>${colors.reset}       Comma-separated account profiles to sync (e.g. claude/work,agy/personal,all)
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
@@ -243,6 +250,18 @@ function parseArgs() {
     audit: false,
     doctor: false,
     json: false,
+    html: false,
+    dashboard: false,
+    noOpen: false,
+    outPath: null,
+    permissions: false,
+    permPreset: 'safe-dev',
+    permReset: false,
+    autoAllow: null,
+    createSkillName: null,
+    skillCategory: null,
+    skillTitle: null,
+    skillDescription: null,
     syncModels: false,
     hud: false,
     herdr: false,
@@ -265,6 +284,25 @@ function parseArgs() {
     else if (arg === 'audit' || arg === '--audit') options.audit = true;
     else if (arg === 'doctor' || arg === '--doctor') options.doctor = true;
     else if (arg === '--json') options.json = true;
+    else if (arg === '--html') options.html = true;
+    else if (arg === 'dashboard' || arg === '--dashboard') options.dashboard = true;
+    else if (arg === '--no-open') options.noOpen = true;
+    else if (arg === '--out' && args[i + 1]) options.outPath = args[++i];
+    else if (arg === 'permissions' || arg === '--permissions') options.permissions = true;
+    else if (arg === '--preset' && args[i + 1]) options.permPreset = args[++i].toLowerCase();
+    else if (arg === '--reset') options.permReset = true;
+    else if (arg === '--auto-allow') {
+      options.autoAllow = args[i + 1] && !args[i + 1].startsWith('-') ? args[++i].toLowerCase() : 'safe-dev';
+    } else if (arg === 'create-skill') {
+      const next = args[i + 1];
+      if (!next || next.startsWith('-')) {
+        console.error(`${colors.red}Error: create-skill requires a kebab-case skill name (e.g. heimdall create-skill my-skill).${colors.reset}`);
+        process.exit(1);
+      }
+      options.createSkillName = args[++i];
+    } else if (arg === '--category' && args[i + 1]) options.skillCategory = args[++i];
+    else if (arg === '--title' && args[i + 1]) options.skillTitle = args[++i];
+    else if (arg === '--description' && args[i + 1]) options.skillDescription = args[++i];
     else if (arg === 'sync' || arg === '--sync') options.sync = true;
     else if (arg === 'sync-docs' || arg === '--sync-docs' || arg === 'syncdocs') options.syncDocs = true;
     else if (arg === 'uninstall' || arg === '--uninstall') options.uninstall = true;
@@ -330,23 +368,50 @@ async function main() {
   }
 
   if (options.doctor) {
+    if (options.html) {
+      const dash = generateDashboard({ rootDir: __dirname, repoDir: process.cwd(), outPath: options.outPath, openBrowser: !options.noOpen });
+      console.log(`${colors.green}✔ Dashboard generated at ${dash.outPath}${colors.reset}`);
+      process.exit(dash.doctorStatus === 'fail' ? 1 : 0);
+    }
     const report = runDoctor({ rootDir: __dirname, repoDir: process.cwd() });
     if (options.json) {
       console.log(JSON.stringify(report, null, 2));
     } else {
       console.log(`${colors.bold}${colors.cyan}=== Heimdall Doctor (${report.status.toUpperCase()}) ===${colors.reset}\n`);
-      for (const check of report.checks) {
-        const icon = check.status === 'pass'
-          ? `${colors.green}✔${colors.reset}`
-          : (check.status === 'warn' ? `${colors.yellow}⚠${colors.reset}` : `${colors.red}✖${colors.reset}`);
-        console.log(`  ${icon} ${colors.bold}${check.name}${colors.reset}: ${check.message}`);
-        if (check.remediation) {
-          console.log(`    ${colors.dim}Fix: ${check.remediation}${colors.reset}`);
-        }
+      for (const c of report.checks) {
+        const icon = c.status === 'pass' ? `${colors.green}✔${colors.reset}` : (c.status === 'warn' ? `${colors.yellow}⚠${colors.reset}` : `${colors.red}✖${colors.reset}`);
+        console.log(`  ${icon} ${colors.bold}${c.name}${colors.reset}: ${c.message}${c.remediation ? `\n    ${colors.dim}Fix: ${c.remediation}${colors.reset}` : ''}`);
       }
       console.log(`\n  Summary: ${report.summary.pass} pass, ${report.summary.warn} warn, ${report.summary.fail} fail\n`);
     }
     process.exit(report.summary.fail > 0 ? 1 : 0);
+  }
+
+  if (options.dashboard) {
+    const dash = generateDashboard({ rootDir: __dirname, repoDir: process.cwd(), outPath: options.outPath, openBrowser: !options.noOpen });
+    console.log(`${colors.green}✔ Static dashboard written to ${dash.outPath}${colors.reset}`);
+    process.exit(0);
+  }
+
+  if (options.permissions) {
+    try {
+      const res = applyAutonomousPermissions({ preset: options.permPreset, agents: options.agents, includeProfiles: true, dryRun: options.dryRun, reset: options.permReset });
+      if (res.mode === 'reset') console.log(`${colors.yellow}✔ Restored ${res.restored.length} config file(s) from .heimdall.bak${colors.reset}`);
+      else {
+        console.log(`${colors.green}✔ Applied '${res.preset}' (${res.platform}, ${res.commandsCount} commands) to ${res.updated.length} config file(s)${colors.reset}`);
+        for (const f of res.updated) console.log(`  • ${f}`);
+      }
+      process.exit(0);
+    } catch (err) {
+      console.error(`${colors.red}Error: ${err.message}${colors.reset}`);
+      process.exit(1);
+    }
+  }
+
+  if (options.createSkillName) {
+    const created = createSkill({ rootDir: __dirname, name: options.createSkillName, title: options.skillTitle, category: options.skillCategory, description: options.skillDescription, profile: options.profile, dryRun: options.dryRun });
+    console.log(`${colors.green}✔ ${created.dryRun ? '[Dry-run] Would create' : 'Created'} skill '${created.name}' at ${created.skillMdPath} (profile: ${created.profile})${colors.reset}`);
+    process.exit(0);
   }
 
   const detected = detectEnvironment();
@@ -706,6 +771,17 @@ async function main() {
     if (herdrUpdated) {
       console.log(`   ${colors.green}✔ Configured Herdr-App OS/GUI clipboard bindings, programs, and heimdall-auto-resume mod${colors.reset}`);
     }
+  }
+
+  if (options.autoAllow) {
+    console.log(`\n-> Configuring Autonomous Permissions (${options.autoAllow})...`);
+    const permRes = applyAutonomousPermissions({
+      preset: options.autoAllow,
+      agents: options.agents,
+      includeProfiles: true,
+      dryRun: options.dryRun
+    });
+    console.log(`   ${colors.green}✔ Updated ${permRes.updated.length} config file(s) with '${permRes.preset}' allowlist${colors.reset}`);
   }
 
   console.log(`\n${colors.bold}${colors.green}=== Heimdall Installation Complete! ===${colors.reset}\n`);

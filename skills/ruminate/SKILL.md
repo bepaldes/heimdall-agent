@@ -29,6 +29,10 @@ Extract actionable behavioral signals from historical session JSONLs across Clau
 - **Location**: `C:\Users\Bernardo\.gemini\antigravity-cli\history.jsonl`
 - **Schema**: Each line is JSON with `"display"` (user prompt text), `"timestamp"` (epoch ms), `"workspace"`, optional `"conversationId"`. Simpler than Claude — user prompts only, no assistant responses inline.
 
+### Heimdall Hook Telemetry
+- **Location**: `~/.heimdall/telemetry.jsonl`
+- **Schema**: Each line is JSON with `timestamp`, `rule` (`zero-dev-server`, `destructive-cmd`, `force-push`, `secret-staging`, `karpathy-800-lines`, `context-threshold`, `plan-location`), `action`, `detail`, and `cwd`. Use it to spot recurring guardrail friction.
+
 ---
 
 ## 3. Extraction Dimensions

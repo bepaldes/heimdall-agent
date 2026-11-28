@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -79,5 +81,25 @@ test('hooks/heimdall-hook.cjs pre-bash guardrails', async (t) => {
     });
     assert.equal(res.status, 0);
     assert.match(res.stderr, /\[Heimdall Plan Sentinel\]/);
+  });
+
+  await t.test('appends JSONL telemetry events when guardrails block commands', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'heimdall-telemetry-'));
+    const telemetryPath = path.join(tmpDir, 'telemetry.jsonl');
+    try {
+      const res = spawnSync(process.execPath, [HOOK_SCRIPT, 'pre-bash'], {
+        input: JSON.stringify({ tool_input: { command: 'npm run dev' } }),
+        env: { ...process.env, HEIMDALL_TELEMETRY_PATH: telemetryPath },
+        encoding: 'utf8'
+      });
+      assert.equal(res.status, 2);
+      const lines = fs.readFileSync(telemetryPath, 'utf8').trim().split('\n');
+      assert.equal(lines.length, 1);
+      const evt = JSON.parse(lines[0]);
+      assert.equal(evt.rule, 'zero-dev-server');
+      assert.equal(evt.action, 'block');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
   });
 });
