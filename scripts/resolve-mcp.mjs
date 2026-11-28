@@ -212,11 +212,13 @@ if (DRY_RUN) {
 fs.writeFileSync(RESOLVED_PATH, JSON.stringify(resolved, null, 2) + '\n');
 console.log(`✓ Wrote ${RESOLVED_PATH}`);
 
-// Report unresolved placeholders
-const serialized = JSON.stringify(resolved);
-const unresolved = serialized.match(/\{\{[^}]+_UNRESOLVED\}\}/g);
+// Report unresolved placeholders in enabled servers only
+const enabledServers = Object.fromEntries(
+  Object.entries(resolved.mcpServers).filter(([, srv]) => !srv.disabled)
+);
+const unresolved = JSON.stringify(enabledServers).match(/\{\{[^}]+_UNRESOLVED\}\}/g);
 if (unresolved) {
-  console.warn(`⚠ Unresolved placeholders: ${unresolved.join(', ')}`);
+  console.warn(`⚠ Unresolved placeholders in enabled servers: ${unresolved.join(', ')}`);
   console.warn('  Install missing packages globally: npm install -g <package-name>');
 }
 
