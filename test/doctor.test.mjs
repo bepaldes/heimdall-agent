@@ -175,3 +175,40 @@ test('runDoctor reports warn when git pre-push hook is missing in a git repo', (
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+test('runDoctor scopes harness checks to saved state.agents when configured', () => {
+  const tmp = makeTempDir('heimdall-doctor-scope-');
+  try {
+    const rootDir = path.join(tmp, 'heimdall');
+    const homeDir = path.join(tmp, 'home');
+    const claudeDir = path.join(homeDir, '.claude');
+    const hermesDir = path.join(homeDir, '.hermes');
+
+    fs.mkdirSync(path.join(rootDir, 'skills'), { recursive: true });
+    fs.mkdirSync(path.join(rootDir, 'agents'), { recursive: true });
+    fs.mkdirSync(path.join(rootDir, 'config'), { recursive: true });
+    fs.mkdirSync(path.join(rootDir, 'hooks'), { recursive: true });
+    fs.mkdirSync(claudeDir, { recursive: true });
+    fs.mkdirSync(hermesDir, { recursive: true }); // Exists on disk, but NOT in saved state.agents
+
+    fs.writeFileSync(path.join(rootDir, 'hooks', 'heimdall-hook.cjs'), '// hook\n');
+    fs.writeFileSync(path.join(rootDir, 'config', 'mcp.resolved.json'), JSON.stringify({ mcpServers: {} }));
+    fs.symlinkSync(path.join(rootDir, 'skills'), path.join(claudeDir, 'skills'), 'dir');
+    fs.symlinkSync(path.join(rootDir, 'agents'), path.join(claudeDir, 'agents'), 'dir');
+    fs.writeFileSync(path.join(homeDir, '.heimdall-state.json'), JSON.stringify({ agents: ['claude'] }));
+
+    const result = runDoctor({
+      rootDir,
+      homeDir,
+      repoDir: tmp,
+      claudeSettingsPath: path.join(claudeDir, 'settings.json')
+    });
+
+    const linkCheck = result.checks.find(c => c.id === 'harness-links');
+    assert.equal(linkCheck.status, 'pass');
+    assert.match(linkCheck.message, /claude/);
+    assert.doesNotMatch(linkCheck.message, /hermes/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
