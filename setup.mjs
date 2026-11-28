@@ -74,6 +74,7 @@ import {
   listProfiles,
   getProfileLaunchEnv
 } from './lib/profiles.cjs';
+import { runDoctor } from './lib/doctor.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -177,6 +178,7 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}sync${colors.reset} (or ${colors.dim}--sync${colors.reset})           Scan PATH for newly installed AI tools and link skills (1-sec zero-drift)
   ${colors.green}sync-docs${colors.reset} (or ${colors.dim}--sync-docs${colors.reset})      Synchronize documentation and config count references from Single Source of Truth
   ${colors.green}audit${colors.reset} (or ${colors.dim}--audit${colors.reset})         Audit installed harnesses, active API endpoints, and skill counts
+  ${colors.green}doctor${colors.reset} (or ${colors.dim}--doctor${colors.reset})       Run deterministic healthcheck on links, MCP entrypoints, and hooks
   ${colors.green}uninstall${colors.reset} (or ${colors.dim}--uninstall${colors.reset})     Safely remove Heimdall skills and agent personas from all harnesses
   ${colors.green}sync-models${colors.reset} (or ${colors.dim}--sync-models${colors.reset}) Probe installed harnesses, Gemini/Antigravity, and custom APIs to refresh models.json
   ${colors.green}hud${colors.reset} (or ${colors.dim}--hud${colors.reset})             Enable, disable, or theme Heimdall HUD (--on | --off | --theme <name> | --lines <1|2>)
@@ -188,7 +190,7 @@ ${colors.bold}PRIMARY SUBCOMMANDS:${colors.reset}
   ${colors.green}help${colors.reset} (or ${colors.dim}--help, -h${colors.reset})      Display this parameter and command reference
 
 ${colors.bold}SETUP & BOOTSTRAP OPTIONS:${colors.reset}
-  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (69), minimal (16), security (12), design (14) [default: full]
+  ${colors.yellow}--profile <name>${colors.reset}       Skill profile tier: full (70), minimal (17), security (12), design (14) [default: full]
   ${colors.yellow}--agents <targets>${colors.reset}     Comma-separated harnesses: claude, gemini, codex, hermes, openclaw, vscode, desktop, all [default: all]
   ${colors.yellow}--profiles <ids>${colors.reset}       Comma-separated account profiles to sync (e.g. claude/work,agy/personal,all)
   ${colors.yellow}--link / --no-link${colors.reset}     Use live NTFS junctions / symlinks vs static copies [default: false in wizard, true recommended]
@@ -239,6 +241,8 @@ function parseArgs() {
     doctrinePath: null,
     dryRun: false,
     audit: false,
+    doctor: false,
+    json: false,
     syncModels: false,
     hud: false,
     herdr: false,
@@ -259,6 +263,8 @@ function parseArgs() {
 
     if (arg === 'help' || arg === '--help' || arg === '-h') options.help = true;
     else if (arg === 'audit' || arg === '--audit') options.audit = true;
+    else if (arg === 'doctor' || arg === '--doctor') options.doctor = true;
+    else if (arg === '--json') options.json = true;
     else if (arg === 'sync' || arg === '--sync') options.sync = true;
     else if (arg === 'sync-docs' || arg === '--sync-docs' || arg === 'syncdocs') options.syncDocs = true;
     else if (arg === 'uninstall' || arg === '--uninstall') options.uninstall = true;
@@ -312,15 +318,38 @@ function parseArgs() {
 }
 
 async function main() {
-  printBanner();
-  await checkForUpdates();
   const options = parseArgs();
-  const detected = detectEnvironment();
+  if (!(options.doctor && options.json)) {
+    printBanner();
+    await checkForUpdates();
+  }
 
   if (options.help) {
     printHelp();
     process.exit(0);
   }
+
+  if (options.doctor) {
+    const report = runDoctor({ rootDir: __dirname, repoDir: process.cwd() });
+    if (options.json) {
+      console.log(JSON.stringify(report, null, 2));
+    } else {
+      console.log(`${colors.bold}${colors.cyan}=== Heimdall Doctor (${report.status.toUpperCase()}) ===${colors.reset}\n`);
+      for (const check of report.checks) {
+        const icon = check.status === 'pass'
+          ? `${colors.green}✔${colors.reset}`
+          : (check.status === 'warn' ? `${colors.yellow}⚠${colors.reset}` : `${colors.red}✖${colors.reset}`);
+        console.log(`  ${icon} ${colors.bold}${check.name}${colors.reset}: ${check.message}`);
+        if (check.remediation) {
+          console.log(`    ${colors.dim}Fix: ${check.remediation}${colors.reset}`);
+        }
+      }
+      console.log(`\n  Summary: ${report.summary.pass} pass, ${report.summary.warn} warn, ${report.summary.fail} fail\n`);
+    }
+    process.exit(report.summary.fail > 0 ? 1 : 0);
+  }
+
+  const detected = detectEnvironment();
 
   if (options.audit) {
     runAudit(options);

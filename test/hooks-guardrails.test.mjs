@@ -49,13 +49,27 @@ test('hooks/heimdall-hook.cjs pre-bash guardrails', async (t) => {
     });
   }
 
-  await t.test('user-prompt injects Heimdall Plan Gate on /plan prompts', () => {
-    const res = spawnSync(process.execPath, [HOOK_SCRIPT, 'user-prompt'], {
-      input: JSON.stringify({ prompt: '/plan add billing' }),
-      encoding: 'utf8'
-    });
-    assert.equal(res.status, 0);
-    assert.match(res.stdout, /\[Heimdall Plan Gate\]/);
+  await t.test('user-prompt injects Heimdall Plan Gate on /plan and natural-language plan prompts', () => {
+    for (const prompt of ['/plan add billing', 'let us make a plan for auth']) {
+      const res = spawnSync(process.execPath, [HOOK_SCRIPT, 'user-prompt'], {
+        input: JSON.stringify({ prompt }),
+        encoding: 'utf8'
+      });
+      assert.equal(res.status, 0);
+      assert.match(res.stdout, /\[Heimdall Plan Gate\]/);
+    }
+  });
+
+  await t.test('pre-write blocks plans written to docs/superpowers/plans/ or .claude/plans/', () => {
+    for (const filePath of ['docs/superpowers/plans/2026-11-27-foo.md', '/home/user/.claude/plans/foo.md']) {
+      const res = spawnSync(process.execPath, [HOOK_SCRIPT, 'pre-write'], {
+        input: JSON.stringify({ tool_input: { file_path: filePath, content: '# Plan' } }),
+        encoding: 'utf8'
+      });
+      assert.equal(res.status, 2, `Expected exit 2 for ${filePath}`);
+      assert.match(res.stderr, /BLOCKED/);
+      assert.match(res.stderr, /docs\/designs\//);
+    }
   });
 
   await t.test('pre-write warns when docs/designs/*.md omits Persona or Required Skills columns', () => {

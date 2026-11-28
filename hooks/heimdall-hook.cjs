@@ -383,6 +383,10 @@ async function main() {
         process.stderr.write(`[Heimdall Karpathy Sentinel] Advisory: File '${filePath}' exceeds 800 lines (${lineCount} lines). Consider decomposing or keeping edits minimal.\n`);
       }
       const normPath = filePath.replace(/\\/g, '/');
+      if (/(^|\/)(docs\/superpowers\/plans|\.claude\/plans)\/[^/]+\.md$/i.test(normPath)) {
+        process.stderr.write(`[Heimdall Plan Sentinel] BLOCKED: Do not save plans to '${filePath}'. Save all plans to 'docs/designs/YYYY-MM-DD <plan name>.md' strictly following playbooks/05-canonical-plan-template.md.\n`);
+        process.exit(2);
+      }
       if (/(^|\/)docs\/designs\/[^/]+\.md$/i.test(normPath) && !normPath.includes('/old/')) {
         const missingCols = [];
         if (!/Heimdall Agent Persona/i.test(content)) missingCols.push('Heimdall Agent Persona');
@@ -402,8 +406,10 @@ async function main() {
     case 'user-prompt': {
       process.stdout.write('[Heimdall Communication Doctrine] Lead with BLUF (conclusion in first 1-2 sentences). Use ASD-STE100 for procedural steps: active imperative verb first, <=20 words/step, zero banned words (ensure, properly, appropriately, gracefully, as needed, etc.).\n');
       const promptText = String(payload.prompt || payload.user_prompt || toolInput.prompt || '');
-      if (/(^|\s)\/(plan|orchestrate|grill-me)\b/i.test(promptText)) {
-        process.stdout.write('[Heimdall Plan Gate] Load ~/.claude/agents/orchestrator.md, assign Heimdall Agent Persona (agents/*.md) + Required Skills (SKILL.md) per task in playbooks/05-canonical-plan-template.md, and enforce reviewer.md skill verification.\n');
+      const isPlanCommand = /(^|\s)\/(plan|orchestrate|grill-me)\b/i.test(promptText);
+      const isNaturalPlan = /\b(make|create|write|build|draft)\s+(a|an|the)?\s*(implementation\s+)?plan\b/i.test(promptText);
+      if (isPlanCommand || isNaturalPlan) {
+        process.stdout.write('[Heimdall Plan Gate] Load ~/.claude/agents/orchestrator.md, save plan to docs/designs/YYYY-MM-DD <plan name>.md (never docs/superpowers/plans/), assign Heimdall Agent Persona (agents/*.md) + Required Skills (SKILL.md) per task in playbooks/05-canonical-plan-template.md, and enforce reviewer.md skill verification.\n');
       }
       break;
     }

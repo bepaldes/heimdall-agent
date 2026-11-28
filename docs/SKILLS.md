@@ -1,6 +1,6 @@
 # Heimdall Canonical Skills & Suites Directory
 
-This directory serves as the reference manual for Heimdall's **30 Primary Toolkits & Suites (69 modular capabilities)**.
+This directory serves as the reference manual for Heimdall's **31 Primary Toolkits & Suites (70 modular capabilities)**.
 
 > **Architecture & Execution**: Each skill module is an isolated directory containing a YAML-frontmattered `SKILL.md`. AI agent harnesses (Google Antigravity, Claude Code, OpenAI Codex CLI) parse frontmatter on startup and dynamically activate instructions via progressive disclosure.
 
@@ -50,6 +50,7 @@ heimdall update-skill all
 - [⚡ MCP Orphan Process Cleanup](#mcp-cleanup)
 - [⚡ MCP Template Resolver & Sync](#mcp-sync)
 - [⚡ Upstream Skill Sync & Triage](#upstream-skill-sync)
+- [⚡ Workspace Onboarding Interview](#onboard)
 
 ---
 

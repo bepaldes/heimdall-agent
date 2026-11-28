@@ -4,13 +4,13 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" /></a>
   <a href="https://nodejs.org"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-339933.svg?style=flat-square&logo=node.js&logoColor=white" alt="Node >= 18" /></a>
   <a href="#10-predefined-agent-personas"><img src="https://img.shields.io/badge/agents-10%20predefined-orange.svg?style=flat-square" alt="Agents: 10 Predefined" /></a>
-  <a href="#skill-inventory-69-modules-across-30-toolkits"><img src="https://img.shields.io/badge/skills-30%20toolkits%20%2869%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 30 Toolkits (69 Modules)" /></a>
+  <a href="#skill-inventory-70-modules-across-31-toolkits"><img src="https://img.shields.io/badge/skills-31%20toolkits%20%2870%20modules%29-blueviolet.svg?style=flat-square" alt="Skills: 31 Toolkits (70 Modules)" /></a>
   <a href="#supported-tools--runtimes"><img src="https://img.shields.io/badge/runtimes-Antigravity%20%7C%20Claude%20%7C%20Codex%20%7C%20Hermes%20%7C%20OpenClaw-black.svg?style=flat-square" alt="Runtimes" /></a>
 </p>
 
 🌐 **Language / Idioma:** **English** | [Português (Brasil)](README.pt-BR.md)
 
-Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **69 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
+Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent software engineering. It enforces planning gates before code generation, prevents AI slop, isolates module boundaries, and synchronizes **10 specialized agent personas** and **70 modular skills** across **Google Antigravity**, **Claude Code**, **OpenAI Codex CLI**, **Hermes Agent**, **OpenClaw**, **OpenDesign**, and **Claude Desktop**.
 
 ---
 
@@ -34,7 +34,7 @@ Heimdall is a portable bootstrap toolkit and quality sentinel for multi-agent so
 **Heimdall** is an environment bootstrapper and multi-agent coordination layer for AI coding tools. More than a skill aggregator, it installs a complete, opinionated **way of working and coding**—combining structured communication, empirical verification, surgical code restraint, and runtime safety hooks into a deterministic, verified engineering environment.
 
 Instead of manually maintaining scattered custom instructions, system prompts, and configuration files across different AI clients, Heimdall provides a single source of truth:
-* **Modular Skills**: 69 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
+* **Modular Skills**: 70 task-activated capabilities (such as database design, security audits, design token enforcement, progressive disclosure, and debugging) that load on demand instead of wasting prompt tokens.
 * **Specialized Agent Personas**: 10 predefined roles with isolated context windows (`orchestrator`, `tester`, `frontend-designer`, `mobile-designer`, `reviewer`, `security-auditor`, `database-architect`, `code-sentinel`, `modernizer`, `cloud-engineer`).
 * **Universal Doctrine**: Central rules (`AGENTS.md`) synchronized across all harnesses, enforcing planning gates, test-driven development (TDD), and minimal surgical code edits.
 
@@ -110,7 +110,7 @@ When Heimdall bootstraps, it establishes live junctions (Windows) or symlinks (P
 
 | Source in Heimdall | Deployed Location | Purpose |
 | :--- | :--- | :--- |
-| `skills/` | `~/.<tool>/skills/` | 69 domain toolkits loaded progressively on demand. |
+| `skills/` | `~/.<tool>/skills/` | 70 domain toolkits loaded progressively on demand. |
 | `agents/` | `~/.<tool>/agents/` | 10 specialized agent persona definitions. |
 | `hooks/` | `~/.claude/hooks/` | Event-driven lifecycle hooks for Claude Code CLI. |
 | `hooks/git/` | `.git/hooks/` (optional) | Universal native Git pre-push hook for all tools. |
@@ -161,7 +161,17 @@ Heimdall includes zero-dependency runtime hooks ([`hooks/heimdall-hook.cjs`](hoo
 <a id="4-how-to-install"></a>
 ## 4. How to Install
 
-### Quick Automated Installation (Recommended)
+### Option 1: AI-Assisted Install (1-Prompt)
+
+Paste this prompt into any AI coding harness with local terminal access (Claude Code, Antigravity, Codex CLI, Cursor, or Hermes):
+
+```text
+Read https://raw.githubusercontent.com/bepaldes/heimdall-agent/main/INSTALL.md and install Heimdall for me.
+```
+
+Your AI will ask for consent, run `node setup.mjs --audit` to detect installed harnesses, let you pick a profile, execute `setup.mjs` deterministically, and verify health via `node setup.mjs doctor`.
+
+### Option 2: Quick Automated Installation (CLI)
 
 Clone the repository and run the setup script with live junctions:
 
@@ -182,8 +192,8 @@ Select a profile tier based on your machine and workflow needs:
 
 | Profile | Skills | Predefined Agents | Description | Best For |
 | :--- | :---: | :---: | :--- | :--- |
-| **`full`** *(Default)* | 69 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
-| **`minimal`** | 16 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Lightweight laptops, smaller context windows |
+| **`full`** *(Default)* | 70 | 10 | Complete engineering suite: planning, design, security, database, hygiene. | Everyday development across all tools |
+| **`minimal`** | 17 | 4 | Lean core: `orchestrator`, `tester`, `code-sentinel`, `reviewer`. | Lightweight laptops, smaller context windows |
 | **`security`** | 12 | 4 | AppSec suite: `orchestrator`, `security-auditor`, `tester`, `reviewer`. | Penetration testing & pre-deployment audits |
 | **`design`** | 13 | 4 | Frontend & mobile: `orchestrator`, `frontend-designer`, `mobile-designer`, `code-sentinel`. | UI/UX design and design-system work |
 
@@ -259,6 +269,10 @@ heimdall sync
 
 # Audit installed tools, active API endpoints, and skill counts
 heimdall audit
+
+# Run deterministic healthcheck on links, MCP entrypoints, and hooks
+heimdall doctor
+heimdall doctor --json
 
 # Refresh dynamic model catalog from your active provider/proxy
 heimdall sync-models
@@ -378,10 +392,10 @@ All personas declare `model: inherit` to run on whichever active model or vendor
 
 ---
 
-<a id="skill-inventory-69-modules-across-30-toolkits"></a>
-### Skill Inventory (69 Modules Across 30 Toolkits)
+<a id="skill-inventory-70-modules-across-31-toolkits"></a>
+### Skill Inventory (70 Modules Across 31 Toolkits)
 
-Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** and **24 Standalone Toolkits (24 modules)**:
+Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** and **25 Standalone Toolkits (25 modules)**:
 
 #### Core Multi-Skill Suites (6 Suites / 45 Modules)
 
@@ -452,7 +466,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 
 </details>
 
-#### Standalone Toolkits (24 Curated Toolkits / 24 Modules)
+#### Standalone Toolkits (25 Curated Toolkits / 25 Modules)
 
 <details open>
 <summary><b>Browse Standalone Toolkits</b></summary>
@@ -481,6 +495,7 @@ Heimdall organizes capabilities into **6 Core Multi-Skill Suites (45 modules)** 
 - **`mcp-cleanup`**: Kills orphaned MCP server processes left behind by crashed or closed agent sessions.
 - **`mcp-sync`**: Resolves the Heimdall MCP template to local paths and syncs across installed agent harnesses.
 - **`upstream-skill-sync`**: Audits upstream skill repositories in `config/skills.json` and classifies updates into Safe 1:1, Selective Merge, or Reject.
+- **`onboard`**: Interviews the user once per workspace to capture stack, test runner, lint/build commands, deploy target, and strictness preferences in `.heimdall/workspace.md`.
 
 </details>
 
