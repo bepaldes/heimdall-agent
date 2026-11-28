@@ -14,7 +14,7 @@ Write implementation plans for an engineer who has not seen this codebase or thi
 **Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
 
 **Save plans to:** `docs/designs/YYYY-MM-DD <plan name>.md`
-- Strictly follow `playbooks/05-canonical-plan-template.md` (including the Multi-Agent Orchestration Matrix with `Heimdall Agent Persona` from `agents/*.md` and `Required Skills (SKILL.md)` per task).
+- Strictly follow `~/.heimdall/playbooks/05-canonical-plan-template.md` (or your harness `playbooks/05-canonical-plan-template.md`, including the Multi-Agent Orchestration Matrix with `Heimdall Agent Persona` from `~/.heimdall/agents/*.md` and `Required Skills (SKILL.md)` per task).
 - Never save plans under `docs/superpowers/plans/` or `.claude/plans/`.
 
 ## Scope Check

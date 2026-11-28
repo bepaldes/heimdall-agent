@@ -27,7 +27,7 @@ Follow this execution lifecycle:
      ```
      STOP and wait for the user's answers and alignment before proceeding.
 2. **Canonical Plan Generation (Turn 2)**:
-   - Generate a 7-section canonical plan following `playbooks/05-canonical-plan-template.md`.
+   - Generate a 7-section canonical plan following `~/.heimdall/playbooks/05-canonical-plan-template.md` (or `~/.claude/playbooks/05-canonical-plan-template.md`).
 3. **Subagent Delegation (Turn 3+)**:
    - Act as the deep-context Elephant. Delegate tasks to fresh, isolated Goldfish subagents:
      - `tester` for failing tests first (TDD)

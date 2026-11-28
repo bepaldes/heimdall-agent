@@ -51,14 +51,16 @@ test('hooks/heimdall-hook.cjs pre-bash guardrails', async (t) => {
     });
   }
 
-  await t.test('user-prompt injects Heimdall Plan Gate on /plan and natural-language plan prompts', () => {
-    for (const prompt of ['/plan add billing', 'let us make a plan for auth']) {
+  await t.test('user-prompt injects Heimdall Plan Gate on /plan, natural-language plan prompts, and plan format queries with global paths', () => {
+    for (const prompt of ['/plan add billing', 'let us make a plan for auth', 'why the plan format is wrong']) {
       const res = spawnSync(process.execPath, [HOOK_SCRIPT, 'user-prompt'], {
         input: JSON.stringify({ prompt }),
         encoding: 'utf8'
       });
       assert.equal(res.status, 0);
       assert.match(res.stdout, /\[Heimdall Plan Gate\]/);
+      assert.match(res.stdout, /~\/\.heimdall\/playbooks\/05-canonical-plan-template\.md/);
+      assert.match(res.stdout, /~\/\.heimdall\/models\.json/);
     }
   });
 

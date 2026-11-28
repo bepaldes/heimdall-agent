@@ -11,7 +11,8 @@ const {
   copyDirectory,
   isHeimdallInstalled,
   deduplicateModelsByMaxContext,
-  syncHerdrAutoResumeMod
+  syncHerdrAutoResumeMod,
+  syncGlobalHeimdallAssets
 } = require('../lib/installer-engine.cjs');
 
 test('lib/installer-engine.cjs', async (t) => {
@@ -87,6 +88,19 @@ test('lib/installer-engine.cjs', async (t) => {
       assert.ok(fs.existsSync(path.join(tmpHerdr, 'mods', 'heimdall-auto-resume', 'main.js')));
     } finally {
       fs.rmSync(tmpHerdr, { recursive: true, force: true });
+    }
+  });
+
+  await t.test('syncGlobalHeimdallAssets populates ~/.heimdall models.json, playbooks, and agents', () => {
+    const tmpHome = fs.mkdtempSync(path.join(os.tmpdir(), 'heimdall-global-'));
+    try {
+      const ok = syncGlobalHeimdallAssets(false, tmpHome);
+      assert.equal(ok, true);
+      assert.ok(fs.existsSync(path.join(tmpHome, '.heimdall', 'models.json')));
+      assert.ok(fs.existsSync(path.join(tmpHome, '.heimdall', 'playbooks', '05-canonical-plan-template.md')));
+      assert.ok(fs.existsSync(path.join(tmpHome, '.heimdall', 'agents', 'orchestrator.md')));
+    } finally {
+      fs.rmSync(tmpHome, { recursive: true, force: true });
     }
   });
 });

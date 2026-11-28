@@ -23,7 +23,7 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
       1. Persona: Identity, core expertise, and voice traits.
       2. Chronological Rules: Ordered lifecycle steps from initialization to handoff.
       3. Unmistakable Guardrails: Explicit negative constraints and non-negotiable "If X, do Y" boundaries.
-    - DYNAMIC MODEL REGISTRY: Resolve authorized model IDs, context limits, and specializations dynamically from `config/models.json` and `playbooks/06-model-registry-matrix.md` (refreshed via `heimdall sync` / `heimdall sync-models`). Never invent unlisted model IDs; route tasks by capability tier across any live registered model family (Anthropic, Google, OpenAI, Zhipu/GLM, Tencent/Hunyuan, Xiaomi/MiMo, etc.).
+    - DYNAMIC MODEL REGISTRY: Resolve authorized model IDs, context limits, and specializations dynamically from `~/.heimdall/models.json` and `~/.heimdall/playbooks/06-model-registry-matrix.md` (or repo-local `config/models.json` / harness `playbooks/06-model-registry-matrix.md`, refreshed via `heimdall sync` / `heimdall sync-models`). Never invent unlisted model IDs; route tasks by capability tier across any live registered model family (Anthropic, Google, OpenAI, Zhipu/GLM, Tencent/Hunyuan, Xiaomi/MiMo, etc.).
     - COMMUNICATION DISCIPLINE (BLUF & STE): Apply `skills/communication-doctrine` on EVERY response, status report, review verdict, and plan. Lead with Bottom Line Up Front (BLUF) in the first 1-2 sentences. Write all procedural execution steps in ASD-STE100 Simplified Technical English (STE): active imperative verbs, <= 20 words per step, zero banned vague qualifiers ('ensure', 'properly', 'appropriately', 'gracefully', 'as needed', 'etc.').
   </core_discipline>
 
@@ -37,10 +37,10 @@ Universal directives for Google Antigravity, Claude Code, and OpenAI Codex CLI a
        - For architectural scope, record settled choices in ADRs (`docs/adr/`).
        - Pause for user approval before generating any code or plan.
     2. TURN 2+ MULTI-MODEL PLAN GENERATION:
-       - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `playbooks/`, `../playbooks/`, or `../heimdall-agent/playbooks/`).
+       - Generate an authoritative plan strictly following `05-canonical-plan-template.md` (resolved via `~/.heimdall/playbooks/05-canonical-plan-template.md`, your harness `playbooks/05-canonical-plan-template.md`, or repo-local `playbooks/`). Do NOT infer plan formats from old files in `docs/designs/`.
        - PLAN STORAGE & LIFECYCLE: All plans MUST be created in `docs/designs/YYYY-MM-DD <plan name>.md`. Once implemented, verified, and confirmed working, the plan is moved to `docs/designs/old/YYYY-MM-DD <plan name>.md`.
        - The plan MUST specify:
-         a) Multi-Agent Orchestration & Model Allocation Matrix (assigning `Heimdall Agent Persona` from `agents/*.md`, `Required Skills (SKILL.md)`, capability-tier model from `06-model-registry-matrix.md` / `config/models.json`, effort level, rationale, and cross-reviewer).
+         a) Multi-Agent Orchestration & Model Allocation Matrix (assigning `Heimdall Agent Persona` from `~/.heimdall/agents/*.md` / harness `agents/*.md`, `Required Skills (SKILL.md)`, capability-tier model from `~/.heimdall/playbooks/06-model-registry-matrix.md` / `~/.heimdall/models.json`, effort level, rationale, and cross-reviewer).
          b) Symmetric Cross-Model Validation Loop (`reviewer.md` / `code-sentinel.md` / `security-auditor.md` verifying diffs against `Required Skills (SKILL.md)`).
          c) Orchestrator Heartbeat (cadence for monitoring task progress and liveness).
          d) Verification Harness (Non-interactive terminating test suites, static builds, and linters. Playwright E2E strictly against pre-existing human-managed servers or static build previews. NEVER include steps to start a dev server).

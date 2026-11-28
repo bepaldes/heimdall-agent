@@ -75,6 +75,9 @@ test('applyAutonomousPermissions updates Claude, Antigravity, Codex, and profile
     assert.ok(claudeCfg.autoMode.allow.includes('Bash(sudo systemctl *)'));
     assert.ok(claudeCfg.permissions.allow.includes('Bash(pnpm *)'));
     assert.equal(claudeCfg.autoMode.allow.filter(x => x === 'Bash(git *)').length, 1);
+    assert.equal(claudeCfg.sandbox.enabled, false);
+    assert.ok(claudeCfg.sandbox.excludedCommands.includes('docker'));
+    assert.ok(claudeCfg.sandbox.excludedCommands.includes('docker compose'));
 
     const agyCfg = JSON.parse(fs.readFileSync(path.join(agyDir, 'settings.json'), 'utf8'));
     assert.ok(agyCfg.permissions.allow.includes('command(pnpm)'));

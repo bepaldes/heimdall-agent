@@ -27,7 +27,7 @@ Follow this execution lifecycle:
      ```
      STOP and wait for the user's answers and alignment before proceeding.
 2. **Canonical Plan Generation (Turn 2)**:
-   - Generate a 7-section canonical plan following `playbooks/05-canonical-plan-template.md`.
+   - Generate a 7-section canonical plan following `~/.heimdall/playbooks/05-canonical-plan-template.md` (or `~/.claude/playbooks/05-canonical-plan-template.md`).
    - Apply the **Model Tier Policy** in Section 3 (Model Allocation Matrix) with an explicit `Selection Rationale` column per task: reserve `Argon`/`Neon` for specialized tasks, use `Opus`/`Fable`/`Codex` as unlimited workhorses, use `Hydrogen` as mid-tier reviewer (stronger than `Flash`), and use `Flash` for fast utility.
 3. **Subagent Delegation (Turn 3+)**:
    - Act as the deep-context Elephant. Delegate tasks to fresh, isolated Goldfish subagents:

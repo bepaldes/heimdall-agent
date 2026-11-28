@@ -407,7 +407,7 @@ async function main() {
       const normPath = filePath.replace(/\\/g, '/');
       if (/(^|\/)(docs\/superpowers\/plans|\.claude\/plans)\/[^/]+\.md$/i.test(normPath)) {
         recordTelemetryEvent('plan-location', 'block', filePath);
-        process.stderr.write(`[Heimdall Plan Sentinel] BLOCKED: Do not save plans to '${filePath}'. Save all plans to 'docs/designs/YYYY-MM-DD <plan name>.md' strictly following playbooks/05-canonical-plan-template.md.\n`);
+        process.stderr.write(`[Heimdall Plan Sentinel] BLOCKED: Do not save plans to '${filePath}'. Save all plans to 'docs/designs/YYYY-MM-DD <plan name>.md' strictly following ~/.heimdall/playbooks/05-canonical-plan-template.md.\n`);
         process.exit(2);
       }
       if (/(^|\/)docs\/designs\/[^/]+\.md$/i.test(normPath) && !normPath.includes('/old/')) {
@@ -415,7 +415,7 @@ async function main() {
         if (!/Heimdall Agent Persona/i.test(content)) missingCols.push('Heimdall Agent Persona');
         if (!/Required Skills/i.test(content)) missingCols.push('Required Skills (SKILL.md)');
         if (missingCols.length > 0) {
-          process.stderr.write(`[Heimdall Plan Sentinel] Advisory: Plan '${filePath}' is missing required Section 3 columns: ${missingCols.join(', ')}. Follow playbooks/05-canonical-plan-template.md.\n`);
+          process.stderr.write(`[Heimdall Plan Sentinel] Advisory: Plan '${filePath}' is missing required Section 3 columns: ${missingCols.join(', ')}. Follow ~/.heimdall/playbooks/05-canonical-plan-template.md.\n`);
         }
       }
       break;
@@ -430,9 +430,10 @@ async function main() {
       process.stdout.write('[Heimdall Communication Doctrine] Lead with BLUF (conclusion in first 1-2 sentences). Use ASD-STE100 for procedural steps: active imperative verb first, <=20 words/step, zero banned words (ensure, properly, appropriately, gracefully, as needed, etc.).\n');
       const promptText = String(payload.prompt || payload.user_prompt || toolInput.prompt || '');
       const isPlanCommand = /(^|\s)\/(plan|orchestrate|grill-me)\b/i.test(promptText);
-      const isNaturalPlan = /\b(make|create|write|build|draft)\s+(a|an|the)?\s*(implementation\s+)?plan\b/i.test(promptText);
+      const isNaturalPlan = /\b(make|create|write|build|draft)\s+(a|an|the)?\s*(implementation\s+)?plan\b|\bplan\s+(format|template)\b/i.test(promptText);
       if (isPlanCommand || isNaturalPlan) {
-        process.stdout.write('[Heimdall Plan Gate] Load ~/.claude/agents/orchestrator.md, save plan to docs/designs/YYYY-MM-DD <plan name>.md (never docs/superpowers/plans/), assign Heimdall Agent Persona (agents/*.md) + Required Skills (SKILL.md) per task in playbooks/05-canonical-plan-template.md, and enforce reviewer.md skill verification.\n');
+        const claudeDir = (process.env.CLAUDE_CONFIG_DIR || '~/.claude').replace(/\\/g, '/');
+        process.stdout.write(`[Heimdall Plan Gate] Load ${claudeDir}/agents/orchestrator.md, save plan to docs/designs/YYYY-MM-DD <plan name>.md (never docs/superpowers/plans/), assign Heimdall Agent Persona (${claudeDir}/agents/*.md) + Required Skills (SKILL.md) per task using ~/.heimdall/playbooks/05-canonical-plan-template.md and ~/.heimdall/models.json (~/.heimdall/playbooks/06-model-registry-matrix.md), and enforce ${claudeDir}/agents/reviewer.md skill verification.\n`);
       }
       break;
     }

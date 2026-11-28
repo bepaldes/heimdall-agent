@@ -11,7 +11,8 @@ const {
   isAgentConfigurable,
   detectDoctrineCandidates,
   detectEnvironment,
-  targetPaths
+  targetPaths,
+  targetPlaybookPaths
 } = require('../lib/harness-detection.cjs');
 
 test('lib/harness-detection.cjs', async (t) => {
@@ -50,5 +51,8 @@ test('lib/harness-detection.cjs', async (t) => {
     assert.ok(Array.isArray(env.pathCandidates));
     assert.ok(Array.isArray(env.doctrineCandidates));
     assert.ok(targetPaths.claude);
+    for (const key of Object.keys(targetPaths)) {
+      assert.ok(targetPlaybookPaths[key], `targetPlaybookPaths must include '${key}'`);
+    }
   });
 });
